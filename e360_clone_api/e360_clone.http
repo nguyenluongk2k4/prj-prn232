@@ -1,0 +1,6 @@
+@e360_clone_HostAddress = http://localhost:5104
+
+GET {{e360_clone_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
