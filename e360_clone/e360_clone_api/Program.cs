@@ -1,4 +1,8 @@
 
+using e360_clone.DataAccess;
+using e360_clone.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 namespace e360_clone
 {
     public class Program
@@ -8,11 +12,34 @@ namespace e360_clone
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Add DbContext with PostgreSQL
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly("e360_clone")
+                ));
+
+            // Register repositories
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Configure CORS for frontend API calls
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins(
+                            builder.Configuration["CorsSettings:AllowedOrigins:0"] ?? "http://localhost:5000",
+                            builder.Configuration["CorsSettings:AllowedOrigins:1"] ?? "https://localhost:5001"
+                        )
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             var app = builder.Build();
 
@@ -24,10 +51,8 @@ namespace e360_clone
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowFrontend");
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

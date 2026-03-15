@@ -1,8 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang chủ - E360 Clone";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">E360 Clone</h1>
+    <h2 class="mb-4">Hệ thống quản lý lịch thi & coi thi</h2>
+    
+    <div class="row mt-5">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Lịch thi</h5>
+                    <p class="card-text">Quản lý lịch thi lớp học và tốt nghiệp</p>
+                    <a href="/Exams" class="btn btn-primary">Xem ngay</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">👨‍🏫 Coi thi</h5>
+                    <p class="card-text">Phân công giám thị coi thi</p>
+                    <a href="/Proctors" class="btn btn-primary">Xem ngay</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">📊 Điểm thi</h5>
+                    <p class="card-text">Quản lý và nhập điểm thi</p>
+                    <a href="/Grades" class="btn btn-primary">Xem ngay</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">👨‍🎓 Sinh viên</h5>
+                    <p class="card-text">Quản lý thông tin sinh viên</p>
+                    <a href="/Students" class="btn btn-primary">Xem ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h3>API Documentation</h3>
+        <p>
+            <a href="http://localhost:5104/swagger" target="_blank" class="btn btn-info">
+                Swagger UI
+            </a>
+        </p>
+    </div>
 </div>

@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "e360_clone_api\\e360_clone.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "e360_clone_fe\\e360_clone_fe.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

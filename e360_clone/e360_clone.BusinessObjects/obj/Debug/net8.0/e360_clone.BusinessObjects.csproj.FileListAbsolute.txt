@@ -1,0 +1,12 @@
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\bin\Debug\net8.0\e360_clone.BusinessObjects.deps.json
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\bin\Debug\net8.0\e360_clone.BusinessObjects.dll
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\bin\Debug\net8.0\e360_clone.BusinessObjects.pdb
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.GeneratedMSBuildEditorConfig.editorconfig
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.AssemblyInfoInputs.cache
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.AssemblyInfo.cs
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.csproj.CoreCompileInputs.cache
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.sourcelink.json
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.dll
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\refint\e360_clone.BusinessObjects.dll
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\e360_clone.BusinessObjects.pdb
+C:\Git\prj-prn232\e360_clone\e360_clone.BusinessObjects\obj\Debug\net8.0\ref\e360_clone.BusinessObjects.dll
