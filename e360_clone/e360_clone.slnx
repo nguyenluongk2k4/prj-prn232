@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../e360_clone_api/e360_clone.csproj" />
+  <Project Path="e360_clone_fe/e360_clone_fe.csproj" />
+</Solution>
