@@ -1,0 +1,135 @@
+@{
+    Layout = "_LayoutAuth";
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-lg-flex bg-white">
+    <div class="w-50 d-lg-flex d-none overflow-hidden position-relative">
+        <img src="~/assets/images/login-bg.webp" alt="Login Background" class="w-100 h-100 object-fit-cover">
+        <div class="position-absolute bottom-0 start-0 w-100 p-40 bg-gradient-to-t from-black-50">
+            <div class="text-white">
+                <h2 class="text-3xl fw-bold mb-2">E360 Clone</h2>
+                <p class="mb-0 opacity-75">Nền tảng quản lý lịch thi và coi thi</p>
+            </div>
+        </div>
+    </div>
+    <div class="lg-w-50 px-24 py-32 d-flex justify-content-center align-items-center">
+        <div class="max-w-540-px mx-auto">
+            <a href="/" class="d-block mb-4">
+                <img src="~/assets/images/logo-ic.png" alt="Logo" class="w-200-px">
+            </a>
+            <div class="mt-32 mb-32">
+                <h1 class="h6 fw-bold text-primary-light mb-8">
+                    Welcome Back 👋
+                </h1>
+                <p class="text-sm text-secondary-light mb-0">
+                    Log in to your account to continue
+                </p>
+            </div>
+            <form asp-action="Login" method="post" class="d-flex flex-column gap-32 submit-form">
+                <div class="d-flex flex-column gap-16">
+                    <div>
+                        <label for="email" class="text-sm fw-semibold text-primary-light d-inline-block mb-8">
+                            Email Address
+                            <span class="text-danger-600">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" class="email-field form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div>
+                        <label for="password" class="text-sm fw-semibold text-primary-light d-inline-block mb-8">
+                            Password
+                            <span class="text-danger-600">*</span>
+                        </label>
+                        <div class="position-relative">
+                            <input type="password" id="password" name="password" class="password-field form-control" placeholder="Enter your password" required>
+                            <button type="button"
+                                class="toggle-password btn p-0 border-0 bg-transparent position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light ri-eye-line"
+                                data-toggle="#password" aria-label="Toggle password visibility">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="form-check style-check d-flex align-items-center">
+                        <input class="form-check-input border border-neutral-400" type="checkbox" name="rememberMe" value="true" id="rememberMe">
+                        <input type="hidden" name="rememberMe" value="false">
+                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="javascript:void(0)" class="text-primary-600 fw-medium text-decoration-underline">Forgot Password?</a>
+                </div>
+                <div class="">
+                    <button type="submit" class="loginBtn btn btn-primary-600 text-sm btn-sm px-12 py-16 w-100 radius-8">Log In</button>
+                </div>
+                <div class="text-center text-sm text-secondary-light">
+                    or login as
+                </div>
+                <div class="d-grid sm-grid-cols-3 grid-cols-2 gap-16">
+                    <a asp-action="Login" asp-route-role="SuperAdmin"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-success text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/sheild-icon.png" alt="Icon">
+                        </span>
+                        <span>Super Admin</span>
+                    </a>
+                    <a asp-action="Login" asp-route-role="Admin"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-info-600 text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/dashboard-icon.png" alt="Icon">
+                        </span>
+                        <span>Admin</span>
+                    </a>
+                    <a asp-action="Login" asp-route-role="Student"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-warning-600 text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/student-icon.png" alt="Icon">
+                        </span>
+                        <span>Student</span>
+                    </a>
+                    <a asp-action="Login" asp-route-role="Teacher"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-purple-600 text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/teacher-icon.png" alt="Icon">
+                        </span>
+                        <span>Teacher</span>
+                    </a>
+                    <a asp-action="Login" asp-route-role="Parent"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-primary-600 text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/guardian-icon.png" alt="Icon">
+                        </span>
+                        <span>Guardians</span>
+                    </a>
+                    <a asp-action="Login" asp-route-role="Librarian"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-pink text-white py-10 px-8">
+                        <span class="d-flex">
+                            <img src="~/assets/images/icons/library-icon.png" alt="Icon">
+                        </span>
+                        <span>Librarian</span>
+                    </a>
+                </div>
+            </form>
+            <div class="mt-32 text-center text-sm">
+                Don't have an account?
+                <a asp-action="Register" class="text-primary-600 fw-semibold text-decoration-underline">
+                    Create an account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = document.querySelector(this.dataset.toggle);
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.classList.toggle('ri-eye-line');
+            this.classList.toggle('ri-eye-off-line');
+        });
+    });
+</script>
+}

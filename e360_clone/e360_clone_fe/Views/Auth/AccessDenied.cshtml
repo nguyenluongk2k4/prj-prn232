@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_LayoutAuth";
+}
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-neutral-50">
+    <div class="text-center px-24">
+        <div class="mb-4">
+            <i class="ri-lock-forbid-line text-6xl text-danger-600"></i>
+        </div>
+        <h1 class="text-3xl fw-bold text-primary-light mb-2">Access Denied</h1>
+        <p class="text-secondary-light mb-4">You don't have permission to access this resource.</p>
+        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary-600">
+            <i class="ri-arrow-left-line"></i> Back to Login
+        </a>
+    </div>
+</div>

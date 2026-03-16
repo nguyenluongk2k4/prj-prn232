@@ -1,56 +1,143 @@
-﻿@{
-    ViewData["Title"] = "Trang chủ - E360 Clone";
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">E360 Clone</h1>
-    <h2 class="mb-4">Hệ thống quản lý lịch thi & coi thi</h2>
-    
-    <div class="row mt-5">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">📋 Lịch thi</h5>
-                    <p class="card-text">Quản lý lịch thi lớp học và tốt nghiệp</p>
-                    <a href="/Exams" class="btn btn-primary">Xem ngay</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">👨‍🏫 Coi thi</h5>
-                    <p class="card-text">Phân công giám thị coi thi</p>
-                    <a href="/Proctors" class="btn btn-primary">Xem ngay</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">📊 Điểm thi</h5>
-                    <p class="card-text">Quản lý và nhập điểm thi</p>
-                    <a href="/Grades" class="btn btn-primary">Xem ngay</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">👨‍🎓 Sinh viên</h5>
-                    <p class="card-text">Quản lý thông tin sinh viên</p>
-                    <a href="/Students" class="btn btn-primary">Xem ngay</a>
-                </div>
-            </div>
+<div class="main-content__wrapper">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div>
+            <h1 class="text-2xl fw-bold mb-2 text-primary-light">Dashboard</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                </ol>
+            </nav>
         </div>
     </div>
-
-    <div class="mt-5">
-        <h3>API Documentation</h3>
-        <p>
-            <a href="http://localhost:5104/swagger" target="_blank" class="btn btn-info">
-                Swagger UI
-            </a>
-        </p>
+    
+    <!-- Content Area -->
+    <div class="content-area p-24">
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-24">
+            <div class="col-md-6 col-xxl-3">
+                <div class="card radius-12 bg-primary-600 text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="mb-2 opacity-75">Total Students</p>
+                                <h3 class="mb-0 fw-bold">1,234</h3>
+                            </div>
+                            <div class="text-4xl opacity-75">
+                                <i class="ri-graduation-cap-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="card radius-12 bg-success-600 text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="mb-2 opacity-75">Total Teachers</p>
+                                <h3 class="mb-0 fw-bold">86</h3>
+                            </div>
+                            <div class="text-4xl opacity-75">
+                                <i class="ri-user-follow-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="card radius-12 bg-warning-600 text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="mb-2 opacity-75">Total Classes</p>
+                                <h3 class="mb-0 fw-bold">42</h3>
+                            </div>
+                            <div class="text-4xl opacity-75">
+                                <i class="ri-list-view"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xxl-3">
+                <div class="card radius-12 bg-info-600 text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="mb-2 opacity-75">Exams Scheduled</p>
+                                <h3 class="mb-0 fw-bold">18</h3>
+                            </div>
+                            <div class="text-4xl opacity-75">
+                                <i class="ri-file-edit-line"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Welcome Card -->
+        <div class="card radius-12">
+            <div class="card-body p-24">
+                <h2 class="text-xl fw-bold mb-3 text-primary-light">Welcome to E360 Clone</h2>
+                <p class="text-secondary-light mb-0">
+                    Hệ thống quản lý lịch thi và coi thi. Chọn một chức năng từ menu bên trái để bắt đầu.
+                </p>
+                
+                <div class="row g-4 mt-4">
+                    <div class="col-md-4">
+                        <a href="/Students" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="w-48-px h-48-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                                        <i class="ri-graduation-cap-line"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 text-primary-light">Student Management</h6>
+                                        <p class="text-sm text-secondary-light mb-0">Quản lý sinh viên</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/Teachers" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="w-48-px h-48-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                                        <i class="ri-user-follow-line"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 text-success-600">Teacher Management</h6>
+                                        <p class="text-sm text-secondary-light mb-0">Quản lý giảng viên</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/Exams" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="w-48-px h-48-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                                        <i class="ri-file-edit-line"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 text-warning-600">Exam Management</h6>
+                                        <p class="text-sm text-secondary-light mb-0">Quản lý kỳ thi</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

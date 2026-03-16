@@ -1,0 +1,40 @@
+<!-- jQuery library -->
+<script src="~/assets/js/lib/jquery-3.7.1.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="~/assets/js/lib/bootstrap.bundle.min.js"></script>
+
+<!-- Apex Chart JS -->
+<script src="~/assets/js/lib/apexcharts.min.js"></script>
+
+<!-- Iconify Font JS -->
+<script src="~/assets/js/lib/iconify-icon.min.js"></script>
+
+<!-- Data Table JS -->
+<script src="~/assets/js/lib/dataTables.min.js"></script>
+
+<!-- Date Picker JS -->
+<script src="~/assets/js/lib/flatpickr.min.js"></script>
+
+<!-- jQuery UI JS -->
+<script src="~/assets/js/lib/jquery-ui.min.js"></script>
+
+<!-- Main App JS -->
+<script src="~/assets/js/app.js"></script>
+
+<!-- App config and utilities -->
+<script src="~/js/config.js"></script>
+<script src="~/js/utils.js"></script>
+<script src="~/js/api-client.js"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<script>
+  // Set current year in footer
+  document.addEventListener('DOMContentLoaded', function() {
+    const yearSpan = document.querySelector('.current-year');
+    if (yearSpan) {
+      yearSpan.textContent = new Date().getFullYear();
+    }
+  });
+</script>

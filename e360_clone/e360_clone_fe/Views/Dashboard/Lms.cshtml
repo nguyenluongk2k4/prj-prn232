@@ -1,0 +1,228 @@
+@{
+    ViewData["Title"] = "LMS Dashboard";
+}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+    <div>
+        <h1 class="text-2xl fw-bold mb-2 text-primary-light">LMS Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Content Area -->
+<div class="content-area p-24">
+    <!-- Welcome Card -->
+    <div class="card radius-12 bg-gradient-warning mb-24">
+        <div class="card-body p-24 text-white">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="text-2xl fw-bold mb-2">Learning Management System 👋</h2>
+                    <p class="mb-0 opacity-75">Access your courses and learning materials.</p>
+                </div>
+                <div class="d-none d-lg-block">
+                    <img src="~/assets/images/login-bg.webp" alt="LMS" class="w-200-px rounded-12" style="object-fit: cover; height: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">My Courses</p>
+                            <h3 class="mb-0 fw-bold text-primary-light">5</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-book-open-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Completed</p>
+                            <h3 class="mb-0 fw-bold text-success-600">3</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-checkbox-circle-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">In Progress</p>
+                            <h3 class="mb-0 fw-bold text-warning-600">2</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-time-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Certificates</p>
+                            <h3 class="mb-0 fw-bold text-info-600">3</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-award-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Courses -->
+    <div class="card radius-12 mb-24">
+        <div class="card-body p-24">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="text-xl fw-bold mb-0 text-primary-light">My Courses</h2>
+                <a href="#" class="text-primary-600 text-decoration-none">View All</a>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card radius-12">
+                        <img src="~/assets/images/login-bg.webp" class="card-img-top" alt="Course" style="height: 150px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary-light">Introduction to Programming</h6>
+                            <p class="card-text text-sm text-secondary-light">Learn the basics of programming with Python.</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="badge bg-success">In Progress</span>
+                                <span class="text-sm text-secondary-light">60%</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card radius-12">
+                        <img src="~/assets/images/login-bg.webp" class="card-img-top" alt="Course" style="height: 150px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary-light">Web Development Basics</h6>
+                            <p class="card-text text-sm text-secondary-light">HTML, CSS, and JavaScript fundamentals.</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="badge bg-success">In Progress</span>
+                                <span class="text-sm text-secondary-light">45%</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card radius-12">
+                        <img src="~/assets/images/login-bg.webp" class="card-img-top" alt="Course" style="height: 150px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary-light">Database Design</h6>
+                            <p class="card-text text-sm text-secondary-light">Learn SQL and database management.</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="badge bg-secondary">Not Started</span>
+                                <span class="text-sm text-secondary-light">0%</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Resources -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card radius-12">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Quick Resources</h2>
+                    <div class="d-flex flex-column gap-3">
+                        <a href="#" class="d-flex align-items-center gap-3 p-12 rounded bg-neutral-50 text-decoration-none bg-hover-neutral-100">
+                            <div class="w-40-px h-40-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center">
+                                <i class="ri-video-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-primary-light">Video Lectures</h6>
+                                <p class="text-sm text-secondary-light mb-0">Access recorded lectures</p>
+                            </div>
+                        </a>
+                        <a href="#" class="d-flex align-items-center gap-3 p-12 rounded bg-neutral-50 text-decoration-none bg-hover-neutral-100">
+                            <div class="w-40-px h-40-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center">
+                                <i class="ri-file-text-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-success-600">Study Materials</h6>
+                                <p class="text-sm text-secondary-light mb-0">Download course notes</p>
+                            </div>
+                        </a>
+                        <a href="#" class="d-flex align-items-center gap-3 p-12 rounded bg-neutral-50 text-decoration-none bg-hover-neutral-100">
+                            <div class="w-40-px h-40-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center">
+                                <i class="ri-question-line"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 text-warning-600">Assignments</h6>
+                                <p class="text-sm text-secondary-light mb-0">Submit your work</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card radius-12">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Recent Activity</h2>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-start gap-3 p-12 rounded bg-neutral-50">
+                            <div class="w-8-px h-8-px rounded-circle bg-success mt-8"></div>
+                            <div>
+                                <p class="mb-1 text-primary-light">Completed "Python Basics" module</p>
+                                <span class="text-xs text-secondary-light">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 p-12 rounded bg-neutral-50">
+                            <div class="w-8-px h-8-px rounded-circle bg-primary mt-8"></div>
+                            <div>
+                                <p class="mb-1 text-primary-light">Submitted Assignment 3</p>
+                                <span class="text-xs text-secondary-light">Yesterday</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3 p-12 rounded bg-neutral-50">
+                            <div class="w-8-px h-8-px rounded-circle bg-warning mt-8"></div>
+                            <div>
+                                <p class="mb-1 text-primary-light">New lecture added: "Advanced SQL"</p>
+                                <span class="text-xs text-secondary-light">2 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

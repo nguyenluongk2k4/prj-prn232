@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "C:\\Git\\prj-prn232\\e360_clone\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\controllers\\studentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\studentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\views\\students\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\views\\students\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -13,10 +21,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\views\\students\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\views\\students\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -363,19 +367,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "StudentsController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\StudentsController.cs",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\StudentsController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\StudentsController.cs",
+              "RelativeToolTip": "e360_clone_fe\\Controllers\\StudentsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-16T13:48:34.484Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Students\\Index.cshtml",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
+              "RelativeToolTip": "e360_clone_fe\\Views\\Students\\Index.cshtml",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-16T13:48:21.484Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Repository.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
               "RelativeDocumentMoniker": "e360_clone.Repositories\\Repository.cs",
               "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
               "RelativeToolTip": "e360_clone.Repositories\\Repository.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-15T08:03:29.246Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "20260315035226_InitialCreate.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Migrations\\20260315035226_InitialCreate.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Migrations\\20260315035226_InitialCreate.cs",
@@ -383,12 +413,11 @@
               "RelativeToolTip": "e360_clone_api\\Migrations\\20260315035226_InitialCreate.cs",
               "ViewState": "AgIAAK8AAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-15T05:39:48.835Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-15T05:39:48.835Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\appsettings.json",
               "RelativeDocumentMoniker": "e360_clone_api\\appsettings.json",
@@ -396,20 +425,7 @@
               "RelativeToolTip": "e360_clone_api\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-15T03:39:59.609Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
-              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Students\\Index.cshtml",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
-              "RelativeToolTip": "e360_clone_fe\\Views\\Students\\Index.cshtml",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-15T03:16:50.852Z"
+              "WhenOpened": "2026-03-15T03:39:59.609Z"
             }
           ]
         },

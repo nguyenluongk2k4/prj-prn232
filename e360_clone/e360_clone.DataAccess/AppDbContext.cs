@@ -19,6 +19,7 @@ namespace e360_clone.DataAccess
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Account> Accounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -191,6 +192,30 @@ namespace e360_clone.DataAccess
                 .HasOne<Subject>()
                 .WithMany()
                 .HasForeignKey(c => c.MajorId);
+
+            // Account configuration
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Email).HasMaxLength(255).IsRequired();
+                entity.Property(e => e.PasswordHash).HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Role).HasMaxLength(50).IsRequired();
+                entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
+                entity.HasIndex(e => e.Username).IsUnique();
+                entity.HasIndex(e => e.Email).IsUnique();
+
+                // Relationships
+                entity.HasOne(a => a.Student)
+                    .WithMany()
+                    .HasForeignKey(a => a.StudentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(a => a.Lecturer)
+                    .WithMany()
+                    .HasForeignKey(a => a.LecturerId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
         }
     }
 }

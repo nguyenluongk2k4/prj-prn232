@@ -4,14 +4,14 @@
     "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj": {}
   },
   "projects": {
-    "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj": {
+    "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj",
-        "projectName": "e360_clone_fe",
-        "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj",
+        "projectUniqueName": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj",
+        "projectName": "e360_clone.BusinessObjects",
+        "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\obj\\",
+        "outputPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -49,6 +49,280 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
+        "projectName": "e360_clone.DataAccess",
+        "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\e360_clone.Repositories.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\e360_clone.Repositories.csproj",
+        "projectName": "e360_clone.Repositories",
+        "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\e360_clone.Repositories.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj"
+              },
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj",
+        "projectName": "e360_clone_fe",
+        "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\e360_clone_fe.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.BusinessObjects\\e360_clone.BusinessObjects.csproj"
+              },
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj"
+              },
+              "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\e360_clone.Repositories.csproj": {
+                "projectPath": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\e360_clone.Repositories.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

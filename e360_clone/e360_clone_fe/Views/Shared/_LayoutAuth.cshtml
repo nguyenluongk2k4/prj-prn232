@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - E360 Clone</title>
+    <link rel="icon" type="image/png" href="~/assets/images/logo-ic.png" sizes="32x32">
+    
+    <!-- Remix Icon -->
+    <link rel="stylesheet" href="~/assets/css/remixicon.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/assets/css/lib/bootstrap.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="~/assets/css/style.css">
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    @RenderBody()
+    
+    <!-- jQuery -->
+    <script src="~/assets/js/lib/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="~/assets/js/lib/bootstrap.bundle.min.js"></script>
+    <!-- Main App -->
+    <script src="~/assets/js/app.js"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

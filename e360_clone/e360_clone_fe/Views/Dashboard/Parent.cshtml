@@ -1,0 +1,231 @@
+@{
+    ViewData["Title"] = "Parent Dashboard";
+}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+    <div>
+        <h1 class="text-2xl fw-bold mb-2 text-primary-light">Parent Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Content Area -->
+<div class="content-area p-24">
+    <!-- Welcome Card -->
+    <div class="card radius-12 bg-gradient-info mb-24">
+        <div class="card-body p-24 text-white">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="text-2xl fw-bold mb-2">Welcome, Parent! 👋</h2>
+                    <p class="mb-0 opacity-75">Monitor your child's academic progress.</p>
+                </div>
+                <div class="d-none d-lg-block">
+                    <img src="~/assets/images/login-bg.webp" alt="Parent" class="w-200-px rounded-12" style="object-fit: cover; height: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Profile Card -->
+    <div class="card radius-12 mb-24">
+        <div class="card-body p-24">
+            <h3 class="text-lg fw-bold mb-4 text-primary-light">My Children</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card radius-12 bg-neutral-50">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-4">
+                                <img src="~/assets/images/thumbs/avatar-img1.png" alt="Student" class="w-80-px h-80-px rounded-circle object-fit-cover">
+                                <div>
+                                    <h5 class="mb-1 text-primary-light">Nguyen Van A</h5>
+                                    <p class="text-sm text-secondary-light mb-1">Class 10A - Student ID: PH001</p>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card radius-12 bg-neutral-50">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-4">
+                                <img src="~/assets/images/thumbs/avatar-img2.png" alt="Student" class="w-80-px h-80-px rounded-circle object-fit-cover">
+                                <div>
+                                    <h5 class="mb-1 text-primary-light">Nguyen Van B</h5>
+                                    <p class="text-sm text-secondary-light mb-1">Class 8B - Student ID: PH002</p>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Attendance</p>
+                            <h3 class="mb-0 fw-bold text-success-600">95%</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Current GPA</p>
+                            <h3 class="mb-0 fw-bold text-primary-light">3.9</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-trophy-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Upcoming Exams</p>
+                            <h3 class="mb-0 fw-bold text-warning-600">2</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-file-edit-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Pending Fees</p>
+                            <h3 class="mb-0 fw-bold text-danger-600">$0</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-danger-100 text-danger-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-money-dollar-circle-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-file-list-3-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-primary-light">View Results</h6>
+                            <p class="text-sm text-secondary-light mb-0">Check exam results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-calendar-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-success-600">Exam Schedule</h6>
+                            <p class="text-sm text-secondary-light mb-0">View exam dates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-message-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-warning-600">Contact Teacher</h6>
+                            <p class="text-sm text-secondary-light mb-0">Send a message</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Results -->
+    <div class="card radius-12">
+        <div class="card-body p-24">
+            <h2 class="text-xl fw-bold mb-3 text-primary-light">Recent Exam Results</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-neutral-100">
+                        <tr>
+                            <th>Student</th>
+                            <th>Exam</th>
+                            <th>Subject</th>
+                            <th>Score</th>
+                            <th>Grade</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nguyen Van A</td>
+                            <td>Midterm Exam</td>
+                            <td>Mathematics</td>
+                            <td>92/100</td>
+                            <td><span class="badge bg-success">A+</span></td>
+                            <td>Mar 10, 2026</td>
+                        </tr>
+                        <tr>
+                            <td>Nguyen Van A</td>
+                            <td>Midterm Exam</td>
+                            <td>Physics</td>
+                            <td>88/100</td>
+                            <td><span class="badge bg-success">A</span></td>
+                            <td>Mar 12, 2026</td>
+                        </tr>
+                        <tr>
+                            <td>Nguyen Van B</td>
+                            <td>Midterm Exam</td>
+                            <td>English</td>
+                            <td>95/100</td>
+                            <td><span class="badge bg-success">A+</span></td>
+                            <td>Mar 11, 2026</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

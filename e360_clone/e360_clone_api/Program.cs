@@ -7,7 +7,7 @@ namespace e360_clone
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +42,22 @@ namespace e360_clone
             });
 
             var app = builder.Build();
+
+            // Seed database
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<AppDbContext>();
+                    await e360_clone.Seeders.AccountSeeder.SeedAsync(context);
+                    Console.WriteLine("✅ Database seeded successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ Error seeding database: {ex.Message}");
+                }
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

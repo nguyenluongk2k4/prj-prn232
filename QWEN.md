@@ -10,11 +10,11 @@ A monorepo containing a clone of FPT's e360 system for managing exam schedules, 
 
 | Component | Path | Technology |
 |-----------|------|------------|
-| **Backend API** | `e360_clone_api/` | ASP.NET Core 8.0 Web API (C#) |
-| **Frontend** | `e360_clone_fe/` | ASP.NET Core 8.0 MVC + AJAX |
-| **BusinessObjects** | `e360_clone.BusinessObjects/` | Class Library - Domain models (entities) |
-| **DataAccess** | `e360_clone.DataAccess/` | Class Library - EF Core DbContext |
-| **Repositories** | `e360_clone.Repositories/` | Class Library - Repository pattern |
+| **Backend API** | `e360_clone/e360_clone_api/` | ASP.NET Core 8.0 Web API (C#) |
+| **Frontend** | `e360_clone/e360_clone_fe/` | ASP.NET Core 8.0 MVC + AJAX |
+| **BusinessObjects** | `e360_clone/e360_clone.BusinessObjects/` | Class Library - Domain models (entities) |
+| **DataAccess** | `e360_clone/e360_clone.DataAccess/` | Class Library - EF Core DbContext |
+| **Repositories** | `e360_clone/e360_clone.Repositories/` | Class Library - Repository pattern |
 
 ### Solution Structure
 
@@ -74,7 +74,7 @@ e360_clone.DataAccess
 
 ### Database Configuration
 
-1. Update connection string in `e360_clone_api/appsettings.json`:
+1. Update connection string in `e360_clone/e360_clone_api/appsettings.json`:
 ```json
 {
   "ConnectionStrings": {
@@ -89,7 +89,7 @@ cd e360_clone/e360_clone_api
 dotnet ef database update
 ```
 
-### Backend API (`e360_clone_api/`)
+### Backend API (`e360_clone/e360_clone_api/`)
 
 ```bash
 cd e360_clone/e360_clone_api
@@ -104,7 +104,7 @@ dotnet watch run        # Run with hot-reload
 - HTTPS: `https://localhost:7052`
 - Swagger UI: `/swagger` (Development mode only)
 
-### Frontend (`e360_clone_fe/`)
+### Frontend (`e360_clone/e360_clone_fe/`)
 
 ```bash
 cd e360_clone/e360_clone_fe
@@ -118,7 +118,7 @@ dotnet watch run        # Run with hot-reload
 
 **API Integration:**
 - Frontend calls API via AJAX/fetch
-- Configure API base URL in `wwwroot/js/site.js` or individual page scripts
+- Configure API base URL in `wwwroot/js/config.js` or individual page scripts
 - Example: `fetch('http://localhost:5104/api/weatherforecast')`
 
 ### Running Both Projects

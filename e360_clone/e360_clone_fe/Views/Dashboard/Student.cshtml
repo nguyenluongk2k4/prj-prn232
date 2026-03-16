@@ -1,0 +1,190 @@
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+    <div>
+        <h1 class="text-2xl fw-bold mb-2 text-primary-light">Student Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Content Area -->
+<div class="content-area p-24">
+    <!-- Welcome Card -->
+    <div class="card radius-12 bg-gradient-primary mb-24">
+        <div class="card-body p-24 text-white">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="text-2xl fw-bold mb-2">Welcome back, Student! 👋</h2>
+                    <p class="mb-0 opacity-75">Here's what's happening with your studies today.</p>
+                </div>
+                <div class="d-none d-lg-block">
+                    <img src="~/assets/images/login-bg.webp" alt="Student" class="w-200-px rounded-12" style="object-fit: cover; height: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Total Courses</p>
+                            <h3 class="mb-0 fw-bold text-primary-light">8</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-book-open-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Attendance</p>
+                            <h3 class="mb-0 fw-bold text-success-600">92%</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Upcoming Exams</p>
+                            <h3 class="mb-0 fw-bold text-warning-600">3</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-file-edit-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">GPA</p>
+                            <h3 class="mb-0 fw-bold text-info-600">3.8</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-trophy-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-calendar-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-primary-light">My Exam Schedule</h6>
+                            <p class="text-sm text-secondary-light mb-0">View upcoming exams</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-file-list-3-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-success-600">My Results</h6>
+                            <p class="text-sm text-secondary-light mb-0">Check exam results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-booklet-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-warning-600">Study Materials</h6>
+                            <p class="text-sm text-secondary-light mb-0">Access course materials</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Schedule Table -->
+    <div class="card radius-12">
+        <div class="card-body p-24">
+            <h2 class="text-xl fw-bold mb-3 text-primary-light">Upcoming Exams</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-neutral-100">
+                        <tr>
+                            <th>Exam</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Room</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mathematics - Final</td>
+                            <td>Mar 20, 2026</td>
+                            <td>8:00 AM - 10:00 AM</td>
+                            <td>Room A101</td>
+                            <td><span class="badge bg-warning">Upcoming</span></td>
+                        </tr>
+                        <tr>
+                            <td>Physics - Final</td>
+                            <td>Mar 22, 2026</td>
+                            <td>2:00 PM - 4:00 PM</td>
+                            <td>Room B202</td>
+                            <td><span class="badge bg-warning">Upcoming</span></td>
+                        </tr>
+                        <tr>
+                            <td>Chemistry - Final</td>
+                            <td>Mar 25, 2026</td>
+                            <td>8:00 AM - 10:00 AM</td>
+                            <td>Room A103</td>
+                            <td><span class="badge bg-warning">Upcoming</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

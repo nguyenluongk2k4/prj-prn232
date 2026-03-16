@@ -1,0 +1,205 @@
+@{
+    ViewData["Title"] = "Teacher Dashboard";
+}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+    <div>
+        <h1 class="text-2xl fw-bold mb-2 text-primary-light">Teacher Dashboard</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Content Area -->
+<div class="content-area p-24">
+    <!-- Welcome Card -->
+    <div class="card radius-12 bg-gradient-success mb-24">
+        <div class="card-body p-24 text-white">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="text-2xl fw-bold mb-2">Welcome back, Teacher! 👋</h2>
+                    <p class="mb-0 opacity-75">Here's what's happening with your classes today.</p>
+                </div>
+                <div class="d-none d-lg-block">
+                    <img src="~/assets/images/login-bg.webp" alt="Teacher" class="w-200-px rounded-12" style="object-fit: cover; height: 150px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Total Classes</p>
+                            <h3 class="mb-0 fw-bold text-primary-light">6</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-list-view"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Total Students</p>
+                            <h3 class="mb-0 fw-bold text-success-600">245</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-group-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Proctor Duties</p>
+                            <h3 class="mb-0 fw-bold text-warning-600">4</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-shield-user-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xxl-3">
+            <div class="card radius-12">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="mb-2 text-secondary-light">Pending Grades</p>
+                            <h3 class="mb-0 fw-bold text-info-600">12</h3>
+                        </div>
+                        <div class="w-56-px h-56-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-edit-box-line"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-24">
+        <div class="col-md-3">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-edit-box-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-primary-light">Enter Grades</h6>
+                            <p class="text-sm text-secondary-light mb-0">Submit student grades</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-calendar-check-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-success-600">Take Attendance</h6>
+                            <p class="text-sm text-secondary-light mb-0">Mark class attendance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-shield-user-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-warning-600">Proctor Schedule</h6>
+                            <p class="text-sm text-secondary-light mb-0">View exam duties</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card radius-12 bg-hover-neutral-50">
+                <div class="card-body p-24">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="w-56-px h-56-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center text-2xl">
+                            <i class="ri-file-list-3-line"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 text-info-600">Class Schedule</h6>
+                            <p class="text-sm text-secondary-light mb-0">View teaching schedule</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Schedule -->
+    <div class="card radius-12">
+        <div class="card-body p-24">
+            <h2 class="text-xl fw-bold mb-3 text-primary-light">Today's Schedule</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-neutral-100">
+                        <tr>
+                            <th>Time</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Room</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>8:00 AM - 9:30 AM</td>
+                            <td>Class 10A</td>
+                            <td>Mathematics</td>
+                            <td>Room 201</td>
+                            <td><span class="badge bg-primary">Lecture</span></td>
+                        </tr>
+                        <tr>
+                            <td>10:00 AM - 11:30 AM</td>
+                            <td>Class 11B</td>
+                            <td>Physics</td>
+                            <td>Lab 3</td>
+                            <td><span class="badge bg-success">Lab</span></td>
+                        </tr>
+                        <tr>
+                            <td>2:00 PM - 4:00 PM</td>
+                            <td>Exam Hall A</td>
+                            <td>Math Final</td>
+                            <td>Room 101</td>
+                            <td><span class="badge bg-warning">Proctor</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

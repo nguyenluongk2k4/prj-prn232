@@ -118,3 +118,4 @@ C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.Reposito
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.BusinessObjects.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.DataAccess.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.Repositories.pdb
+C:\Git\prj-prn232\e360_clone\e360_clone_api\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
