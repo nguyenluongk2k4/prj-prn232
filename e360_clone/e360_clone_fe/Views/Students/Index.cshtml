@@ -165,11 +165,29 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/modules/students.api.js"></script>
-    <script src="~/js/modules/students.ui.js"></script>
+    <!-- Core libraries -->
+    <script src="~/js/core/http.js"></script>
+    <script src="~/js/core/auth.js"></script>
+    
+    <!-- Student module -->
+    <script src="~/js/modules/students/api.js"></script>
+    <script src="~/js/modules/students/helpers.js"></script>
+    <script src="~/js/modules/students/ui.js"></script>
+    
+    <!-- Page initialization -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            StudentUI.init();
+            // Check authentication
+            if (!Auth.isAuthenticated()) {
+                Auth.setRedirectUrl(window.location.pathname);
+                window.location.href = '/Auth/Login';
+                return;
+            }
+            
+            // Initialize Students UI
+            if (typeof StudentsUI !== 'undefined') {
+                StudentsUI.init();
+            }
         });
     </script>
 }

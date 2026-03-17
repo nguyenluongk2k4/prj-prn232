@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("e360_clone.DataAccess")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aca8fc61bd4ade98652442524243ce489ad1b02b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5151ae0620b539888b008a9a43df15e8d9360ffa")]
 [assembly: System.Reflection.AssemblyProductAttribute("e360_clone.DataAccess")]
 [assembly: System.Reflection.AssemblyTitleAttribute("e360_clone.DataAccess")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

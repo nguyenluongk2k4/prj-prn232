@@ -26,7 +26,15 @@
                     Log in to your account to continue
                 </p>
             </div>
-            <form asp-action="Login" method="post" class="d-flex flex-column gap-32 submit-form">
+            
+            <!-- Error Alert -->
+            <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                <i class="ri-error-warning-line me-2"></i>
+                <span id="errorMessage">Invalid email or password</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <form id="loginForm" class="d-flex flex-column gap-32 submit-form">
                 <div class="d-flex flex-column gap-16">
                     <div>
                         <label for="email" class="text-sm fw-semibold text-primary-light d-inline-block mb-8">
@@ -59,49 +67,55 @@
                     <a href="javascript:void(0)" class="text-primary-600 fw-medium text-decoration-underline">Forgot Password?</a>
                 </div>
                 <div class="">
-                    <button type="submit" class="loginBtn btn btn-primary-600 text-sm btn-sm px-12 py-16 w-100 radius-8">Log In</button>
+                    <button type="submit" id="loginBtn" class="loginBtn btn btn-primary-600 text-sm btn-sm px-12 py-16 w-100 radius-8">
+                        <span class="btn-text">Log In</span>
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Logging in...
+                        </span>
+                    </button>
                 </div>
                 <div class="text-center text-sm text-secondary-light">
                     or login as
                 </div>
                 <div class="d-grid sm-grid-cols-3 grid-cols-2 gap-16">
-                    <a asp-action="Login" asp-route-role="SuperAdmin"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-success text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="SuperAdmin"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-success text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/sheild-icon.png" alt="Icon">
                         </span>
                         <span>Super Admin</span>
                     </a>
-                    <a asp-action="Login" asp-route-role="Admin"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-info-600 text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="Admin"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-info-600 text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/dashboard-icon.png" alt="Icon">
                         </span>
                         <span>Admin</span>
                     </a>
-                    <a asp-action="Login" asp-route-role="Student"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-warning-600 text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="Student"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-warning-600 text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/student-icon.png" alt="Icon">
                         </span>
                         <span>Student</span>
                     </a>
-                    <a asp-action="Login" asp-route-role="Teacher"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-purple-600 text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="Teacher"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-purple-600 text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/teacher-icon.png" alt="Icon">
                         </span>
                         <span>Teacher</span>
                     </a>
-                    <a asp-action="Login" asp-route-role="Parent"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-primary-600 text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="Parent"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-primary-600 text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/guardian-icon.png" alt="Icon">
                         </span>
                         <span>Guardians</span>
                     </a>
-                    <a asp-action="Login" asp-route-role="Librarian"
-                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-pink text-white py-10 px-8">
+                    <a href="javascript:void(0)" data-role="Librarian"
+                        class="quick-login-btn d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-pink text-white py-10 px-8">
                         <span class="d-flex">
                             <img src="~/assets/images/icons/library-icon.png" alt="Icon">
                         </span>
@@ -111,7 +125,7 @@
             </form>
             <div class="mt-32 text-center text-sm">
                 Don't have an account?
-                <a asp-action="Register" class="text-primary-600 fw-semibold text-decoration-underline">
+                <a href="javascript:void(0)" class="text-primary-600 fw-semibold text-decoration-underline">
                     Create an account
                 </a>
             </div>
@@ -120,6 +134,9 @@
 </div>
 
 @section Scripts {
+<script src="~/js/core/http.js"></script>
+<script src="~/js/core/auth.js"></script>
+<script src="~/js/modules/auth/api.js"></script>
 <script>
     // Toggle password visibility
     document.querySelectorAll('.toggle-password').forEach(btn => {
@@ -131,5 +148,98 @@
             this.classList.toggle('ri-eye-off-line');
         });
     });
+
+    // Show/hide error alert
+    function showError(message) {
+        const alert = document.getElementById('errorAlert');
+        const msg = document.getElementById('errorMessage');
+        msg.textContent = message;
+        alert.classList.remove('d-none');
+        setTimeout(() => alert.classList.add('d-none'), 5000);
+    }
+
+    // Set button loading state
+    function setLoginLoading(loading) {
+        const btn = document.getElementById('loginBtn');
+        const btnText = btn.querySelector('.btn-text');
+        const btnLoading = btn.querySelector('.btn-loading');
+        
+        if (loading) {
+            btn.disabled = true;
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        } else {
+            btn.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+        }
+    }
+
+    // Handle form submit
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        setLoginLoading(true);
+
+        try {
+            const response = await AuthApi.login(email, password);
+            
+            if (response.success) {
+                // Save token and user info using Auth core
+                Auth.setAuth(response.data.token, {
+                    username: response.data.username,
+                    email: response.data.email,
+                    fullName: response.data.fullName,
+                    role: response.data.role,
+                    avatarUrl: response.data.avatarUrl
+                });
+
+                // Redirect based on role
+                Auth.redirectByRole();
+            } else {
+                showError(response.message || 'Login failed');
+            }
+        } catch (error) {
+            showError(error.message || 'Login failed. Please try again.');
+        } finally {
+            setLoginLoading(false);
+        }
+    });
+
+    // Handle quick login
+    document.querySelectorAll('.quick-login-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const role = this.dataset.role;
+            
+            try {
+                const response = await AuthApi.quickLogin(role);
+                
+                if (response.success) {
+                    // Save token and user info
+                    Auth.setAuth(response.data.token, {
+                        username: response.data.username,
+                        email: response.data.email,
+                        fullName: response.data.fullName,
+                        role: response.data.role,
+                        avatarUrl: response.data.avatarUrl
+                    });
+
+                    // Redirect based on role
+                    Auth.redirectByRole();
+                }
+            } catch (error) {
+                showError(error.message || 'Quick login failed');
+            }
+        });
+    });
+
+    // Check if already logged in
+    if (Auth.isAuthenticated()) {
+        Auth.redirectByRole();
+    }
 </script>
 }

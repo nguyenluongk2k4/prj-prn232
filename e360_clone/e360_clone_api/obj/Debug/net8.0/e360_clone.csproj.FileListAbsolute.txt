@@ -118,4 +118,11 @@ C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.Reposito
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.BusinessObjects.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.DataAccess.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\e360_clone.Repositories.pdb
-C:\Git\prj-prn232\e360_clone\e360_clone_api\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

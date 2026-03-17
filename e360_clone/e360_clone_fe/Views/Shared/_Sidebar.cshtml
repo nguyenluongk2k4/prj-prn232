@@ -28,8 +28,8 @@
           <img src="~/assets/images/thumbs/avatar-img1.png" alt="Thumbnail"
             class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
           <span class="profile-dropdown__contents">
-            <span class="h6 mb-0 text-md d-block text-primary-light">@User.Identity?.Name</span>
-            <span class="text-secondary-light text-sm mb-0 d-block">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+            <span class="h6 mb-0 text-md d-block text-primary-light" id="sidebarUserName">Loading...</span>
+            <span class="text-secondary-light text-sm mb-0 d-block" id="sidebarUserRole">...</span>
           </span>
         </span>
         <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
@@ -55,13 +55,11 @@
           <hr class="dropdown-divider">
         </li>
         <li>
-          <form asp-controller="Auth" asp-action="Logout" method="post">
-            <button type="submit"
-              class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 w-100 border-0 bg-transparent">
-              <i class="ri-shut-down-line"></i>
-              Log Out
-            </button>
-          </form>
+          <button type="button" id="logoutBtn"
+            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 w-100 border-0 bg-transparent">
+            <i class="ri-shut-down-line"></i>
+            Log Out
+          </button>
         </li>
       </ul>
     </div>
