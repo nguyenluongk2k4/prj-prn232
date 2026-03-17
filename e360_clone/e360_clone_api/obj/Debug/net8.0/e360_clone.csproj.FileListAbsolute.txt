@@ -126,3 +126,4 @@ C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityM
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Git\prj-prn232\e360_clone\e360_clone_api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Git\prj-prn232\e360_clone\e360_clone_api\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("e360_clone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5151ae0620b539888b008a9a43df15e8d9360ffa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03fdb053f37c1a661071b36dbdf6df25eee8b9d1")]
 [assembly: System.Reflection.AssemblyProductAttribute("e360_clone")]
 [assembly: System.Reflection.AssemblyTitleAttribute("e360_clone")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

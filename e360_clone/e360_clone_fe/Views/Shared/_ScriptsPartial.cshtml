@@ -25,9 +25,12 @@
 <!-- App config -->
 <script src="~/js/config.js"></script>
 
-<!-- Core JS (HTTP, Auth) -->
+<!-- Core JS (HTTP, Auth) - MUST LOAD FIRST -->
 <script src="~/js/core/http.js"></script>
 <script src="~/js/core/auth.js"></script>
+
+<!-- Utilities -->
+<script src="~/js/utils.js"></script>
 
 <!-- Enums -->
 <script src="~/js/enums/AccountStatus.js"></script>
@@ -52,9 +55,6 @@
 <script src="~/js/mappers/AccountMapper.js"></script>
 <script src="~/js/mappers/ExamMapper.js"></script>
 <script src="~/js/mappers/index.js"></script>
-
-<!-- Utilities -->
-<script src="~/js/utils.js"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
 

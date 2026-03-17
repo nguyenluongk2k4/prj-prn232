@@ -1,5 +1,37 @@
 [
   {
+    "ContainingType": "e360_clone.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/Auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "e360_clone.Controllers.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "e360_clone.Controllers.AuthController",
+    "Method": "QuickLogin",
+    "RelativePath": "api/Auth/quick-login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "e360_clone.Controllers.QuickLoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "e360_clone.Controllers.StudentsController",
     "Method": "GetAll",
     "RelativePath": "api/Students",

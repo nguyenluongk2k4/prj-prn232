@@ -50,3 +50,4 @@ C:\Git\prj-prn232\e360_clone\e360_clone_fe\bin\Debug\net8.0\e360_clone.BusinessO
 C:\Git\prj-prn232\e360_clone\e360_clone_fe\bin\Debug\net8.0\e360_clone.DataAccess.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_fe\bin\Debug\net8.0\e360_clone.Repositories.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone_fe\obj\Debug\net8.0\e360_clo.03200E38.Up2Date
+C:\Git\prj-prn232\e360_clone\e360_clone_fe\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

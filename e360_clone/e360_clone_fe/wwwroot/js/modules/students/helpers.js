@@ -8,14 +8,24 @@ const StudentsHelper = (function() {
     // Format student data for display (uses StudentMapper)
     function formatStudent(student) {
         if (!student) return null;
-        
+
         // If student is already mapped, use computed properties
-        if (student instanceof Student) {
+        if (typeof Student !== 'undefined' && student instanceof Student) {
             return student;
         }
-        
+
         // Otherwise use mapper
-        return StudentMapper.fromApi(student);
+        if (typeof StudentMapper !== 'undefined') {
+            return StudentMapper.fromApi(student);
+        }
+
+        // Fallback: basic formatting
+        return {
+            ...student,
+            formattedDateOfBirth: formatDate(student.dateOfBirth),
+            statusText: getStatusText(student.status),
+            statusBadge: getStatusClass(student.status)
+        };
     }
 
     // Get status badge class (uses StudentStatus enum)
@@ -30,12 +40,20 @@ const StudentsHelper = (function() {
 
     // Format date
     function formatDate(dateString) {
-        return StudentMapper.formatDate(dateString);
+        if (typeof StudentMapper !== 'undefined') {
+            return StudentMapper.formatDate(dateString);
+        }
+        if (!dateString) return '';
+        return new Date(dateString).toLocaleDateString('vi-VN');
     }
 
     // Format date for input
     function formatDateForInput(dateString) {
-        return StudentMapper.formatDateForInput(dateString);
+        if (typeof StudentMapper !== 'undefined') {
+            return StudentMapper.formatDateForInput(dateString);
+        }
+        if (!dateString) return '';
+        return new Date(dateString).toISOString().split('T')[0];
     }
 
     // Validate student form
