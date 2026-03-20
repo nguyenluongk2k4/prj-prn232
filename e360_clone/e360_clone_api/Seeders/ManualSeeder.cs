@@ -10,7 +10,7 @@ namespace e360_clone.Seeders
         public static async Task SeedAsync()
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>()
-                .UseNpgsql("Host=aws-1-ap-northeast-2.pooler.supabase.com;Port=5432;Database=postgres;Username=postgres.tngcpurejirmztvzbmmj;Password=Prn232_pasword");
+                .UseNpgsql("Host=103.72.56.152;Port=5433;Database=postgres;Username=postgres;Password=GYM2Esz09utEFCm34MXACE9EYEFZMBGB");
 
             using var context = new AppDbContext(optionsBuilder.Options);
 
@@ -28,12 +28,12 @@ namespace e360_clone.Seeders
 
             var accounts = new List<Account>
             {
-                new Account { Username = "superadmin", Email = "superadmin@e360.com", PasswordHash = passwordHash, Role = "SuperAdmin", FullName = "Super Administrator", Status = "Active", CreatedAt = DateTime.Now },
-                new Account { Username = "admin", Email = "admin@e360.com", PasswordHash = passwordHash, Role = "Admin", FullName = "System Administrator", Status = "Active", CreatedAt = DateTime.Now },
-                new Account { Username = "student", Email = "student@e360.com", PasswordHash = passwordHash, Role = "Student", FullName = "Nguyen Van Student", Status = "Active", CreatedAt = DateTime.Now },
-                new Account { Username = "teacher", Email = "teacher@e360.com", PasswordHash = passwordHash, Role = "Teacher", FullName = "Tran Van Teacher", Status = "Active", CreatedAt = DateTime.Now },
-                new Account { Username = "parent", Email = "parent@e360.com", PasswordHash = passwordHash, Role = "Parent", FullName = "Le Van Parent", Status = "Active", CreatedAt = DateTime.Now },
-                new Account { Username = "librarian", Email = "librarian@e360.com", PasswordHash = passwordHash, Role = "Librarian", FullName = "Pham Van Librarian", Status = "Active", CreatedAt = DateTime.Now }
+                new Account { Username = "superadmin", Email = "superadmin@e360.com", PasswordHash = passwordHash, Role = "SuperAdmin", FullName = "Super Administrator", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "admin", Email = "admin@e360.com", PasswordHash = passwordHash, Role = "Admin", FullName = "System Administrator", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "student", Email = "student@e360.com", PasswordHash = passwordHash, Role = "Student", FullName = "Nguyen Van Student", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "teacher", Email = "teacher@e360.com", PasswordHash = passwordHash, Role = "Teacher", FullName = "Tran Van Teacher", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "parent", Email = "parent@e360.com", PasswordHash = passwordHash, Role = "Parent", FullName = "Le Van Parent", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "librarian", Email = "librarian@e360.com", PasswordHash = passwordHash, Role = "Librarian", FullName = "Pham Van Librarian", Status = "Active", CreatedAt = DateTime.UtcNow }
             };
 
             await context.Accounts.AddRangeAsync(accounts);

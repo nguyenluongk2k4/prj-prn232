@@ -27,7 +27,9 @@
     <script src="~/assets/js/lib/bootstrap.bundle.min.js"></script>
     <!-- Main App -->
     <script src="~/assets/js/app.js"></script>
-    
+    <!-- App Config (must load before core JS) -->
+    <script src="~/js/config.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

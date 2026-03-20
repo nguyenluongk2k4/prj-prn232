@@ -151,11 +151,12 @@
 
     // Show/hide error alert
     function showError(message) {
-        const alert = document.getElementById('errorAlert');
+        const alertEl = document.getElementById('errorAlert');
         const msg = document.getElementById('errorMessage');
+        if (!alertEl || !msg) return;
         msg.textContent = message;
-        alert.classList.remove('d-none');
-        setTimeout(() => alert.classList.add('d-none'), 5000);
+        alertEl.classList.remove('d-none');
+        setTimeout(() => alertEl.classList.add('d-none'), 5000);
     }
 
     // Set button loading state

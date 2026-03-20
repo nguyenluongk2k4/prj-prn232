@@ -38,7 +38,7 @@
 
 ### Accounts & Auth
 1. `POST /api/accounts`
-- Tạo tài khoản hệ thống (Admin/Student/Teacher/Parent/Librarian).
+- Tạo tài khoản hệ thống (Admin/SuperAdmin/AcademicStaff/Teacher/Student).
 
 2. `GET /api/accounts`
 - Danh sách tài khoản, lọc theo role/status, hỗ trợ paging.
