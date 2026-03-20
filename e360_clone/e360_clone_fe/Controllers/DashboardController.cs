@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone_fe.Controllers
 {
-    [Authorize]
     public class DashboardController : Controller
     {
         public IActionResult Index(string area = "Admin")

@@ -92,6 +92,39 @@ namespace e360_clone.Controllers
             });
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        {
+            if (await _context.Accounts.AnyAsync(a => a.Email == model.Email))
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "Email đã tồn tại" });
+
+            var username = model.Email.Split('@')[0];
+            if (await _context.Accounts.AnyAsync(a => a.Username == username))
+                username = username + "_" + DateTime.UtcNow.Ticks.ToString()[^4..];
+
+            var account = new Account
+            {
+                Username = username,
+                Email = model.Email,
+                PasswordHash = PasswordHelper.HashPassword(model.Password),
+                Role = "Student",
+                FullName = model.FullName,
+                StudentId = model.StudentId,
+                Status = "Active",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Accounts.Add(account);
+            await _context.SaveChangesAsync();
+
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Tạo tài khoản thành công",
+                Data = new { account.Id, account.Username, account.Email, account.FullName, account.Role }
+            });
+        }
+
         [HttpPost("quick-login")]
         public async Task<IActionResult> QuickLogin([FromBody] QuickLoginRequest model)
         {
@@ -165,6 +198,17 @@ namespace e360_clone.Controllers
         public string Password { get; set; } = string.Empty;
 
         public bool RememberMe { get; set; }
+    }
+
+    public class RegisterRequest
+    {
+        [Required]
+        public string FullName { get; set; } = string.Empty;
+        [Required]
+        public string Email { get; set; } = string.Empty;
+        [Required]
+        public string Password { get; set; } = string.Empty;
+        public int? StudentId { get; set; }
     }
 
     public class QuickLoginRequest

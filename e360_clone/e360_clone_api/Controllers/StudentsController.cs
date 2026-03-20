@@ -67,7 +67,7 @@ namespace e360_clone.Controllers
                 });
             }
 
-            student.CreatedAt = DateTime.Now;
+            student.CreatedAt = DateTime.UtcNow;
             await _studentRepository.AddAsync(student);
 
             return CreatedAtAction(nameof(GetById), new { id = student.Id }, new ApiResponse<Student>
