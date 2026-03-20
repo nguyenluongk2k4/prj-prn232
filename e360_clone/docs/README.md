@@ -53,7 +53,7 @@ docs/
 
 - **Backend**: ASP.NET Core 8.0 Web API
 - **Frontend**: ASP.NET Core 8.0 MVC + AJAX
-- **Database**: PostgreSQL (Supabase)
+- **Database**: PostgreSQL (self-hosted trên Coolify, `postgres.memore.vn:5433`)
 - **ORM**: Entity Framework Core 8
 - **Architecture**: Layered (BusinessObjects, DataAccess, Repositories)
 
