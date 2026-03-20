@@ -30,10 +30,9 @@ namespace e360_clone.Seeders
             {
                 new Account { Username = "superadmin", Email = "superadmin@e360.com", PasswordHash = passwordHash, Role = "SuperAdmin", FullName = "Super Administrator", Status = "Active", CreatedAt = DateTime.UtcNow },
                 new Account { Username = "admin", Email = "admin@e360.com", PasswordHash = passwordHash, Role = "Admin", FullName = "System Administrator", Status = "Active", CreatedAt = DateTime.UtcNow },
-                new Account { Username = "student", Email = "student@e360.com", PasswordHash = passwordHash, Role = "Student", FullName = "Nguyen Van Student", Status = "Active", CreatedAt = DateTime.UtcNow },
+                new Account { Username = "academicstaff", Email = "academicstaff@e360.com", PasswordHash = passwordHash, Role = "AcademicStaff", FullName = "Nguyen Van Academic", Status = "Active", CreatedAt = DateTime.UtcNow },
                 new Account { Username = "teacher", Email = "teacher@e360.com", PasswordHash = passwordHash, Role = "Teacher", FullName = "Tran Van Teacher", Status = "Active", CreatedAt = DateTime.UtcNow },
-                new Account { Username = "parent", Email = "parent@e360.com", PasswordHash = passwordHash, Role = "Parent", FullName = "Le Van Parent", Status = "Active", CreatedAt = DateTime.UtcNow },
-                new Account { Username = "librarian", Email = "librarian@e360.com", PasswordHash = passwordHash, Role = "Librarian", FullName = "Pham Van Librarian", Status = "Active", CreatedAt = DateTime.UtcNow }
+                new Account { Username = "student", Email = "student@e360.com", PasswordHash = passwordHash, Role = "Student", FullName = "Nguyen Van Student", Status = "Active", CreatedAt = DateTime.UtcNow }
             };
 
             await context.Accounts.AddRangeAsync(accounts);
