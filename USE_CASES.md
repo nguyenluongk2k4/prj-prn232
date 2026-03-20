@@ -76,4 +76,7 @@ Tài liệu mô tả luồng thao tác chính theo vai trò trong hệ thống q
 3. Xem danh sách lịch thi của bản thân theo môn/ngày.
 4. Xem chi tiết ca thi: phòng thi, giờ thi, giám thị.
 5. Xem trạng thái điểm danh của bản thân tại từng ca thi.
-6. Xem điểm thi sau khi đã được công bố (`Published`).
+6. **Tự xác nhận điểm danh** sau khi buổi thi kết thúc (`StudentConfirmed = true`).
+7. Xem điểm thi sau khi đã được công bố (`Published`).
+
+> **Lưu ý điểm danh:** Giám thị ghi nhận trạng thái chính thức (`Status`, `CheckInTime`, `Violation`). Sinh viên xác nhận thêm bằng `StudentConfirmed` sau buổi thi — dùng để đối chiếu nếu có tranh chấp.
