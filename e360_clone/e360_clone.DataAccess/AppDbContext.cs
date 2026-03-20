@@ -13,7 +13,6 @@ namespace e360_clone.DataAccess
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<ExamRoom> ExamRooms { get; set; }
-        public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ProctorAssignment> ProctorAssignments { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
@@ -25,7 +24,6 @@ namespace e360_clone.DataAccess
         {
             base.OnModelCreating(modelBuilder);
 
-            // Student configuration
             modelBuilder.Entity<Student>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -37,7 +35,6 @@ namespace e360_clone.DataAccess
                 entity.HasIndex(e => e.StudentCode).IsUnique();
             });
 
-            // Lecturer configuration
             modelBuilder.Entity<Lecturer>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -50,7 +47,6 @@ namespace e360_clone.DataAccess
                 entity.HasIndex(e => e.EmployeeCode).IsUnique();
             });
 
-            // Subject configuration
             modelBuilder.Entity<Subject>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -61,7 +57,6 @@ namespace e360_clone.DataAccess
                 entity.HasIndex(e => e.SubjectCode).IsUnique();
             });
 
-            // Class configuration
             modelBuilder.Entity<Class>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -70,9 +65,11 @@ namespace e360_clone.DataAccess
                 entity.Property(e => e.AcademicYear).HasMaxLength(20);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
                 entity.HasIndex(e => e.ClassCode).IsUnique();
+                entity.HasOne<Subject>()
+                    .WithMany()
+                    .HasForeignKey(c => c.MajorId);
             });
 
-            // ExamRoom configuration
             modelBuilder.Entity<ExamRoom>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -83,7 +80,6 @@ namespace e360_clone.DataAccess
                 entity.HasIndex(e => e.RoomCode).IsUnique();
             });
 
-            // Exam configuration
             modelBuilder.Entity<Exam>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -92,28 +88,27 @@ namespace e360_clone.DataAccess
                 entity.Property(e => e.ExamType).HasMaxLength(50);
                 entity.Property(e => e.AcademicYear).HasMaxLength(20);
                 entity.Property(e => e.Semester).HasMaxLength(20);
+                entity.Property(e => e.Notes).HasMaxLength(500);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Planned");
                 entity.HasIndex(e => e.ExamCode).IsUnique();
+
+                entity.HasOne<Subject>().WithMany().HasForeignKey(e => e.SubjectId);
+                entity.HasOne<Class>().WithMany().HasForeignKey(e => e.ClassId);
+                entity.HasOne<ExamRoom>().WithMany().HasForeignKey(e => e.RoomId);
+                entity.HasOne<Account>().WithMany().HasForeignKey(e => e.CreatedBy);
             });
 
-            // ExamSchedule configuration
-            modelBuilder.Entity<ExamSchedule>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Scheduled");
-                entity.Property(e => e.Notes).HasMaxLength(500);
-            });
-
-            // ProctorAssignment configuration
             modelBuilder.Entity<ProctorAssignment>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Role).HasMaxLength(50);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Assigned");
                 entity.Property(e => e.Notes).HasMaxLength(500);
+
+                entity.HasOne<Exam>().WithMany().HasForeignKey(pa => pa.ExamId);
+                entity.HasOne<Lecturer>().WithMany().HasForeignKey(pa => pa.LecturerId);
             });
 
-            // Grade configuration
             modelBuilder.Entity<Grade>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -121,79 +116,22 @@ namespace e360_clone.DataAccess
                 entity.Property(e => e.LetterGrade).HasMaxLength(5);
                 entity.Property(e => e.Notes).HasMaxLength(500);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Draft");
+
+                entity.HasOne<Student>().WithMany().HasForeignKey(g => g.StudentId);
+                entity.HasOne<Exam>().WithMany().HasForeignKey(g => g.ExamId);
             });
 
-            // Attendance configuration
             modelBuilder.Entity<Attendance>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Present");
                 entity.Property(e => e.Notes).HasMaxLength(500);
                 entity.Property(e => e.Violation).HasMaxLength(200);
+
+                entity.HasOne<Exam>().WithMany().HasForeignKey(a => a.ExamId);
+                entity.HasOne<Student>().WithMany().HasForeignKey(a => a.StudentId);
             });
 
-            // Relationships
-            modelBuilder.Entity<Exam>()
-                .HasOne<Subject>()
-                .WithMany()
-                .HasForeignKey(e => e.SubjectId);
-
-            modelBuilder.Entity<Exam>()
-                .HasOne<Class>()
-                .WithMany()
-                .HasForeignKey(e => e.ClassId);
-
-            modelBuilder.Entity<Exam>()
-                .HasOne<ExamRoom>()
-                .WithMany()
-                .HasForeignKey(e => e.RoomId);
-
-            modelBuilder.Entity<ExamSchedule>()
-                .HasOne<Exam>()
-                .WithMany()
-                .HasForeignKey(es => es.ExamId);
-
-            modelBuilder.Entity<ExamSchedule>()
-                .HasOne<ExamRoom>()
-                .WithMany()
-                .HasForeignKey(es => es.RoomId);
-
-            modelBuilder.Entity<ProctorAssignment>()
-                .HasOne<ExamSchedule>()
-                .WithMany()
-                .HasForeignKey(pa => pa.ExamScheduleId);
-
-            modelBuilder.Entity<ProctorAssignment>()
-                .HasOne<Lecturer>()
-                .WithMany()
-                .HasForeignKey(pa => pa.LecturerId);
-
-            modelBuilder.Entity<Grade>()
-                .HasOne<Student>()
-                .WithMany()
-                .HasForeignKey(g => g.StudentId);
-
-            modelBuilder.Entity<Grade>()
-                .HasOne<Exam>()
-                .WithMany()
-                .HasForeignKey(g => g.ExamId);
-
-            modelBuilder.Entity<Attendance>()
-                .HasOne<ExamSchedule>()
-                .WithMany()
-                .HasForeignKey(a => a.ExamScheduleId);
-
-            modelBuilder.Entity<Attendance>()
-                .HasOne<Student>()
-                .WithMany()
-                .HasForeignKey(a => a.StudentId);
-
-            modelBuilder.Entity<Class>()
-                .HasOne<Subject>()
-                .WithMany()
-                .HasForeignKey(c => c.MajorId);
-
-            // Account configuration
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -205,16 +143,10 @@ namespace e360_clone.DataAccess
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.HasIndex(e => e.Email).IsUnique();
 
-                // Relationships
-                entity.HasOne(a => a.Student)
-                    .WithMany()
-                    .HasForeignKey(a => a.StudentId)
-                    .OnDelete(DeleteBehavior.SetNull);
-
-                entity.HasOne(a => a.Lecturer)
-                    .WithMany()
-                    .HasForeignKey(a => a.LecturerId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(a => a.Student).WithMany()
+                    .HasForeignKey(a => a.StudentId).OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(a => a.Lecturer).WithMany()
+                    .HasForeignKey(a => a.LecturerId).OnDelete(DeleteBehavior.SetNull);
             });
         }
     }
