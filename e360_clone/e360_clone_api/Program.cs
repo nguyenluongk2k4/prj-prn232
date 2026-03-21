@@ -57,14 +57,13 @@ namespace e360_clone
             builder.Services.AddAuthorization();
 
             // Configure CORS for frontend API calls
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>()
+                ?? new[] { "http://localhost:5000", "https://localhost:5001" };
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins(
-                            builder.Configuration["CorsSettings:AllowedOrigins:0"] ?? "http://localhost:5000",
-                            builder.Configuration["CorsSettings:AllowedOrigins:1"] ?? "https://localhost:5001"
-                        )
+                    policy.WithOrigins(allowedOrigins)
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });

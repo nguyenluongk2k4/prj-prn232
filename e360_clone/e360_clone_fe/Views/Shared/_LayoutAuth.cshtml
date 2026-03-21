@@ -26,10 +26,17 @@
     <!-- Bootstrap -->
     <script src="~/assets/js/lib/bootstrap.bundle.min.js"></script>
     <!-- Main App -->
+<<<<<<< HEAD
     <script src="~/assets/js/app.js" asp-append-version="true"></script>
     <!-- App config (required by core modules) -->
     <script src="~/js/config.js" asp-append-version="true"></script>
     
+=======
+    <script src="~/assets/js/app.js"></script>
+    <!-- App Config (must load before core JS) -->
+    <script src="~/js/config.js"></script>
+
+>>>>>>> b336218bced390ad786db22d60644e50b49274f3
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

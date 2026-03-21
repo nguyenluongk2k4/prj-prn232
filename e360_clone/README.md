@@ -1,5 +1,19 @@
 \# chủ đề: API cho Nền tảng quản lý lịch thi \& coi thi
 
+## Database
+
+**PostgreSQL** tự host trên **Coolify** (VPS riêng) tại `postgres.memore.vn`, port **5433** (thay vì 5432 mặc định để tránh bị block bởi firewall/ISP).
+
+- Dashboard Coolify: https://postgres.memore.vn/project/default/editor/25312
+- Connection string (xem `e360_clone_api/appsettings.json`):
+  ```
+  Host=103.72.56.152;Port=5433;Database=postgres;Username=postgres;Password=...
+  ```
+
+> Lý do dùng port 5433: port 5432 bị một số mạng/ISP block, port 5433 tránh được vấn đề này.
+
+
+
 
 
 \## 1. Nghiệp vụ

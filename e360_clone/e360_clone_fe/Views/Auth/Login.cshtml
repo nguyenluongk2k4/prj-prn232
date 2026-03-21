@@ -147,5 +147,102 @@
             this.classList.toggle('ri-eye-off-line');
         });
     });
+<<<<<<< HEAD
+=======
+
+    // Show/hide error alert
+    function showError(message) {
+        const alertEl = document.getElementById('errorAlert');
+        const msg = document.getElementById('errorMessage');
+        if (!alertEl || !msg) return;
+        msg.textContent = message;
+        alertEl.classList.remove('d-none');
+        setTimeout(() => alertEl.classList.add('d-none'), 5000);
+    }
+
+    // Set button loading state
+    function setLoginLoading(loading) {
+        const btn = document.getElementById('loginBtn');
+        const btnText = btn.querySelector('.btn-text');
+        const btnLoading = btn.querySelector('.btn-loading');
+        
+        if (loading) {
+            btn.disabled = true;
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        } else {
+            btn.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+        }
+    }
+
+    // Handle form submit
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        setLoginLoading(true);
+
+        try {
+            const response = await AuthApi.login(email, password);
+            
+            if (response.success) {
+                // Save token and user info using Auth core
+                Auth.setAuth(response.data.token, {
+                    username: response.data.username,
+                    email: response.data.email,
+                    fullName: response.data.fullName,
+                    role: response.data.role,
+                    avatarUrl: response.data.avatarUrl
+                });
+
+                // Redirect based on role
+                Auth.redirectByRole();
+            } else {
+                showError(response.message || 'Login failed');
+            }
+        } catch (error) {
+            showError(error.message || 'Login failed. Please try again.');
+        } finally {
+            setLoginLoading(false);
+        }
+    });
+
+    // Handle quick login
+    document.querySelectorAll('.quick-login-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const role = this.dataset.role;
+            
+            try {
+                const response = await AuthApi.quickLogin(role);
+                
+                if (response.success) {
+                    // Save token and user info
+                    Auth.setAuth(response.data.token, {
+                        username: response.data.username,
+                        email: response.data.email,
+                        fullName: response.data.fullName,
+                        role: response.data.role,
+                        avatarUrl: response.data.avatarUrl
+                    });
+
+                    // Redirect based on role
+                    Auth.redirectByRole();
+                }
+            } catch (error) {
+                showError(error.message || 'Quick login failed');
+            }
+        });
+    });
+
+    // Check if already logged in
+    if (Auth.isAuthenticated()) {
+        Auth.redirectByRole();
+    }
+>>>>>>> b336218bced390ad786db22d60644e50b49274f3
 </script>
 }

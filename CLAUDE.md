@@ -8,19 +8,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 real_project/
 ├── e360_clone/          # Main .NET solution — all active backend/MVC work happens here
 │   ├── e360_clone_api/  # ASP.NET Core 8 Web API (primary backend)
-│   ├── e360_clone_fe/   # ASP.NET Core MVC frontend (old MVC approach)
-│   ├── e360_clone.BusinessObjects/  # Entity models (no dependencies)
+│   ├── e360_clone_fe/   # ASP.NET Core MVC frontend (active UI)
+│   ├── e360_clone.BusinessObjects/  # Entity models, enums, helpers, utilities
 │   ├── e360_clone.DataAccess/       # EF Core DbContext (PostgreSQL)
-│   ├── e360_clone.Repositories/     # Generic repository pattern
+│   ├── e360_clone.Repositories/     # Generic repository + UnitOfWork
 │   └── SeedDatabase/    # DB seeding utilities
-├── e360_clone_fe/       # New Next.js 16 frontend (in early scaffolding)
-├── e360_clone_api/      # Build artifacts only — do not edit
 ├── API.md               # Full API specification (implemented + required)
 ├── USE_CASES.md         # Use case flows per role
 └── AGENTS.md            # Repository guidelines
 ```
 
-> All active .NET development is inside `e360_clone/`. See `e360_clone/CLAUDE.md` for detailed guidance on that sub-project.
+> Note: `e360_clone/CLAUDE.md` is outdated (references a Next.js frontend that was abandoned). The active frontend is `e360_clone_fe/` (ASP.NET MVC).
 
 ## Commands
 
@@ -46,15 +44,6 @@ cd e360_clone/e360_clone_fe
 dotnet run              # http://localhost:5000
 ```
 
-### New Next.js Frontend (`e360_clone_fe/`)
-```bash
-cd e360_clone_fe
-npm install
-npm run dev             # http://localhost:3000
-npm run build
-npm run lint
-```
-
 ## Architecture
 
 ### Backend layer dependencies
@@ -65,29 +54,47 @@ e360_clone_api
         └── e360_clone.BusinessObjects
 ```
 
+### Entity model base
+All entities extend `BaseEntity` (`e360_clone.BusinessObjects/Common/BaseEntity.cs`): `Id` (int PK), `CreatedAt`, `UpdatedAt`. Enums live in `e360_clone.BusinessObjects/Enums/Enums.cs`: `ExamStatus`, `ProctorStatus`, `GradeStatus`, `AttendanceStatus`, `ViolationType`, `SubjectType`, `RoomStatus`, `ExamType`, `ProctorRole`. Common enums (`RecordStatus`, `Gender`) are in `BaseEntity.cs`. `Account.Role` is a plain `string` field (not an enum): values are `"Admin"`, `"SuperAdmin"`, `"Student"`, `"Teacher"`, `"Librarian"`, `"Parent"`.
+
 ### API contract
-- All responses are wrapped: `ApiResponse<T>` (`success`, `message`, `data`) or `PagedResponse<T>` (adds `pageNumber`, `pageSize`, `totalRecords`, `totalPages`).
-- List endpoints accept: `pageNumber`, `pageSize`, `searchTerm`, `sortBy`, `sortDescending`.
-- Auth: JWT Bearer. Login via `POST /api/auth/login` (email + password) or `POST /api/auth/quick-login` (role, demo only).
-- All data-mutating endpoints require JWT and role-based authorization.
-- Audit fields required on all entities: `createdAt`, `updatedAt`, `status`.
+- All responses: `ApiResponse<T>` (`success`, `message`, `data`) or `PagedResponse<T>` (adds `pageNumber`, `pageSize`, `totalRecords`, `totalPages`). Both defined in `BaseApiController.cs`.
+- `BaseApiController` provides helpers: `HandleResult<T>()`, `HandleNotFound()`, `HandleError()`.
+- List endpoints accept `PagedRequest`: `pageNumber`, `pageSize`, `searchTerm`, `sortBy`, `sortDescending`.
+- Auth: JWT Bearer. Login via `POST /api/auth/login` (email/username + password) or `POST /api/auth/quick-login` (role string, demo only). Register via `POST /api/auth/register`.
+- JWT claims include `ClaimTypes.Name` (username), `ClaimTypes.Email`, `ClaimTypes.Role`, `"FullName"`, `"UserId"`.
 
-### ASP.NET MVC frontend (legacy)
-The `e360_clone/e360_clone_fe/` project is an ASP.NET Core MVC shell that serves static pages. Each feature follows a 4-file module pattern:
+### Repository & utilities (backend)
+- Inject `IRepository<T>` (defined in `e360_clone.Repositories/IRepository.cs`) for single-entity work or `IUnitOfWork` for multi-entity transactions.
+- Key `IRepository<T>` methods: `GetAllAsync()`, `GetByIdAsync()`, `FindAsync()`, `FirstOrDefaultAsync()`, `AnyAsync()`, `CountAsync()`, `GetPagedAsync()`, `GetPagedFilteredAsync()`, `SearchAsync()`.
+- `PagedResult<T>` (from `IRepository.cs`) holds `Items`, `TotalRecords`, `TotalPages`, `HasPrevious`, `HasNext`.
+- Utility classes in `e360_clone.BusinessObjects/Utilities/Utils.cs`: `GradeUtils`, `DateTimeUtils`, `StringUtils`, `PaginationUtils`.
+- Response helpers in `e360_clone.BusinessObjects/Helpers/Helpers.cs` and `PasswordHelper.cs` (SHA256 for demo).
+
+### ASP.NET MVC frontend
+`e360_clone/e360_clone_fe/` is an ASP.NET Core MVC shell serving Razor views backed by vanilla JS modules. Each feature follows this pattern:
 1. Backend API controller: `e360_clone_api/Controllers/[Feature]Controller.cs`
-2. Frontend MVC controller: `e360_clone_fe/Controllers/[Feature]Controller.cs` (returns `View()`)
+2. Frontend MVC controller: `e360_clone_fe/Controllers/[Feature]Controller.cs` (returns `View()`, no logic)
 3. Razor view: `e360_clone_fe/Views/[Feature]/Index.cshtml`
-4. JS modules: `wwwroot/js/modules/[feature].api.js` + `[feature].ui.js`
+4. JS modules (IIFE pattern): `wwwroot/js/modules/[feature]/api.js`, `helpers.js`, `ui.js`
 
-Key JS files: `wwwroot/js/config.js` (API base URL), `utils.js` (toast, loading, formatDate), `api-client.js` (fetch wrapper).
+### Frontend JS layer
+Script load order (set in `_ScriptsPartial.cshtml`):
+1. **Libs** (`wwwroot/assets/js/lib/`): jQuery 3.7.1, Bootstrap bundle, ApexCharts, DataTables, Flatpickr, Iconify, jQuery UI
+2. **Config** (`wwwroot/js/config.js`): sets `APP_CONFIG.API_BASE_URL` (default `http://localhost:5104/api`)
+3. **Core** (`wwwroot/js/core/`): `http.js` → `auth.js` — must load before everything else
+4. **Utils** (`wwwroot/js/utils.js`): `Utils.showLoading()`, `Utils.hideLoading()`, `Utils.showToast()`
+5. **Enums** (`wwwroot/js/enums/`): `AccountStatus`, `Role`, `StudentStatus`, `Gender`, `ExamStatus`, `GradeType`, `AttendanceStatus`
+6. **Models** (`wwwroot/js/models/`): `Student`, `Account`, `UserInfo`, `Exam`, `ApiResponse`
+7. **Mappers** (`wwwroot/js/mappers/`): `StudentMapper`, `AccountMapper`, `ExamMapper`
+8. **Feature scripts** (`@section Scripts` in each view)
 
-### New Next.js frontend
-`e360_clone_fe/` uses Next.js 16 App Router, Tailwind CSS 4, strict TypeScript, path alias `@/*` → project root.
+JS call chain: `Http` (auto-attaches JWT Bearer from `localStorage.authToken`) → `[Feature]Api` → `[Feature]Helper` → `[Feature]UI`. Never call `Http` directly from UI layer. `Auth` module (from `auth.js`) manages `localStorage` keys `authToken` and `userInfo`; on 401, `Http` auto-redirects to `/Auth/Login`.
 
 ## Database
 - PostgreSQL via Supabase
 - Connection string in `e360_clone/e360_clone_api/appsettings.json` → `ConnectionStrings.DefaultConnection`
-- Password hashing: SHA256 (demo). Production should use BCrypt/Argon2.
+- Password hashing: SHA256 via `PasswordHelper` (demo). Production should use BCrypt/Argon2.
 - Default seeded accounts (password `123456`): `superadmin`, `admin`, `student`, `teacher`, `parent`, `librarian` — see `e360_clone/DATABASE_AUTH_SETUP.md`.
 
 ## Roles & Modules
@@ -100,5 +107,5 @@ Full API spec in `API.md`. Use case flows per role in `USE_CASES.md`.
 ## Conventions
 - C# targets `net8.0`; `Nullable` and `ImplicitUsings` enabled; PascalCase types/methods, camelCase locals.
 - Vietnamese is the primary language for business logic, UI text, and documentation.
-- Backend namespace: `e360_clone`; frontend uses strict TypeScript.
+- Backend namespace: `e360_clone`. Frontend JS uses vanilla ES6 IIFEs (no TypeScript, no bundler).
 - Commit format: `type: summary` (e.g. `fix: seed account roles`). If DB changes are included, note migration name.
