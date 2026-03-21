@@ -1,0 +1,20 @@
+# Build outputs (global)
+**/bin/
+**/obj/
+
+# Build outputs (explicit project roots)
+e360_clone/e360_clone_api/bin/
+e360_clone/e360_clone_api/obj/
+e360_clone/e360_clone_fe/bin/
+e360_clone/e360_clone_fe/obj/
+e360_clone.BusinessObjects/bin/
+e360_clone.BusinessObjects/obj/
+e360_clone.DataAccess/bin/
+e360_clone.DataAccess/obj/
+e360_clone.Repositories/bin/
+e360_clone.Repositories/obj/
+SeedDatabase/bin/
+SeedDatabase/obj/
+
+# VS/IDE
+.vs/

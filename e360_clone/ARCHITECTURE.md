@@ -343,10 +343,18 @@ namespace e360_clone.Repositories
 ```
 e360_clone_api/
 ├── Controllers/
-│   ├── BaseApiController.cs    # Base controller
-│   ├── StudentsController.cs
+│   ├── BaseApiController.cs           # Base controller
 │   ├── AuthController.cs
-│   └── ...
+│   ├── AttendancesController.cs
+│   ├── ClassesController.cs
+│   ├── ExamsController.cs
+│   ├── GradesController.cs
+│   ├── LecturersController.cs
+│   ├── ProctorAssignmentsController.cs
+│   ├── RoomsController.cs
+│   ├── StudentsController.cs
+│   ├── SubjectsController.cs
+│   └── WeatherForecastController.cs   # Sample/demo
 ├── Models/
 │   ├── ApiResponse.cs          # Standard response wrapper
 │   └── DTOs/
@@ -408,8 +416,10 @@ namespace e360_clone.Controllers
 e360_clone_fe/
 ├── Controllers/
 │   ├── BaseController.cs       # Base controller với auth helpers
+│   ├── DashboardController.cs
 │   ├── HomeController.cs
-│   ├── AuthController.cs       # Login, Logout
+│   ├── Auth/
+│   │   └── AuthController.cs   # Login, Logout
 │   ├── StudentsController.cs   # Student management
 │   └── ...
 ├── Models/
@@ -732,8 +742,14 @@ namespace e360_clone_fe.Controllers
 ### 1. Đặt Tên
 
 **Controllers:**
-- Backend: `StudentsController.cs` (trong `e360_clone_api/Controllers/`)
-- Frontend: `StudentsController.cs` (trong `e360_clone_fe/Controllers/`)
+- Backend (hiện có, trong `e360_clone_api/Controllers/`):
+  `AuthController`, `AttendancesController`, `ClassesController`, `ExamsController`,
+  `GradesController`, `LecturersController`, `ProctorAssignmentsController`,
+  `RoomsController`, `StudentsController`, `SubjectsController`,
+  `WeatherForecastController` (sample), `BaseApiController` (base).
+- Frontend (hiện có, trong `e360_clone_fe/Controllers/`):
+  `Auth/AuthController`, `DashboardController`, `HomeController`,
+  `StudentsController`, `BaseController` (base).
 
 **Models/ViewModels:**
 - Entity: `Student.cs` (trong `BusinessObjects/`)
