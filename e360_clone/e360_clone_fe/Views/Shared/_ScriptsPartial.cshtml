@@ -1,62 +1,32 @@
 <!-- jQuery library -->
-<script src="~/assets/js/lib/jquery-3.7.1.min.js"></script>
+<script src="/assets/js/lib/jquery-3.7.1.min.js"></script>
 
 <!-- Bootstrap JS -->
-<script src="~/assets/js/lib/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/lib/bootstrap.bundle.min.js"></script>
 
 <!-- Apex Chart JS -->
-<script src="~/assets/js/lib/apexcharts.min.js"></script>
+<script src="/assets/js/lib/apexcharts.min.js"></script>
 
 <!-- Iconify Font JS -->
-<script src="~/assets/js/lib/iconify-icon.min.js"></script>
+<script src="/assets/js/lib/iconify-icon.min.js"></script>
 
 <!-- Data Table JS -->
-<script src="~/assets/js/lib/dataTables.min.js"></script>
+<script src="/assets/js/lib/dataTables.min.js"></script>
 
 <!-- Date Picker JS -->
-<script src="~/assets/js/lib/flatpickr.min.js"></script>
+<script src="/assets/js/lib/flatpickr.min.js"></script>
 
 <!-- jQuery UI JS -->
-<script src="~/assets/js/lib/jquery-ui.min.js"></script>
+<script src="/assets/js/lib/jquery-ui.min.js"></script>
 
 <!-- Main App JS -->
-<script src="~/assets/js/app.js"></script>
+<script src="/assets/js/app.js" asp-append-version="true"></script>
 
 <!-- App config -->
-<script src="~/js/config.js"></script>
-
-<!-- Core JS (HTTP, Auth) - MUST LOAD FIRST -->
-<script src="~/js/core/http.js"></script>
-<script src="~/js/core/auth.js"></script>
+<script src="/js/config.js" asp-append-version="true"></script>
 
 <!-- Utilities -->
-<script src="~/js/utils.js"></script>
-
-<!-- Enums -->
-<script src="~/js/enums/AccountStatus.js"></script>
-<script src="~/js/enums/Role.js"></script>
-<script src="~/js/enums/StudentStatus.js"></script>
-<script src="~/js/enums/Gender.js"></script>
-<script src="~/js/enums/ExamStatus.js"></script>
-<script src="~/js/enums/GradeType.js"></script>
-<script src="~/js/enums/AttendanceStatus.js"></script>
-<script src="~/js/enums/index.js"></script>
-
-<!-- Models -->
-<script src="~/js/models/ApiResponse.js"></script>
-<script src="~/js/models/Student.js"></script>
-<script src="~/js/models/Account.js"></script>
-<script src="~/js/models/UserInfo.js"></script>
-<script src="~/js/models/Exam.js"></script>
-<script src="~/js/models/index.js"></script>
-
-<!-- Mappers -->
-<script src="~/js/mappers/StudentMapper.js"></script>
-<script src="~/js/mappers/AccountMapper.js"></script>
-<script src="~/js/mappers/ExamMapper.js"></script>
-<script src="~/js/mappers/index.js"></script>
-
-@await RenderSectionAsync("Scripts", required: false)
+<script src="/js/utils.js"></script>
 
 <script>
   // Set current year in footer
@@ -65,19 +35,15 @@
     if (yearSpan) {
       yearSpan.textContent = new Date().getFullYear();
     }
-    
-    // Load user info into sidebar
-    const userInfo = Auth.getUser();
-    if (userInfo) {
-      const userNameEl = document.getElementById('sidebarUserName');
-      const userRoleEl = document.getElementById('sidebarUserRole');
-      if (userNameEl) userNameEl.textContent = userInfo.fullName || userInfo.username;
-      if (userRoleEl) userRoleEl.textContent = RoleHelper.getText(userInfo.role) || userInfo.role;
-    }
-    
-    // Handle logout
-    document.getElementById('logoutBtn')?.addEventListener('click', function() {
-      Auth.logout();
+
+    // Handle logout button
+    document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Submit logout form
+      const form = document.getElementById('logoutForm');
+      if (form) {
+        form.submit();
+      }
     });
   });
 </script>

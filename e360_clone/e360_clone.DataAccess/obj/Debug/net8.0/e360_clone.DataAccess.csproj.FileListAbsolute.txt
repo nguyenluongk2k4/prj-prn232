@@ -14,3 +14,5 @@ C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\obj\Debug\net8.0\e360_clone.D
 C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\obj\Debug\net8.0\refint\e360_clone.DataAccess.dll
 C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\obj\Debug\net8.0\e360_clone.DataAccess.pdb
 C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\obj\Debug\net8.0\ref\e360_clone.DataAccess.dll
+C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\bin\Debug\net8.0\appsettings.Development.json
+C:\Git\prj-prn232\e360_clone\e360_clone.DataAccess\bin\Debug\net8.0\appsettings.json

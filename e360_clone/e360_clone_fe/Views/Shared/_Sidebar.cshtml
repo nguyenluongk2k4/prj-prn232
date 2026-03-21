@@ -7,9 +7,9 @@
   <div class="">
     <div class="sidebar-logo d-flex align-items-center justify-content-between">
       <a href="/" class="">
-        <img src="~/assets/images/logo-ic.png" alt="site logo" class="light-logo" style="max-height: 50px;">
-        <img src="~/assets/images/logo-ic.png" alt="site logo" class="dark-logo" style="max-height: 50px;">
-        <img src="~/assets/images/logo-ic.png" alt="site logo" class="logo-icon" style="max-height: 40px;">
+        <img src="/assets/images/logo.png" alt="site logo" class="light-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-light.png" alt="site logo" class="dark-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-icon.png" alt="site logo" class="logo-icon" style="max-height: 32px;">
       </a>
       <button type="button" class="text-xxl d-xl-flex d-none line-height-1 sidebar-toggle text-neutral-500"
         aria-label="Collapse Sidebar">
@@ -20,16 +20,19 @@
   
   <!-- User Info -->
   <div class="mx-16 py-12">
+    @{
+        var user = Context.Session.GetUser();
+    }
     <div class="dropdown profile-dropdown">
       <button type="button"
         class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
         data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
         <span class="d-flex align-items-start gap-10">
-          <img src="~/assets/images/thumbs/avatar-img1.png" alt="Thumbnail"
+          <img src="@(user?.AvatarUrl ?? "/assets/images/thumbs/avatar-img1.png")" alt="Avatar"
             class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
           <span class="profile-dropdown__contents">
-            <span class="h6 mb-0 text-md d-block text-primary-light" id="sidebarUserName">Loading...</span>
-            <span class="text-secondary-light text-sm mb-0 d-block" id="sidebarUserRole">...</span>
+            <span class="h6 mb-0 text-md d-block text-primary-light" id="sidebarUserName">@(user?.DisplayName ?? "Guest")</span>
+            <span class="text-secondary-light text-sm mb-0 d-block" id="sidebarUserRole">@(user?.RoleText ?? "...")</span>
           </span>
         </span>
         <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
@@ -55,6 +58,9 @@
           <hr class="dropdown-divider">
         </li>
         <li>
+          <form id="logoutForm" asp-controller="Auth" asp-action="Logout" method="post" class="d-none">
+            @Html.AntiForgeryToken()
+          </form>
           <button type="button" id="logoutBtn"
             class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 w-100 border-0 bg-transparent">
             <i class="ri-shut-down-line"></i>

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using e360_clone.DataAccess;
+using e360_clone.DataAccess.DAOs;
 using e360_clone.Repositories;
+using e360_clone_fe.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<AccountDAO>();
+
+// Register ApiService for calling backend API
+builder.Services.AddApiService(builder.Configuration);
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -30,16 +37,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
-// Configure CORS for API calls
-builder.Services.AddCors(options =>
+// Add Session for user data storage
+builder.Services.AddSession(options =>
 {
-    options.AddPolicy("AllowApi", policy =>
-    {
-        policy.WithOrigins("http://localhost:5104", "https://localhost:7052")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "E360.Session";
 });
+
 
 var app = builder.Build();
 
@@ -55,7 +61,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors("AllowApi");
+// Use Session before Auth
+app.UseSession();
 
 // Use Authentication & Authorization
 app.UseAuthentication();

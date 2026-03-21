@@ -1,21 +1,28 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using e360_clone.BusinessObjects;
+using e360_clone_fe.Extensions;
 
 namespace e360_clone_fe.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         public IActionResult Index()
         {
-            // Redirect to appropriate dashboard based on user role
-            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            // Check if user is logged in
+            var user = HttpContext.Session.GetUser();
             
-            return role switch
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            // Redirect to appropriate dashboard based on user role
+            return user.Role switch
             {
                 "Student" => RedirectToAction("Student", "Dashboard"),
                 "Teacher" => RedirectToAction("Teacher", "Dashboard"),
                 "Parent" => RedirectToAction("Parent", "Dashboard"),
+                "Admin" => RedirectToAction("Lms", "Dashboard"),
                 _ => RedirectToAction("School", "Dashboard")
             };
         }

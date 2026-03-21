@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
-
-@await Html.PartialAsync("_HeadPartial")
-
+<head>
+  @await Html.PartialAsync("_HeadPartial")
+  @RenderSection("Head", required: false)
+</head>
 <body>
   <!-- Theme Customization -->
   @await Html.PartialAsync("_ThemeCustomization")
@@ -15,21 +16,22 @@
   
   <!-- Main Content -->
   <main class="dashboard-main">
-    
+
     <!-- Header -->
     @await Html.PartialAsync("_Header")
-    
+
     <!-- Page Content -->
     <div class="main-content__wrapper">
       @RenderBody()
     </div>
-    
+
     <!-- Footer -->
     @await Html.PartialAsync("_Footer")
   </main>
   
   <!-- Scripts -->
   @await Html.PartialAsync("_ScriptsPartial")
+  @RenderSection("Scripts", required: false)
 </body>
 
 </html>

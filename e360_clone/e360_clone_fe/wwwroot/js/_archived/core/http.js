@@ -5,9 +5,13 @@
  */
 
 const Http = (function() {
+    const appConfig = globalThis.APP_CONFIG || {};
+    // Always use HTTPS URL directly to avoid HTTP→HTTPS redirect breaking CORS preflight
+    const defaultBaseUrl = 'https://localhost:7052/api';
+    const baseUrl = appConfig.API_BASE_URL || defaultBaseUrl;
     const config = {
-        baseUrl: APP_CONFIG?.API_BASE_URL || 'http://localhost:5104/api',
-        timeout: APP_CONFIG?.API_TIMEOUT || 10000,
+        baseUrl,
+        timeout: appConfig.API_TIMEOUT || 10000,
         headers: {
             'Content-Type': 'application/json'
         }
