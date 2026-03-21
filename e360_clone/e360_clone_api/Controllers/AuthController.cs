@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using e360_clone.BusinessObjects;
-using e360_clone.DataAccess;
 using e360_clone.BusinessObjects.Helpers;
-using Microsoft.EntityFrameworkCore;
+using e360_clone.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
@@ -11,16 +10,14 @@ using System.Text;
 
 namespace e360_clone.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
     public class AuthController : BaseApiController
     {
-        private readonly AppDbContext _context;
+        private readonly IAccountRepository _accountRepository;
         private readonly IConfiguration _config;
 
-        public AuthController(AppDbContext context, IConfiguration config)
+        public AuthController(IAccountRepository accountRepository, IConfiguration config)
         {
-            _context = context;
+            _accountRepository = accountRepository;
             _config = config;
         }
 
@@ -37,8 +34,7 @@ namespace e360_clone.Controllers
             }
 
             // Find account by email or username
-            var account = await _context.Accounts
-                .FirstOrDefaultAsync(a => a.Email == model.Email || a.Username == model.Email);
+            var account = await _accountRepository.FindByEmailOrUsernameAsync(model.Email);
 
             if (account == null)
             {
@@ -74,7 +70,7 @@ namespace e360_clone.Controllers
 
             // Update last login
             account.LastLoginAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _accountRepository.UpdateLastLoginAsync(account.Id);
 
             return Ok(new ApiResponse<LoginResponse>
             {
@@ -95,11 +91,11 @@ namespace e360_clone.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
-            if (await _context.Accounts.AnyAsync(a => a.Email == model.Email))
+            if (await _accountRepository.EmailExistsAsync(model.Email))
                 return BadRequest(new ApiResponse<object> { Success = false, Message = "Email đã tồn tại" });
 
             var username = model.Email.Split('@')[0];
-            if (await _context.Accounts.AnyAsync(a => a.Username == username))
+            if (await _accountRepository.UsernameExistsAsync(username))
                 username = username + "_" + DateTime.UtcNow.Ticks.ToString()[^4..];
 
             var account = new Account
@@ -114,8 +110,7 @@ namespace e360_clone.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Accounts.Add(account);
-            await _context.SaveChangesAsync();
+            await _accountRepository.AddAsync(account);
 
             return Ok(new ApiResponse<object>
             {

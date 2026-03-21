@@ -6,9 +6,9 @@ namespace e360_clone.Controllers
 {
     public class RoomsController : BaseApiController
     {
-        private readonly IRepository<ExamRoom> _repository;
+        private readonly IExamRoomRepository _repository;
 
-        public RoomsController(IRepository<ExamRoom> repository)
+        public RoomsController(IExamRoomRepository repository)
         {
             _repository = repository;
         }
@@ -16,26 +16,37 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var items = await _repository.GetAllAsync();
-            var query = items.AsQueryable();
+            var term = request.SearchTerm?.Trim();
+            Func<IQueryable<ExamRoom>, IOrderedQueryable<ExamRoom>> orderBy = q => q.OrderBy(x => x.RoomCode);
 
-            if (!string.IsNullOrEmpty(request.SearchTerm))
+            IEnumerable<ExamRoom> data;
+            int totalRecords;
+
+            if (!string.IsNullOrEmpty(term))
             {
-                query = query.Where(x => x.RoomName.Contains(request.SearchTerm) || x.RoomCode.Contains(request.SearchTerm));
+                data = await _repository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    x => x.RoomName.Contains(term) || x.RoomCode.Contains(term),
+                    orderBy);
+                totalRecords = await _repository.CountAsync(
+                    x => x.RoomName.Contains(term) || x.RoomCode.Contains(term));
             }
-
-            var totalRecords = query.Count();
-            var data = query
-                .OrderBy(x => x.RoomCode)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            else
+            {
+                data = await _repository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    null,
+                    orderBy);
+                totalRecords = await _repository.CountAsync();
+            }
 
             return Ok(new PagedResponse<ExamRoom>
             {
                 Success = true,
                 Message = "Lấy danh sách phòng thi thành công",
-                Data = data,
+                Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords

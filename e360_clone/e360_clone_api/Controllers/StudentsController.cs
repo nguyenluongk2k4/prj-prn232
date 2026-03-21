@@ -6,9 +6,9 @@ namespace e360_clone.Controllers
 {
     public class StudentsController : BaseApiController
     {
-        private readonly IRepository<Student> _studentRepository;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentsController(IRepository<Student> studentRepository)
+        public StudentsController(IStudentRepository studentRepository)
         {
             _studentRepository = studentRepository;
         }
@@ -16,26 +16,37 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var students = await _studentRepository.GetAllAsync();
-            var query = students.AsQueryable();
+            var term = request.SearchTerm?.Trim();
+            Func<IQueryable<Student>, IOrderedQueryable<Student>> orderBy = q => q.OrderBy(s => s.StudentCode);
 
-            if (!string.IsNullOrEmpty(request.SearchTerm))
+            IEnumerable<Student> data;
+            int totalRecords;
+
+            if (!string.IsNullOrEmpty(term))
             {
-                query = query.Where(s => s.FullName.Contains(request.SearchTerm) || s.StudentCode.Contains(request.SearchTerm));
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => s.FullName.Contains(term) || s.StudentCode.Contains(term),
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(
+                    s => s.FullName.Contains(term) || s.StudentCode.Contains(term));
             }
-
-            var totalRecords = query.Count();
-            var data = query
-                .OrderBy(s => s.StudentCode)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            else
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    null,
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync();
+            }
 
             return Ok(new PagedResponse<Student>
             {
                 Success = true,
                 Message = "Lấy danh sách sinh viên thành công",
-                Data = data,
+                Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords
@@ -95,7 +106,7 @@ namespace e360_clone.Controllers
             existing.Address = student.Address;
             existing.ClassId = student.ClassId;
             existing.Status = student.Status;
-            existing.UpdatedAt = DateTime.Now;
+            existing.UpdatedAt = DateTime.UtcNow;
 
             await _studentRepository.UpdateAsync(existing);
 

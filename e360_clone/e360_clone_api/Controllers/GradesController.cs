@@ -6,9 +6,9 @@ namespace e360_clone.Controllers
 {
     public class GradesController : BaseApiController
     {
-        private readonly IRepository<Grade> _repository;
+        private readonly IGradeRepository _repository;
 
-        public GradesController(IRepository<Grade> repository)
+        public GradesController(IGradeRepository repository)
         {
             _repository = repository;
         }
@@ -16,21 +16,18 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var items = await _repository.GetAllAsync();
-            var query = items.AsQueryable();
-
-            var totalRecords = query.Count();
-            var data = query
-                .OrderBy(x => x.StudentId)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            var data = await _repository.GetPagedFilteredAsync(
+                request.PageNumber,
+                request.PageSize,
+                null,
+                q => q.OrderBy(x => x.StudentId));
+            var totalRecords = await _repository.CountAsync();
 
             return Ok(new PagedResponse<Grade>
             {
                 Success = true,
                 Message = "Lấy danh sách điểm thành công",
-                Data = data,
+                Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords

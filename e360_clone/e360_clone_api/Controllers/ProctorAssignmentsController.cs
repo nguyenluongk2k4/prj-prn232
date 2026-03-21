@@ -7,9 +7,9 @@ namespace e360_clone.Controllers
     [Route("api/proctors")]
     public class ProctorAssignmentsController : BaseApiController
     {
-        private readonly IRepository<ProctorAssignment> _repository;
+        private readonly IProctorAssignmentRepository _repository;
 
-        public ProctorAssignmentsController(IRepository<ProctorAssignment> repository)
+        public ProctorAssignmentsController(IProctorAssignmentRepository repository)
         {
             _repository = repository;
         }
@@ -17,21 +17,18 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var items = await _repository.GetAllAsync();
-            var query = items.AsQueryable();
-
-            var totalRecords = query.Count();
-            var data = query
-                .OrderBy(x => x.ExamId)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            var data = await _repository.GetPagedFilteredAsync(
+                request.PageNumber,
+                request.PageSize,
+                null,
+                q => q.OrderBy(x => x.ExamId));
+            var totalRecords = await _repository.CountAsync();
 
             return Ok(new PagedResponse<ProctorAssignment>
             {
                 Success = true,
                 Message = "Lấy danh sách phân công coi thi thành công",
-                Data = data,
+                Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords

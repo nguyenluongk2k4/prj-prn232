@@ -3,6 +3,30 @@
   "WorkspaceRootPath": "C:\\Git\\prj-prn232\\e360_clone\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\controllers\\attendancescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\controllers\\attendancescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\accountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\accountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -13,10 +37,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\views\\dashboard\\lms.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\views\\dashboard\\lms.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
@@ -55,10 +75,6 @@
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\accountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\accountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.dataaccess\\daos\\accountdao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|solutionrelative:e360_clone.dataaccess\\daos\\accountdao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -71,28 +87,12 @@
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\irepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\irepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\iaccountrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\models\\account.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\wwwroot\\js\\_archived\\models\\account.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.dataaccess\\configurations\\accountconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|solutionrelative:e360_clone.dataaccess\\configurations\\accountconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\controllers\\baseapicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\controllers\\baseapicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.dataaccess\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|solutionrelative:e360_clone.dataaccess\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.dataaccess\\e360_clone.dataaccess.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -105,14 +105,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.dataaccess\\daos\\basedao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0D444C61-FD5F-18A1-FC6F-FFAE102DF9CB}|e360_clone.DataAccess\\e360_clone.DataAccess.csproj|solutionrelative:e360_clone.dataaccess\\daos\\basedao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{43833CFF-7824-4184-D12A-104E8BDD7901}|e360_clone.Repositories\\e360_clone.Repositories.csproj|solutionrelative:e360_clone.repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\services\\apiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -471,6 +463,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "AttendancesController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AttendancesController.cs",
+              "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\AttendancesController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AttendancesController.cs",
+              "RelativeToolTip": "e360_clone_api\\Controllers\\AttendancesController.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAQwCcAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T18:17:45.934Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\appsettings.json",
               "RelativeDocumentMoniker": "e360_clone_fe\\appsettings.json",
@@ -478,77 +483,24 @@
               "RelativeToolTip": "e360_clone_fe\\appsettings.json",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-21T18:10:12.35Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T18:10:12.35Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Teacher.cshtml",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
-              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
-              "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:35:48.684Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Auth\\Login.cshtml",
-              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Auth\\Login.cshtml",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Auth\\Login.cshtml",
-              "RelativeToolTip": "e360_clone_fe\\Views\\Auth\\Login.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:34:50.995Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Lms.cshtml",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
-              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
-              "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAgwAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:34:41.106Z",
+              "DocumentIndex": 3,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "e360_clone_api\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAE0AAAAAAAAAAAAYwEQAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T15:05:35.503Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 11,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\HomeController.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "e360_clone_fe\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAkAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T17:24:46.842Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "utils.js",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\utils.js",
-              "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\utils.js",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\utils.js",
-              "RelativeToolTip": "e360_clone_fe\\wwwroot\\js\\utils.js",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-03-17T02:01:10.638Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
               "Title": "config.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\config.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\config.js",
@@ -556,25 +508,121 @@
               "RelativeToolTip": "e360_clone_fe\\wwwroot\\js\\config.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-03-17T02:01:06.563Z",
+              "WhenOpened": "2026-03-17T02:01:06.563Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "utils.js",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\utils.js",
+              "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\utils.js",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\utils.js",
+              "RelativeToolTip": "e360_clone_fe\\wwwroot\\js\\utils.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-03-17T02:01:10.638Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Repository.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
+              "RelativeDocumentMoniker": "e360_clone.Repositories\\Repository.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
+              "RelativeToolTip": "e360_clone.Repositories\\Repository.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAAAiwDIAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-15T08:03:29.246Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
+              "Title": "AccountRepository.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\AccountRepository.cs",
+              "RelativeDocumentMoniker": "e360_clone.Repositories\\AccountRepository.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\AccountRepository.cs",
+              "RelativeToolTip": "e360_clone.Repositories\\AccountRepository.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAAAqwBEAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T15:48:48.754Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Auth\\Login.cshtml",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Auth\\Login.cshtml",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Auth\\Login.cshtml",
+              "RelativeToolTip": "e360_clone_fe\\Views\\Auth\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-21T17:34:50.995Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Lms.cshtml",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
+              "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAgwAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-21T17:34:41.106Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
               "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
               "RelativeToolTip": "e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAwC8AAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAADgAAAAAAAAAAAAQwD8AAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:48:04.402Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:48:04.402Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 16,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "e360_clone_fe\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAkAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T17:24:46.842Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IAccountRepository.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IAccountRepository.cs",
+              "RelativeDocumentMoniker": "e360_clone.Repositories\\IAccountRepository.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IAccountRepository.cs",
+              "RelativeToolTip": "e360_clone.Repositories\\IAccountRepository.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAgwA0AAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T15:11:30.746Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Teacher.cshtml",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
+              "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-21T17:35:48.684Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "School.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\School.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\School.cshtml",
@@ -582,12 +630,11 @@
               "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\School.cshtml",
               "ViewState": "AgIAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:35:44.628Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T17:35:44.628Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "auth.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js",
@@ -595,12 +642,11 @@
               "RelativeToolTip": "e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js",
               "ViewState": "AgIAAFsAAAAAAAAAAAAcwGIAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-03-21T17:45:23.47Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T17:45:23.47Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 14,
               "Title": "Parent.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Parent.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Parent.cshtml",
@@ -608,12 +654,11 @@
               "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Parent.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:35:42.525Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T17:35:42.525Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "Student.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Student.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Student.cshtml",
@@ -621,12 +666,11 @@
               "RelativeToolTip": "e360_clone_fe\\Views\\Dashboard\\Student.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T17:35:47.036Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T17:35:47.036Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 17,
               "Title": "DashboardController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\DashboardController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\DashboardController.cs",
@@ -634,25 +678,11 @@
               "RelativeToolTip": "e360_clone_fe\\Controllers\\DashboardController.cs",
               "ViewState": "AgIAACIAAAAAAAAAAAAkwCoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T16:32:16.628Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T16:32:16.628Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "AccountRepository.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\AccountRepository.cs",
-              "RelativeDocumentMoniker": "e360_clone.Repositories\\AccountRepository.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\AccountRepository.cs",
-              "RelativeToolTip": "e360_clone.Repositories\\AccountRepository.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAASwBEAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:48:48.754Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "Account.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\models\\Account.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\_archived\\models\\Account.js",
@@ -660,12 +690,11 @@
               "RelativeToolTip": "e360_clone_fe\\wwwroot\\js\\_archived\\models\\Account.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-03-21T15:47:58.585Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:47:58.585Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 19,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\AppDbContext.cs",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\AppDbContext.cs",
@@ -673,12 +702,11 @@
               "RelativeToolTip": "e360_clone.DataAccess\\AppDbContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T14:42:37.955Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T14:42:37.955Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 18,
               "Title": "AccountDAO.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\DAOs\\AccountDAO.cs",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\DAOs\\AccountDAO.cs",
@@ -686,12 +714,11 @@
               "RelativeToolTip": "e360_clone.DataAccess\\DAOs\\AccountDAO.cs",
               "ViewState": "AgIAAAcAAAAAAAAAAAAAwBIAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:17:28.072Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:17:28.072Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 20,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Home\\Index.cshtml",
@@ -699,51 +726,11 @@
               "RelativeToolTip": "e360_clone_fe\\Views\\Home\\Index.cshtml",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-21T16:32:34.839Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T16:32:34.839Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "AccountConfiguration.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\Configurations\\AccountConfiguration.cs",
-              "RelativeDocumentMoniker": "e360_clone.DataAccess\\Configurations\\AccountConfiguration.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\Configurations\\AccountConfiguration.cs",
-              "RelativeToolTip": "e360_clone.DataAccess\\Configurations\\AccountConfiguration.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:29:33.34Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "IAccountRepository.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IAccountRepository.cs",
-              "RelativeDocumentMoniker": "e360_clone.Repositories\\IAccountRepository.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IAccountRepository.cs",
-              "RelativeToolTip": "e360_clone.Repositories\\IAccountRepository.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAEwA0AAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:11:30.746Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "IRepository.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IRepository.cs",
-              "RelativeDocumentMoniker": "e360_clone.Repositories\\IRepository.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IRepository.cs",
-              "RelativeToolTip": "e360_clone.Repositories\\IRepository.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAA5wAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:03:09.972Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "BaseApiController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\BaseApiController.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\BaseApiController.cs",
@@ -751,21 +738,19 @@
               "RelativeToolTip": "e360_clone_api\\Controllers\\BaseApiController.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:19:50.828Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:19:50.828Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 23,
-              "Title": "e360_clone.DataAccess",
+              "Title": "e360_clone.DataAccess.csproj",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
               "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
               "RelativeToolTip": "e360_clone.DataAccess\\e360_clone.DataAccess.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-03-21T15:18:30.816Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:18:30.816Z"
             },
             {
               "$type": "Document",
@@ -777,38 +762,11 @@
               "RelativeToolTip": "e360_clone.DataAccess\\DAOs\\BaseDAO.cs",
               "ViewState": "AgIAACQAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:17:35.355Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\appsettings.json",
-              "RelativeDocumentMoniker": "e360_clone.DataAccess\\appsettings.json",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\appsettings.json",
-              "RelativeToolTip": "e360_clone.DataAccess\\appsettings.json",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAkAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-21T15:18:36.852Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:17:35.355Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 26,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\AuthController.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "e360_clone_api\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAFcAAAAAAAAAAAAYwGEAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:05:35.503Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 28,
               "Title": "ApiService.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Services\\ApiService.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Services\\ApiService.cs",
@@ -816,8 +774,7 @@
               "RelativeToolTip": "e360_clone_fe\\Services\\ApiService.cs",
               "ViewState": "AgIAAF8AAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T14:50:01.024Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T14:50:01.024Z"
             },
             {
               "$type": "Document",
@@ -829,12 +786,11 @@
               "RelativeToolTip": "e360_clone_api\\appsettings.json",
               "ViewState": "AgIAABEAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-15T03:39:59.609Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-15T03:39:59.609Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 27,
               "Title": "StudentsController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\StudentsController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\StudentsController.cs",
@@ -846,7 +802,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 28,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Students\\Index.cshtml",
@@ -855,19 +811,6 @@
               "ViewState": "AgIAABsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-03-16T13:48:21.484Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 27,
-              "Title": "Repository.cs",
-              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
-              "RelativeDocumentMoniker": "e360_clone.Repositories\\Repository.cs",
-              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
-              "RelativeToolTip": "e360_clone.Repositories\\Repository.cs",
-              "ViewState": "AgIAADoAAAAAAAAAAADwvzIAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-15T08:03:29.246Z",
-              "EditorCaption": ""
             }
           ]
         },

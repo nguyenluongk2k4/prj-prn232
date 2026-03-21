@@ -59,5 +59,10 @@ namespace e360_clone.DataAccess.DAOs
         {
             return await _context.SaveChangesAsync();
         }
+
+        public virtual IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }

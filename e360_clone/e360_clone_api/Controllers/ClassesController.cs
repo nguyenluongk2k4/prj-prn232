@@ -6,9 +6,9 @@ namespace e360_clone.Controllers
 {
     public class ClassesController : BaseApiController
     {
-        private readonly IRepository<Class> _repository;
+        private readonly IClassRepository _repository;
 
-        public ClassesController(IRepository<Class> repository)
+        public ClassesController(IClassRepository repository)
         {
             _repository = repository;
         }
@@ -16,26 +16,37 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var items = await _repository.GetAllAsync();
-            var query = items.AsQueryable();
+            var term = request.SearchTerm?.Trim();
+            Func<IQueryable<Class>, IOrderedQueryable<Class>> orderBy = q => q.OrderBy(x => x.ClassCode);
 
-            if (!string.IsNullOrEmpty(request.SearchTerm))
+            IEnumerable<Class> data;
+            int totalRecords;
+
+            if (!string.IsNullOrEmpty(term))
             {
-                query = query.Where(x => x.ClassName.Contains(request.SearchTerm) || x.ClassCode.Contains(request.SearchTerm));
+                data = await _repository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    x => x.ClassName.Contains(term) || x.ClassCode.Contains(term),
+                    orderBy);
+                totalRecords = await _repository.CountAsync(
+                    x => x.ClassName.Contains(term) || x.ClassCode.Contains(term));
             }
-
-            var totalRecords = query.Count();
-            var data = query
-                .OrderBy(x => x.ClassCode)
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
+            else
+            {
+                data = await _repository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    null,
+                    orderBy);
+                totalRecords = await _repository.CountAsync();
+            }
 
             return Ok(new PagedResponse<Class>
             {
                 Success = true,
                 Message = "Lấy danh sách lớp học thành công",
-                Data = data,
+                Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords

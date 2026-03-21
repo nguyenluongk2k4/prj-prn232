@@ -1,6 +1,7 @@
 
 using e360_clone.DataAccess;
 using e360_clone.Repositories;
+using e360_clone.DataAccess.DAOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -29,6 +30,26 @@ namespace e360_clone
             // Register repositories
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<AccountDAO>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<StudentDAO>();
+            builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<SubjectDAO>();
+            builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+            builder.Services.AddScoped<ClassDAO>();
+            builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<ExamDAO>();
+            builder.Services.AddScoped<IExamRepository, ExamRepository>();
+            builder.Services.AddScoped<ExamRoomDAO>();
+            builder.Services.AddScoped<IExamRoomRepository, ExamRoomRepository>();
+            builder.Services.AddScoped<LecturerDAO>();
+            builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
+            builder.Services.AddScoped<AttendanceDAO>();
+            builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            builder.Services.AddScoped<GradeDAO>();
+            builder.Services.AddScoped<IGradeRepository, GradeRepository>();
+            builder.Services.AddScoped<ProctorAssignmentDAO>();
+            builder.Services.AddScoped<IProctorAssignmentRepository, ProctorAssignmentRepository>();
 
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
