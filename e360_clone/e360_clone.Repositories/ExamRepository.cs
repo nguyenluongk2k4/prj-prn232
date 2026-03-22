@@ -77,5 +77,26 @@ namespace e360_clone.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<List<int>> GetConflictingRoomIdsAsync(
+            DateTime examDate,
+            TimeSpan startTime,
+            TimeSpan endTime,
+            int? excludeExamId = null)
+        {
+            var query = _dao.Query()
+                .Where(x => x.ExamDate.Date == examDate.Date)
+                .Where(x => x.StartTime < endTime && x.EndTime > startTime);
+
+            if (excludeExamId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeExamId.Value);
+            }
+
+            return await query
+                .Select(x => x.RoomId)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 }

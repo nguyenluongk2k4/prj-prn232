@@ -1,0 +1,107 @@
+﻿@model e360_clone_fe.Models.ViewModels.SubjectFormViewModel
+@{
+    ViewData["Title"] = "Cập nhật môn học";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Cập nhật môn học</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Môn học</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3">Thông tin môn học</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="SubjectCode" class="form-label fw-medium"></label>
+                                    <input asp-for="SubjectCode" class="form-control" />
+                                    <span asp-validation-for="SubjectCode" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="SubjectName" class="form-label fw-medium"></label>
+                                    <input asp-for="SubjectName" class="form-control" />
+                                    <span asp-validation-for="SubjectName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="Credits" class="form-label fw-medium"></label>
+                                    <input asp-for="Credits" type="number" class="form-control" />
+                                    <span asp-validation-for="Credits" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="TheoryHours" class="form-label fw-medium"></label>
+                                    <input asp-for="TheoryHours" type="number" class="form-control" />
+                                    <span asp-validation-for="TheoryHours" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="PracticeHours" class="form-label fw-medium"></label>
+                                    <input asp-for="PracticeHours" type="number" class="form-control" />
+                                    <span asp-validation-for="PracticeHours" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Department" class="form-label fw-medium"></label>
+                                    <input asp-for="Department" class="form-control" />
+                                    <span asp-validation-for="Department" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="SubjectType" class="form-label fw-medium"></label>
+                                    <select asp-for="SubjectType" class="form-select">
+                                        <option value="Core">Core</option>
+                                        <option value="Elective">Elective</option>
+                                        <option value="General">General</option>
+                                    </select>
+                                    <span asp-validation-for="SubjectType" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Status" class="form-label fw-medium"></label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary-600">
+                                    <i class="ri-save-line"></i> Lưu thay đổi
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="ri-close-line"></i> Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

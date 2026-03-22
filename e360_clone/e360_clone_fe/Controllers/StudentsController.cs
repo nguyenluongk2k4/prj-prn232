@@ -11,7 +11,7 @@ namespace e360_clone_fe.Controllers
     /// </summary>
     public class StudentsController : BaseController
     {
-        private const string ApiEndpoint = "/students";
+        private const string ApiEndpoint = "students";
 
         public StudentsController(IApiService apiService, ILogger<StudentsController> logger)
             : base(apiService, logger)
@@ -37,7 +37,7 @@ namespace e360_clone_fe.Controllers
                 queryParams["searchTerm"] = searchTerm;
             }
 
-            var response = await _apiService.GetAsync<PagedResponse<StudentViewModel>>(ApiEndpoint, queryParams);
+            var response = await _apiService.GetAsync<List<StudentViewModel>>(ApiEndpoint, queryParams);
 
             if (!response.Success)
             {
@@ -47,7 +47,7 @@ namespace e360_clone_fe.Controllers
 
             var pagedModel = new PagedViewModel<StudentViewModel>
             {
-                Items = response.Data?.Items ?? new List<StudentViewModel>(),
+                Items = response.Data ?? new List<StudentViewModel>(),
                 PageNumber = response.PageNumber,
                 PageSize = response.PageSize,
                 TotalRecords = response.TotalRecords,
@@ -238,17 +238,4 @@ namespace e360_clone_fe.Controllers
         }
     }
 
-    /// <summary>
-    /// Paged response wrapper for API
-    /// </summary>
-    public class PagedResponse<T>
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public IEnumerable<T> Data { get; set; } = new List<T>();
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int TotalRecords { get; set; }
-        public IEnumerable<T> Items => Data;
-    }
 }

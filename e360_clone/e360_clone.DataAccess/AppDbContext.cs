@@ -18,8 +18,17 @@ namespace e360_clone.DataAccess
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Major> Majors { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Account> Accounts { get; set; }
+        
+        // New entities for Student Management & Exam Scheduling
+        public DbSet<StudentSubject> StudentSubjects { get; set; }
+        public DbSet<CourseSession> CourseSessions { get; set; }
+        public DbSet<StudentAttendance> StudentAttendances { get; set; }
+        public DbSet<ExamForm> ExamForms { get; set; }
+        public DbSet<StudentExam> StudentExams { get; set; }
+        public DbSet<TeachingAssignment> TeachingAssignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

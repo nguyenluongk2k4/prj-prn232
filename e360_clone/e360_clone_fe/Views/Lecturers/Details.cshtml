@@ -1,0 +1,149 @@
+﻿@model e360_clone_fe.Models.ViewModels.LecturerDetailsViewModel
+@{
+    ViewData["Title"] = "Chi tiết giảng viên";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Chi tiết giảng viên</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Giảng viên</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Lecturer.Id" class="btn btn-primary-600">
+                    <i class="ri-edit-line"></i> Sửa
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card h-100">
+            <div class="card-body p-24">
+                <div class="d-flex gap-32 flex-md-row flex-column">
+                    <div class="max-w-300-px w-100 text-center">
+                        <figure class="mb-24 w-120-px h-120-px mx-auto rounded-circle overflow-hidden">
+                            <img src="/assets/images/thumbs/teacher-details-img.png" alt="teacher"
+                                 class="w-100 h-100 object-fit-cover">
+                        </figure>
+                        <h2 class="h6 text-primary-light mb-16 fw-semibold">@Model.Lecturer.FullName</h2>
+                        <p class="mb-0">Mã GV: <span class="text-primary-600 fw-semibold">@Model.Lecturer.EmployeeCode</span></p>
+                        <p class="mb-0">Bộ môn: <span class="text-primary-light fw-semibold">@Model.Lecturer.Department</span></p>
+                        <div class="mt-32 d-flex gap-16 w-100">
+                            <form asp-action="Delete" asp-route-id="@Model.Lecturer.Id" method="post"
+                                  class="flex-grow-1" onsubmit="return confirm('Bạn có chắc muốn xóa giảng viên này?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="btn border fw-medium border-danger-600 bg-hover-danger-200 text-danger-600 text-md d-flex justify-content-center align-items-center gap-8 w-100 px-12 py-8 radius-8">
+                                    <span class="d-flex text-lg">
+                                        <i class="ri-delete-bin-2-line"></i>
+                                    </span>
+                                    Xóa
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="">
+                        <span class="h-100 w-1-px bg-neutral-200"></span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="pb-16 border-bottom d-flex align-items-center justify-content-between gap-20">
+                            <h3 class="h6 text-primary-light text-lg mb-0 fw-semibold">Thông tin cá nhân</h3>
+                            <span class="@(Model.Lecturer.Status == "Active" ? "bg-success-100 text-success-600" : "bg-danger-100 text-danger-600") px-16 py-4 radius-4 fw-medium text-sm">
+                                @Model.Lecturer.Status
+                            </span>
+                        </div>
+                        <div class="mt-16 d-flex flex-column gap-8">
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Ngày sinh</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Lecturer.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Giới tính</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Lecturer.Gender</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Chức danh</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Lecturer.Position</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Điện thoại</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.Lecturer.PhoneNumber</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Email</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.Lecturer.Email</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-24">
+            <div class="card h-100">
+                <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+                    <h6 class="text-lg fw-semibold mb-0">Môn học đang giảng dạy</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table bordered-table mb-0">
+                            <thead class="bg-neutral-100">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Mã môn</th>
+                                    <th>Tên môn</th>
+                                    <th>Lớp</th>
+                                    <th>Năm học</th>
+                                    <th>Học kỳ</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.TeachingAssignments.Any())
+                                {
+                                    var index = 1;
+                                    foreach (var assignment in Model.TeachingAssignments)
+                                    {
+                                        var statusClass = assignment.Status == "Active"
+                                            ? "bg-success-100 text-success-600"
+                                            : "bg-neutral-100 text-neutral-600";
+                                        <tr>
+                                            <td>@index</td>
+                                            <td>@assignment.SubjectCode</td>
+                                            <td>@assignment.SubjectName</td>
+                                            <td>@assignment.ClassCode - @assignment.ClassName</td>
+                                            <td>@assignment.AcademicYear</td>
+                                            <td>@assignment.Semester</td>
+                                            <td><span class="@statusClass px-16 py-4 radius-4 fw-medium text-sm">@assignment.Status</span></td>
+                                        </tr>
+                                        index++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                            <p class="text-muted mt-2">Chưa có phân công giảng dạy</p>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

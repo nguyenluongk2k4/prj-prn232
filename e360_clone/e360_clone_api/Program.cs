@@ -1,4 +1,4 @@
-
+﻿
 using e360_clone.DataAccess;
 using e360_clone.Repositories;
 using e360_clone.DataAccess.DAOs;
@@ -34,10 +34,15 @@ namespace e360_clone
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<StudentDAO>();
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<IStudentSubjectRepository, StudentSubjectRepository>();
             builder.Services.AddScoped<SubjectDAO>();
             builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
             builder.Services.AddScoped<ClassDAO>();
             builder.Services.AddScoped<IClassRepository, ClassRepository>();
+            builder.Services.AddScoped<MajorDAO>();
+            builder.Services.AddScoped<IMajorRepository, MajorRepository>();
+            builder.Services.AddScoped<TeachingAssignmentDAO>();
+            builder.Services.AddScoped<ITeachingAssignmentRepository, TeachingAssignmentRepository>();
             builder.Services.AddScoped<ExamDAO>();
             builder.Services.AddScoped<IExamRepository, ExamRepository>();
             builder.Services.AddScoped<ExamRoomDAO>();
@@ -100,11 +105,11 @@ namespace e360_clone
                 {
                     var context = services.GetRequiredService<AppDbContext>();
                     await e360_clone.Seeders.AccountSeeder.SeedAsync(context);
-                    Console.WriteLine("✅ Database seeded successfully!");
+                    Console.WriteLine("âœ… Database seeded successfully!");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ Error seeding database: {ex.Message}");
+                    Console.WriteLine($"âŒ Error seeding database: {ex.Message}");
                 }
             }
 
@@ -116,7 +121,11 @@ namespace e360_clone
             }
 
             app.UseCors("AllowFrontend");
-            app.UseHttpsRedirection();
+            var enableHttpsRedirection = builder.Configuration.GetValue<bool>("EnableHttpsRedirection");
+            if (enableHttpsRedirection)
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
@@ -125,3 +134,4 @@ namespace e360_clone
         }
     }
 }
+

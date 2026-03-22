@@ -1,23 +1,31 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace e360_clone_fe.Services
 {
     /// <summary>
-    /// Service for calling backend API from MVC controllers
-    /// Handles JWT token management, HTTP calls, and error handling
+    /// API Settings configuration
+    /// </summary>
+    public class ApiSettings
+    {
+        public string BaseUrl { get; set; } = "http://localhost:5104/api";
+        public string HttpsUrl { get; set; } = "https://localhost:7052/api";
+        public int Timeout { get; set; } = 30;
+    }
+
+    /// <summary>
+    /// Service for calling backend API with JWT authentication
+    /// JWT token stored in HttpOnly cookie
     /// </summary>
     public interface IApiService
     {
         Task<ApiResponse<T>> GetAsync<T>(string endpoint);
         Task<ApiResponse<T>> GetAsync<T>(string endpoint, Dictionary<string, string> queryParams);
+        Task<ApiResponse<T>> GetWithTokenAsync<T>(string endpoint, string token, Dictionary<string, string>? queryParams = null);
         Task<ApiResponse<T>> PostAsync<T>(string endpoint, object data);
         Task<ApiResponse<T>> PutAsync<T>(string endpoint, object data);
         Task<ApiResponse<T>> DeleteAsync<T>(string endpoint);
@@ -25,6 +33,8 @@ namespace e360_clone_fe.Services
         Task<byte[]> DownloadAsync(string endpoint, Dictionary<string, string>? queryParams = null);
         Task<ApiResponse<T>> UploadAsync<T>(string endpoint, IFormFile file, Dictionary<string, string>? additionalData = null);
         void SetAuthToken(string token);
+        string? GetAuthToken();
+        void ClearAuthToken();
     }
 
     public class ApiService : IApiService
@@ -33,7 +43,6 @@ namespace e360_clone_fe.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApiSettings _apiSettings;
         private readonly ILogger<ApiService> _logger;
-        private string? _authToken;
 
         public ApiService(
             HttpClient httpClient,
@@ -48,34 +57,61 @@ namespace e360_clone_fe.Services
         }
 
         /// <summary>
-        /// Set JWT token for API calls (called after login)
+        /// Set JWT token in HttpOnly cookie
         /// </summary>
         public void SetAuthToken(string token)
         {
-            _authToken = token;
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                var isHttps = context.Request.IsHttps;
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = isHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                };
+                context.Response.Cookies.Append("jwt_token", token, cookieOptions);
+            }
         }
 
         /// <summary>
-        /// Get JWT token from current user claims
+        /// Get JWT token from cookie
         /// </summary>
-        private string? GetTokenFromClaims()
+        public string? GetAuthToken()
         {
-            var user = _httpContextAccessor.HttpContext?.User;
-            if (user?.Identity?.IsAuthenticated != true)
-                return null;
-
-            // Token might be stored in session or claims
-            return _httpContextAccessor.HttpContext?.Session.GetString("authToken");
+            var context = _httpContextAccessor.HttpContext;
+            return context?.Request.Cookies["jwt_token"];
         }
 
         /// <summary>
-        /// Configure HttpClient with auth token before each request
+        /// Clear JWT token (logout)
+        /// </summary>
+        public void ClearAuthToken()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                var isHttps = context.Request.IsHttps;
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = isHttps,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddDays(-1)
+                };
+                context.Response.Cookies.Append("jwt_token", "", cookieOptions);
+            }
+        }
+
+        /// <summary>
+        /// Configure HttpClient with JWT token
         /// </summary>
         private async Task ConfigureClientAsync()
         {
-            var token = _authToken ?? GetTokenFromClaims();
-            
-            _httpClient.BaseAddress = new Uri(_apiSettings.BaseUrl);
+            var token = GetAuthToken();
+
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -85,33 +121,57 @@ namespace e360_clone_fe.Services
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", token);
             }
-
-            // Handle 401 Unauthorized
-            _httpClient.DefaultRequestHeaders.Add("X-Handle-401", "true");
         }
 
         /// <summary>
-        /// Handle API response and check for errors
+        /// Handle API response
         /// </summary>
         private async Task<ApiResponse<T>> HandleResponseAsync<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
+            var requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "(unknown)";
 
-            // Handle 401 Unauthorized - redirect to login
+            if ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400)
+            {
+                var location = response.Headers.Location?.ToString() ?? "(no location)";
+                _logger.LogWarning("API redirect {Status} from {RequestUri} to {Location}", response.StatusCode, requestUri, location);
+                return ApiResponse<T>.ErrorResult($"Lỗi API: {response.StatusCode}");
+            }
+
+            // Handle 401 Unauthorized - clear token and redirect
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                // Clear session and redirect
+                var isAuthEndpoint = requestUri.Contains("/api/Auth/login", StringComparison.OrdinalIgnoreCase)
+                    || requestUri.Contains("/api/Auth/quick-login", StringComparison.OrdinalIgnoreCase)
+                    || requestUri.Contains("/api/Auth/register", StringComparison.OrdinalIgnoreCase)
+                    || requestUri.Contains("/api/Auth/me", StringComparison.OrdinalIgnoreCase);
+
                 var context = _httpContextAccessor.HttpContext;
-                if (context != null)
+                if (!isAuthEndpoint)
                 {
-                    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    context.Session.Clear();
+                    ClearAuthToken();
                 }
 
+                if (context != null)
+                {
+                    var onLoginPage = context.Request.Path.StartsWithSegments("/Auth/Login", StringComparison.OrdinalIgnoreCase);
+                    if (!isAuthEndpoint && !onLoginPage)
+                    {
+                        context.Response.Redirect("/Auth/Login?returnUrl=" + Uri.EscapeDataString(context.Request.Path + context.Request.QueryString));
+                    }
+                }
                 return ApiResponse<T>.ErrorResult("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
             }
 
-            // Try to parse as API response
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                _logger.LogWarning("Empty API response from {RequestUri} with status {StatusCode}", requestUri, response.StatusCode);
+                return response.IsSuccessStatusCode
+                    ? ApiResponse<T>.SuccessResult(default!, "Thành công")
+                    : ApiResponse<T>.ErrorResult($"Lỗi API: {response.StatusCode}");
+            }
+
+            // Parse API response
             try
             {
                 var apiResponse = JsonSerializer.Deserialize<ApiResponse<T>>(content, new JsonSerializerOptions
@@ -180,6 +240,29 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GET request failed for {Endpoint}", endpoint);
+                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<T>> GetWithTokenAsync<T>(string endpoint, string token, Dictionary<string, string>? queryParams = null)
+        {
+            try
+            {
+                await ConfigureClientAsync();
+
+                var url = queryParams != null && queryParams.Count > 0
+                    ? $"{endpoint}?{new FormUrlEncodedContent(queryParams).ReadAsStringAsync().Result}"
+                    : endpoint;
+
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(request);
+                return await HandleResponseAsync<T>(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GET with token failed for {Endpoint}", endpoint);
                 return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
             }
         }
@@ -318,13 +401,11 @@ namespace e360_clone_fe.Services
 
                 using var formData = new MultipartFormDataContent();
                 
-                // Add file
                 using var fileStream = file.OpenReadStream();
                 using var streamContent = new StreamContent(fileStream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                 formData.Add(streamContent, "file", file.FileName);
 
-                // Add additional data
                 if (additionalData != null)
                 {
                     foreach (var kvp in additionalData)
@@ -359,7 +440,7 @@ namespace e360_clone_fe.Services
             ? (int)Math.Ceiling(TotalRecords / (double)PageSize) 
             : 0;
 
-        public static ApiResponse<T> SuccessResult(T data, string message = "Thành công")
+        public static ApiResponse<T> SuccessResult(T? data, string message = "Thành công")
         {
             return new ApiResponse<T>
             {
@@ -387,16 +468,15 @@ namespace e360_clone_fe.Services
     {
         public static IServiceCollection AddApiService(this IServiceCollection services, IConfiguration configuration)
         {
-            // Configure ApiSettings
             services.Configure<ApiSettings>(configuration.GetSection("ApiSettings"));
             
             services.AddHttpContextAccessor();
-            services.AddSession();
             
             services.AddHttpClient<IApiService, ApiService>((serviceProvider, client) =>
             {
                 var settings = serviceProvider.GetRequiredService<IOptions<ApiSettings>>().Value;
-                client.BaseAddress = new Uri(settings.BaseUrl);
+                var baseUrl = (settings.BaseUrl ?? string.Empty).TrimEnd('/') + "/";
+                client.BaseAddress = new Uri(baseUrl);
                 client.Timeout = TimeSpan.FromSeconds(settings.Timeout);
             });
 

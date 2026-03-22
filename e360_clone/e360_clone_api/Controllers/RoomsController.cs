@@ -7,10 +7,12 @@ namespace e360_clone.Controllers
     public class RoomsController : BaseApiController
     {
         private readonly IExamRoomRepository _repository;
+        private readonly IExamRepository _examRepository;
 
-        public RoomsController(IExamRoomRepository repository)
+        public RoomsController(IExamRoomRepository repository, IExamRepository examRepository)
         {
             _repository = repository;
+            _examRepository = examRepository;
         }
 
         [HttpGet]
@@ -51,6 +53,20 @@ namespace e360_clone.Controllers
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords
             });
+        }
+
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailableRooms(
+            [FromQuery] DateTime examDate,
+            [FromQuery] TimeSpan startTime,
+            [FromQuery] TimeSpan endTime,
+            [FromQuery] int? excludeExamId)
+        {
+            var rooms = await _repository.GetAllAsync();
+            var conflicts = await _examRepository.GetConflictingRoomIdsAsync(examDate, startTime, endTime, excludeExamId);
+
+            var available = rooms.Where(r => !conflicts.Contains(r.Id)).ToList();
+            return HandleResult(available, "Lấy danh sách phòng trống thành công");
         }
 
         [HttpGet("{id}")]

@@ -6,6 +6,7 @@ namespace e360_clone_fe.Controllers
 {
     /// <summary>
     /// Base controller with common patterns for MVC controllers
+    /// Uses JWT authentication (token stored in HttpOnly cookie)
     /// </summary>
     public abstract class BaseController : Controller
     {
@@ -16,6 +17,62 @@ namespace e360_clone_fe.Controllers
         {
             _apiService = apiService;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Check if user is authenticated (has valid JWT token)
+        /// </summary>
+        protected bool IsAuthenticated()
+        {
+            var token = _apiService.GetAuthToken();
+            return !string.IsNullOrEmpty(token);
+        }
+
+        /// <summary>
+        /// Get current user role from TempData
+        /// </summary>
+        protected string? GetCurrentUserRole()
+        {
+            var role = HttpContext.Session.GetString("Role");
+            return !string.IsNullOrEmpty(role) ? role : TempData["Role"]?.ToString();
+        }
+
+        /// <summary>
+        /// Redirect to login if not authenticated
+        /// </summary>
+        protected IActionResult RequireAuth()
+        {
+            if (!IsAuthenticated())
+            {
+                return RedirectToAction("Login", "Auth", new { returnUrl = Request.Path + Request.QueryString });
+            }
+            return null!;
+        }
+
+        /// <summary>
+        /// Check if user has required role
+        /// </summary>
+        protected bool HasRole(params string[] roles)
+        {
+            var userRole = GetCurrentUserRole();
+            if (string.IsNullOrEmpty(userRole)) return false;
+            return roles.Contains(userRole);
+        }
+
+        /// <summary>
+        /// Require specific roles
+        /// </summary>
+        protected IActionResult RequireRole(params string[] roles)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            if (!HasRole(roles))
+            {
+                return RedirectToAction("AccessDenied", "Auth");
+            }
+
+            return null!;
         }
 
         /// <summary>
@@ -87,69 +144,6 @@ namespace e360_clone_fe.Controllers
         protected string? GetSearchTerm()
         {
             return Request.Query["searchTerm"].FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Check if user is authenticated
-        /// </summary>
-        protected bool IsAuthenticated()
-        {
-            return User.Identity?.IsAuthenticated == true;
-        }
-
-        /// <summary>
-        /// Get current user ID from claims
-        /// </summary>
-        protected int? GetCurrentUserId()
-        {
-            var userId = User.FindFirst("UserId")?.Value;
-            return int.TryParse(userId, out var result) ? result : null;
-        }
-
-        /// <summary>
-        /// Get current user role from claims
-        /// </summary>
-        protected string? GetCurrentUserRole()
-        {
-            return User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        }
-
-        /// <summary>
-        /// Redirect to login if not authenticated
-        /// </summary>
-        protected IActionResult RequireAuth()
-        {
-            if (!IsAuthenticated())
-            {
-                return RedirectToAction("Login", "Auth", new { returnUrl = Request.Path + Request.QueryString });
-            }
-            return null!;
-        }
-
-        /// <summary>
-        /// Check if user has required role
-        /// </summary>
-        protected bool HasRole(params string[] roles)
-        {
-            if (!IsAuthenticated()) return false;
-            var userRole = GetCurrentUserRole();
-            return roles.Contains(userRole);
-        }
-
-        /// <summary>
-        /// Require specific roles
-        /// </summary>
-        protected IActionResult RequireRole(params string[] roles)
-        {
-            var authResult = RequireAuth();
-            if (authResult != null) return authResult;
-
-            if (!HasRole(roles))
-            {
-                return RedirectToAction("AccessDenied", "Auth");
-            }
-
-            return null!;
         }
     }
 }

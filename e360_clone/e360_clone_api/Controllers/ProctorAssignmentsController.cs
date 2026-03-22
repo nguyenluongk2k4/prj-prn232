@@ -8,10 +8,17 @@ namespace e360_clone.Controllers
     public class ProctorAssignmentsController : BaseApiController
     {
         private readonly IProctorAssignmentRepository _repository;
+        private readonly IExamRepository _examRepository;
+        private readonly ITeachingAssignmentRepository _teachingAssignmentRepository;
 
-        public ProctorAssignmentsController(IProctorAssignmentRepository repository)
+        public ProctorAssignmentsController(
+            IProctorAssignmentRepository repository,
+            IExamRepository examRepository,
+            ITeachingAssignmentRepository teachingAssignmentRepository)
         {
             _repository = repository;
+            _examRepository = examRepository;
+            _teachingAssignmentRepository = teachingAssignmentRepository;
         }
 
         [HttpGet]
@@ -51,6 +58,21 @@ namespace e360_clone.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<ProctorAssignment> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
+            var exam = await _examRepository.GetByIdAsync(assignment.ExamId);
+            if (exam == null)
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
+
+            var isTeachingSameClass = await _teachingAssignmentRepository.ExistsForLecturerAndExamAsync(
+                assignment.LecturerId, exam);
+            if (isTeachingSameClass)
+            {
+                return BadRequest(new ApiResponse<ProctorAssignment>
+                {
+                    Success = false,
+                    Message = "Không thể phân công giảng viên coi thi chính lớp và môn mình đang dạy"
+                });
+            }
+
             assignment.AssignedAt = DateTime.UtcNow;
             await _repository.AddAsync(assignment);
 
@@ -68,6 +90,21 @@ namespace e360_clone.Controllers
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
                 return HandleNotFound($"Không tìm thấy phân công coi thi có ID = {id}");
+
+            var exam = await _examRepository.GetByIdAsync(assignment.ExamId);
+            if (exam == null)
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
+
+            var isTeachingSameClass = await _teachingAssignmentRepository.ExistsForLecturerAndExamAsync(
+                assignment.LecturerId, exam);
+            if (isTeachingSameClass)
+            {
+                return BadRequest(new ApiResponse<ProctorAssignment>
+                {
+                    Success = false,
+                    Message = "Không thể phân công giảng viên coi thi chính lớp và môn mình đang dạy"
+                });
+            }
 
             existing.ExamId = assignment.ExamId;
             existing.LecturerId = assignment.LecturerId;

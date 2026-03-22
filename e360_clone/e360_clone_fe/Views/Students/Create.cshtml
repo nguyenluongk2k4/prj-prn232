@@ -91,13 +91,53 @@
                             <h5 class="fw-bold mb-3">Thông tin học tập</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ngành</label>
+                                    <select id="majorSelect" class="form-select">
+                                        <option value="">-- Chọn ngành --</option>
+                                        <optgroup label="Khối Công nghệ">
+                                            <option value="SE">SE - Software Engineering</option>
+                                            <option value="AI">AI - Artificial Intelligence</option>
+                                            <option value="IA">IA - Information Assurance</option>
+                                            <option value="SWD">SWD - Software Development</option>
+                                            <option value="PRJ">PRJ - Project</option>
+                                        </optgroup>
+                                        <optgroup label="Khối Kinh tế / Kinh doanh">
+                                            <option value="BUS">BUS - Business</option>
+                                            <option value="MKT">MKT - Marketing</option>
+                                            <option value="FIN">FIN - Finance</option>
+                                            <option value="ACC">ACC - Accounting</option>
+                                        </optgroup>
+                                        <optgroup label="Khối Ngôn ngữ / Quốc tế">
+                                            <option value="EN">EN - English</option>
+                                            <option value="JPN">JPN - Japanese</option>
+                                            <option value="KOR">KOR - Korean</option>
+                                            <option value="CHI">CHI - Chinese</option>
+                                        </optgroup>
+                                        <optgroup label="Khối Thiết kế / Truyền thông">
+                                            <option value="GD">GD - Graphic Design</option>
+                                            <option value="MM">MM - Multimedia Communication</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Khóa</label>
+                                    <select id="cohortSelect" class="form-select">
+                                        <option value="">-- Chọn khóa --</option>
+                                        <option value="17">K17</option>
+                                        <option value="18">K18</option>
+                                        <option value="19">K19</option>
+                                        <option value="20">K20</option>
+                                        <option value="21">K21</option>
+                                        <option value="22">K22</option>
+                                        <option value="23">K23</option>
+                                        <option value="24">K24</option>
+                                        <option value="25">K25</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
                                     <label asp-for="ClassId" class="form-label fw-medium"></label>
-                                    <select asp-for="ClassId" class="form-select">
+                                    <select asp-for="ClassId" class="form-select" id="classSelect">
                                         <option value="">-- Chọn lớp --</option>
-                                        <!-- Add class options here -->
-                                        <option value="1">Lớp 10A</option>
-                                        <option value="2">Lớp 10B</option>
-                                        <option value="3">Lớp 11A</option>
                                     </select>
                                     <span asp-validation-for="ClassId" class="text-danger"></span>
                                 </div>
@@ -141,5 +181,59 @@
             if (value.length > 10) value = value.substring(0, 10);
             e.target.value = value;
         });
+
+        (function () {
+            const majorSelect = document.getElementById('majorSelect');
+            const cohortSelect = document.getElementById('cohortSelect');
+            const classSelect = document.getElementById('classSelect');
+            const apiBase = window.APP_CONFIG?.API_BASE_URL || '/api';
+            let classes = [];
+
+            function resetClassOptions() {
+                classSelect.innerHTML = '<option value="">-- Chọn lớp --</option>';
+            }
+
+            function renderClassOptions(items) {
+                resetClassOptions();
+                items.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.textContent = `${c.classCode} - ${c.className}`;
+                    classSelect.appendChild(option);
+                });
+            }
+
+            async function loadClassesByFilter() {
+                const major = majorSelect.value;
+                const cohort = cohortSelect.value;
+
+                if (!major || !cohort) {
+                    resetClassOptions();
+                    return;
+                }
+
+                try {
+                    const url = `${apiBase}/classes?pageNumber=1&pageSize=200&majorCode=${encodeURIComponent(major)}&cohort=${encodeURIComponent(cohort)}`;
+                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    const json = await res.json();
+                    classes = Array.isArray(json.data) ? json.data : [];
+                    renderClassOptions(classes);
+                } catch (err) {
+                    console.error('Failed to load classes', err);
+                    resetClassOptions();
+                }
+            }
+
+            majorSelect?.addEventListener('change', loadClassesByFilter);
+            cohortSelect?.addEventListener('change', loadClassesByFilter);
+
+            if (majorSelect && cohortSelect && classSelect) {
+                resetClassOptions();
+            }
+        })();
     </script>
 }
+
+
+
+

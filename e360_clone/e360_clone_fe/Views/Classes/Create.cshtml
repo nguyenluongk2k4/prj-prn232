@@ -1,0 +1,119 @@
+﻿@model e360_clone_fe.Models.ViewModels.ClassFormPageViewModel
+@{
+    ViewData["Title"] = "Thêm lớp";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Thêm lớp mới</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Lớp học</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3">Thông tin lớp học</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Class.ClassCode" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.ClassCode" class="form-control" placeholder="Nhập mã lớp" />
+                                    <span asp-validation-for="Class.ClassCode" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.ClassName" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.ClassName" class="form-control" placeholder="Nhập tên lớp" />
+                                    <span asp-validation-for="Class.ClassName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.MajorId" class="form-label fw-medium"></label>
+                                    <select asp-for="Class.MajorId" class="form-select">
+                                        <option value="">-- Chọn ngành --</option>
+                                        @foreach (var major in Model.Majors)
+                                        {
+                                            <option value="@major.Id">@major.MajorCode - @major.MajorName</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Class.MajorId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.Cohort" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.Cohort" type="number" class="form-control" placeholder="Ví dụ: 18" />
+                                    <span asp-validation-for="Class.Cohort" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.CohortYear" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.CohortYear" type="number" class="form-control" placeholder="Ví dụ: 2018" />
+                                    <span asp-validation-for="Class.CohortYear" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.AcademicYear" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.AcademicYear" class="form-control" placeholder="2024-2025" />
+                                    <span asp-validation-for="Class.AcademicYear" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.CourseId" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.CourseId" type="number" class="form-control" placeholder="Mã khóa học" />
+                                    <span asp-validation-for="Class.CourseId" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.Semester" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.Semester" type="number" class="form-control" placeholder="Học kỳ" />
+                                    <span asp-validation-for="Class.Semester" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.StudentCount" class="form-label fw-medium"></label>
+                                    <input asp-for="Class.StudentCount" type="number" class="form-control" placeholder="Sĩ số" />
+                                    <span asp-validation-for="Class.StudentCount" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Class.Status" class="form-label fw-medium"></label>
+                                    <select asp-for="Class.Status" class="form-select">
+                                        <option value="Active">Đang học</option>
+                                        <option value="Graduated">Đã tốt nghiệp</option>
+                                        <option value="Disbanded">Giải thể</option>
+                                    </select>
+                                    <span asp-validation-for="Class.Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary-600">
+                                    <i class="ri-save-line"></i> Lưu thông tin
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="ri-close-line"></i> Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

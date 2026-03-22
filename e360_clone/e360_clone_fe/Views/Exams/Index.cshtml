@@ -1,0 +1,172 @@
+﻿@model e360_clone_fe.Models.ViewModels.PagedViewModel<e360_clone_fe.Models.ViewModels.ExamViewModel>
+@{
+    ViewData["Title"] = "Danh sách kỳ thi";
+    var subjectMap = ViewBag.SubjectMap as Dictionary<int, string> ?? new Dictionary<int, string>();
+    var classMap = ViewBag.ClassMap as Dictionary<int, string> ?? new Dictionary<int, string>();
+    var roomMap = ViewBag.RoomMap as Dictionary<int, string> ?? new Dictionary<int, string>();
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Danh sách kỳ thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Kỳ thi</li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh sách</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Create" class="btn btn-primary-600">
+                    <i class="ri-add-line"></i> Thêm kỳ thi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card h-100">
+            <div class="card-body p-0 dataTable-wrapper">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-bottom border-neutral-200">
+                    <div class="d-flex flex-wrap align-items-center gap-16">
+                        <form asp-action="Index" method="get" class="navbar-search dt-search m-0">
+                            <input type="text" class="dt-input bg-transparent radius-4" name="searchTerm" value="@Model.SearchTerm" placeholder="Tìm kiếm...">
+                            <iconify-icon icon="ion:search-outline" class="icon"></iconify-icon>
+                        </form>
+                    </div>
+                    <div class="d-flex align-items-center gap-8 text-secondary-light">
+                        <span>Rows per page:</span>
+                        <div class="dt-length">
+                            <select class="dt-input form-control form-select" onchange="location.href='?pageNumber=1&pageSize=' + this.value + '&searchTerm=@Model.SearchTerm'">
+                                @if (Model.PageSize == 5) { <option value="5" selected>5</option> } else { <option value="5">5</option> }
+                                @if (Model.PageSize == 10) { <option value="10" selected>10</option> } else { <option value="10">10</option> }
+                                @if (Model.PageSize == 25) { <option value="25" selected>25</option> } else { <option value="25">25</option> }
+                                @if (Model.PageSize == 50) { <option value="50" selected>50</option> } else { <option value="50">50</option> }
+                                @if (Model.PageSize == 100) { <option value="100" selected>100</option> } else { <option value="100">100</option> }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-24">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mã</th>
+                                    <th>Tên kỳ thi</th>
+                                    <th>Môn</th>
+                                    <th>Lớp</th>
+                                    <th>Ngày thi</th>
+                                    <th>Phòng</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items.Any())
+                                {
+                                    foreach (var item in Model.Items)
+                                    {
+                                        var subject = subjectMap.TryGetValue(item.SubjectId, out var s) ? s : item.SubjectId.ToString();
+                                        var cls = classMap.TryGetValue(item.ClassId, out var c) ? c : item.ClassId.ToString();
+                                        var room = roomMap.TryGetValue(item.RoomId, out var r) ? r : item.RoomId.ToString();
+                                        <tr>
+                                            <td>@item.ExamCode</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span class="fw-semibold text-primary-light">@item.ExamName</span>
+                                                    <span class="text-sm text-secondary-light">@item.ExamType</span>
+                                                </div>
+                                            </td>
+                                            <td>@subject</td>
+                                            <td>@cls</td>
+                                            <td>@item.ExamDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@room</td>
+                                            <td><span class="badge bg-secondary">@item.Status</span></td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                                        <i class="ri-more-2-fill"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">
+                                                                <i class="ri-eye-line"></i> Chi tiết
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">
+                                                                <i class="ri-edit-line"></i> Sửa
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <form asp-action="Delete" method="post" onsubmit="return confirm('Xóa kỳ thi này?');">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="id" value="@item.Id" />
+                                                                <button type="submit" class="dropdown-item text-danger">
+                                                                    <i class="ri-delete-bin-6-line"></i> Xóa
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center text-secondary-light">Không có dữ liệu</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="dataTable-bottom d-flex align-items-center justify-content-between flex-wrap gap-10 px-20 py-12 border-top border-neutral-200">
+                    <div class="dataTable-info">
+                        Hiển thị @Model.StartRecord - @Model.EndRecord trên @Model.TotalRecords
+                    </div>
+                    <nav class="dataTable-pagination">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                                <a class="page-link" href="?pageNumber=@(Model.PageNumber-1)&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">Trước</a>
+                            </li>
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" href="?pageNumber=@i&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                                <a class="page-link" href="?pageNumber=@(Model.PageNumber+1)&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

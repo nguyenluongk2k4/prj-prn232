@@ -1,0 +1,405 @@
+﻿@model e360_clone_fe.Models.ViewModels.PagedViewModel<e360_clone_fe.Models.ViewModels.ClassFormViewModel>
+@{
+    ViewData["Title"] = "Danh sách lớp học";
+    var majorMap = ViewBag.MajorMap as Dictionary<int, string> ?? new Dictionary<int, string>();
+    var majors = ViewBag.Majors as List<e360_clone_fe.Models.ViewModels.MajorViewModel> ?? new List<e360_clone_fe.Models.ViewModels.MajorViewModel>();
+    var selectedMajorCode = ViewBag.SelectedMajorCode as string ?? string.Empty;
+    var selectedStatus = ViewBag.SelectedStatus as string ?? string.Empty;
+    int? selectedCohort = ViewBag.SelectedCohort as int?;
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Danh sách lớp học</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Lớp học</li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh sách</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Create" class="btn btn-primary-600 d-flex align-items-center gap-6">
+                    <span class="d-flex text-md">
+                        <i class="ri-add-large-line"></i>
+                    </span>
+                    Thêm lớp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card h-100">
+            <div class="card-body p-0 dataTable-wrapper">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-bottom border-neutral-200">
+                    <form method="get" class="d-flex align-items-center justify-content-between flex-wrap gap-16 w-100">
+                        <input type="hidden" name="pageNumber" value="1" />
+                        <div class="d-flex flex-wrap align-items-center gap-16">
+                            <div class="dropdown">
+                                <button type="button"
+                                        class="px-12 py-5-px border border-neutral-300 radius-8 d-flex align-items-center gap-20"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="d-flex align-items-center gap-1 text-secondary-light text-sm">
+                                        <i class="ri-file-upload-line text-md line-height-1"></i>
+                                        Export
+                                    </span>
+                                    <span class="">
+                                        <i class="ri-arrow-down-s-line"></i>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu p-12 border bg-base shadow">
+                                    <li>
+                                        <button type="button" id="exportClassesExcel"
+                                                class="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-10">
+                                            <i class="ri-file-excel-line"></i>
+                                            Excel
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="navbar-search dt-search m-0">
+                                <input type="text" class="dt-input bg-transparent radius-4" name="searchTerm"
+                                       placeholder="Search..." value="@Model.SearchTerm">
+                                <iconify-icon icon="ion:search-outline" class="icon"></iconify-icon>
+                            </div>
+                            <div class="d-flex align-items-center gap-8">
+                                <select name="majorCode" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Ngành --</option>
+                                    @foreach (var major in majors)
+                                    {
+                                        if (major.MajorCode == selectedMajorCode)
+                                        {
+                                            <option value="@major.MajorCode" selected>@major.MajorCode - @major.MajorName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@major.MajorCode">@major.MajorCode - @major.MajorName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center gap-8">
+                                <select name="cohort" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Khóa --</option>
+                                    @for (var k = 15; k <= 30; k++)
+                                    {
+                                        if (selectedCohort.HasValue && selectedCohort.Value == k)
+                                        {
+                                            <option value="@k" selected>K@k</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@k">K@k</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center gap-8">
+                                <select name="status" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- Trạng thái --</option>
+                                    @if (selectedStatus == "Active")
+                                    {
+                                        <option value="Active" selected>Đang học</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Active">Đang học</option>
+                                    }
+                                    @if (selectedStatus == "Graduated")
+                                    {
+                                        <option value="Graduated" selected>Đã tốt nghiệp</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Graduated">Đã tốt nghiệp</option>
+                                    }
+                                    @if (selectedStatus == "Disbanded")
+                                    {
+                                        <option value="Disbanded" selected>Giải thể</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Disbanded">Giải thể</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="ri-search-line"></i> Tìm kiếm
+                            </button>
+                            @if (!string.IsNullOrEmpty(Model.SearchTerm) || !string.IsNullOrEmpty(selectedMajorCode) || selectedCohort.HasValue || !string.IsNullOrEmpty(selectedStatus))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="ri-close-line"></i> Xóa bộ lọc
+                                </a>
+                            }
+                        </div>
+                        <div class="d-flex align-items-center gap-8 text-secondary-light">
+                            <span>Rows per page:</span>
+                            <div class="dt-length">
+                                <select name="pageSize" class="dt-input form-control form-select" onchange="this.form.submit()">
+                                    @if (Model.PageSize == 5)
+                                    {
+                                        <option value="5" selected>5</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="5">5</option>
+                                    }
+                                    @if (Model.PageSize == 10)
+                                    {
+                                        <option value="10" selected>10</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="10">10</option>
+                                    }
+                                    @if (Model.PageSize == 25)
+                                    {
+                                        <option value="25" selected>25</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="25">25</option>
+                                    }
+                                    @if (Model.PageSize == 50)
+                                    {
+                                        <option value="50" selected>50</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="50">50</option>
+                                    }
+                                    @if (Model.PageSize == 100)
+                                    {
+                                        <option value="100" selected>100</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="100">100</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="p-0">
+                    <table class="table bordered-table mb-0 data-table" id="classTable">
+                        <thead class="bg-neutral-100">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Mã lớp</th>
+                                <th scope="col">Tên lớp</th>
+                                <th scope="col">Ngành</th>
+                                <th scope="col">Khóa</th>
+                                <th scope="col">Năm khóa</th>
+                                <th scope="col">Năm học</th>
+                                <th scope="col">Học kỳ</th>
+                                <th scope="col">Sĩ số</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items.Any())
+                            {
+                                var index = Model.StartRecord;
+                                foreach (var cls in Model.Items)
+                                {
+                                    var status = cls.Status ?? "";
+                                    var statusClass = status.Equals("Active", StringComparison.OrdinalIgnoreCase)
+                                        ? "bg-success-100 text-success-600"
+                                        : status.Equals("Graduated", StringComparison.OrdinalIgnoreCase)
+                                            ? "bg-primary-100 text-primary-600"
+                                            : status.Equals("Disbanded", StringComparison.OrdinalIgnoreCase)
+                                                ? "bg-danger-100 text-danger-600"
+                                                : "bg-neutral-100 text-neutral-600";
+                                    var majorName = majorMap.TryGetValue(cls.MajorId, out var name) ? name : "N/A";
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@cls.ClassCode</td>
+                                        <td>@cls.ClassName</td>
+                                        <td>@majorName</td>
+                                        <td>K@cls.Cohort</td>
+                                        <td>@cls.CohortYear</td>
+                                        <td>@cls.AcademicYear</td>
+                                        <td>@cls.Semester</td>
+                                        <td>@cls.StudentCount</td>
+                                        <td>
+                                            <span class="@statusClass px-24 py-4 radius-4 fw-medium text-sm">@cls.Status</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="text-primary-light text-xl"
+                                                        data-bs-toggle="dropdown" data-bs-display="static"
+                                                        aria-expanded="false">
+                                                    <iconify-icon icon="tabler:dots-vertical"></iconify-icon>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-lg-end border p-12">
+                                                    <li>
+                                                        <a asp-action="Details" asp-route-id="@cls.Id"
+                                                           class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
+                                                            <i class="ri-eye-line"></i>
+                                                            Xem chi tiết
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a asp-action="Edit" asp-route-id="@cls.Id"
+                                                           class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
+                                                            <i class="ri-edit-2-line"></i>
+                                                            Sửa
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <form asp-action="Delete" asp-route-id="@cls.Id" method="post"
+                                                              onsubmit="return confirm('Bạn có chắc muốn xóa lớp này?');">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit"
+                                                                    class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 border-0 bg-transparent w-100 text-start">
+                                                                <i class="ri-delete-bin-6-line"></i>
+                                                                Xóa
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="11" class="text-center py-4">
+                                        <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                        <p class="text-muted mt-2">Không có lớp nào</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-top border-neutral-200 dataTable-bottom">
+                        <div class="text-secondary-light text-sm dataTable-info">
+                            Hiển thị @Model.StartRecord - @Model.EndRecord trong tổng số @Model.TotalRecords bản ghi
+                        </div>
+                        <div class="dataTable-pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-searchTerm="@Model.SearchTerm"
+                                       asp-route-majorCode="@selectedMajorCode"
+                                       asp-route-cohort="@selectedCohort"
+                                       asp-route-status="@selectedStatus">
+                                        Previous
+                                    </a>
+                                </li>
+                                @{
+                                    var startPage = Math.Max(1, Model.PageNumber - 2);
+                                    var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                                }
+                                @for (var i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                        <a class="page-link" asp-action="Index"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-pageSize="@Model.PageSize"
+                                           asp-route-searchTerm="@Model.SearchTerm"
+                                           asp-route-majorCode="@selectedMajorCode"
+                                           asp-route-cohort="@selectedCohort"
+                                           asp-route-status="@selectedStatus">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-searchTerm="@Model.SearchTerm"
+                                       asp-route-majorCode="@selectedMajorCode"
+                                       asp-route-cohort="@selectedCohort"
+                                       asp-route-status="@selectedStatus">
+                                        Next
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function exportTableToCsv(tableId, filename) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            const rows = table.querySelectorAll('tr');
+            const csv = [];
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('th, td');
+                const rowData = [];
+                cols.forEach(col => {
+                    let text = col.innerText.replace(/\s+/g, ' ').trim();
+                    text = '"' + text.replace(/"/g, '""') + '"';
+                    rowData.push(text);
+                });
+                csv.push(rowData.join(','));
+            });
+            const csvContent = "\uFEFF" + csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                setTimeout(function () {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+
+            const exportBtn = document.getElementById('exportClassesExcel');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    exportTableToCsv('classTable', 'class-list.csv');
+                });
+            }
+        });
+    </script>
+}

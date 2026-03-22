@@ -7,9 +7,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace e360_clone.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : BaseApiController
     {
         private readonly IAccountRepository _accountRepository;
@@ -152,6 +155,38 @@ namespace e360_clone.Controllers
             });
         }
 
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Unauthorized"
+                });
+            }
+
+            var account = await _accountRepository.GetByIdAsync(userId);
+            if (account == null)
+            {
+                return HandleNotFound("Không tìm thấy tài khoản");
+            }
+
+            return HandleResult(new UserProfileResponse
+            {
+                Id = account.Id,
+                Username = account.Username,
+                Email = account.Email,
+                FullName = account.FullName ?? account.Username,
+                Role = account.Role,
+                AvatarUrl = account.AvatarUrl,
+                Status = account.Status
+            }, "Lấy thông tin người dùng thành công");
+        }
+
         private string GenerateJwtToken(Account account)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
@@ -220,5 +255,16 @@ namespace e360_clone.Controllers
         public string FullName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
+    }
+
+    public class UserProfileResponse
+    {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
+        public string? Status { get; set; }
     }
 }

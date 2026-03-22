@@ -13,7 +13,7 @@ A monorepo containing a clone of FPT's e360 system for managing exam schedules, 
 | **Backend API** | `e360_clone_api/` | ASP.NET Core 8.0 Web API (C#) |
 | **Frontend** | `e360_clone_fe/` | ASP.NET Core 8.0 MVC + AJAX |
 | **BusinessObjects** | `e360_clone.BusinessObjects/` | Class Library - Domain models (entities) |
-| **DataAccess** | `e360_clone.DataAccess/` | Class Library - EF Core DbContext |
+| **DataAccess** | `e360_clone.DataAccess/` | Class Library - EF Core DbContext, DAOs, Migrations |
 | **Repositories** | `e360_clone.Repositories/` | Class Library - Repository pattern |
 
 ### Solution Structure
@@ -23,21 +23,34 @@ C:\Git\prj-prn232\e360_clone\
 ├── e360_clone.slnx              # Solution file
 ├── e360_clone_api/              # Web API project
 │   ├── Controllers/
-│   ├── Migrations/
+│   ├── Migrations/              # [DEPRECATED] Move to DataAccess
 │   ├── Seeders/
 │   ├── Program.cs
 │   └── appsettings.json
 ├── e360_clone_fe/               # MVC Frontend project
 │   ├── Controllers/
 │   ├── Views/
+│   ├── Extensions/
+│   ├── Services/
+│   ├── Models/
 │   └── wwwroot/
 ├── e360_clone.BusinessObjects/  # Domain models (entities)
 │   ├── Student.cs
 │   ├── Lecturer.cs
 │   ├── Exam.cs
+│   ├── StudentSubject.cs        # NEW: Student-Subject enrollment
+│   ├── CourseSession.cs         # NEW: Class sessions
+│   ├── StudentAttendance.cs     # NEW: Attendance records
+│   ├── ExamForm.cs              # NEW: Exam forms (MCQ, Essay, etc.)
+│   ├── StudentExam.cs           # NEW: Student-Exam registration
 │   └── ...
-├── e360_clone.DataAccess/       # EF Core DbContext
-│   └── AppDbContext.cs
+├── e360_clone.DataAccess/       # EF Core DbContext, DAOs, Migrations
+│   ├── AppDbContext.cs
+│   ├── Configurations/          # Entity configurations
+│   ├── DAOs/                    # Data Access Objects
+│   │   ├── BaseDAO.cs
+│   │   └── AccountDAO.cs
+│   └── Migrations/              # [REQUIRED] All migrations go here
 └── e360_clone.Repositories/     # Repository pattern
     ├── IRepository.cs
     └── Repository.cs
@@ -50,6 +63,12 @@ e360_clone_api
 ├── e360_clone.BusinessObjects
 ├── e360_clone.DataAccess
 └── e360_clone.Repositories
+
+e360_clone_fe
+├── e360_clone.BusinessObjects
+├── e360_clone.DataAccess
+├── e360_clone.Repositories
+└── e360_clone_fe.Services (ApiService)
 
 e360_clone.Repositories
 ├── e360_clone.BusinessObjects
@@ -86,7 +105,8 @@ e360_clone.DataAccess
 
 2. Run migrations to create database schema:
 ```bash
-cd e360_clone/e360_clone_api
+# Migrations MUST be in DataAccess project
+cd e360_clone/e360_clone.DataAccess
 dotnet ef migrations add <MigrationName>
 dotnet ef database update
 ```
@@ -106,7 +126,7 @@ dotnet watch run        # Run with hot-reload
 - HTTPS: `https://localhost:7052`
 - Swagger UI: `/swagger` (Development mode only)
 
-### Frontend (`e360_clone_fe/`)
+### Frontend MVC (`e360_clone_fe/`)
 
 ```bash
 cd e360_clone/e360_clone_fe
@@ -224,10 +244,10 @@ e360_clone_api/
 │   ├── AuthController.cs       # Authentication endpoints
 │   ├── StudentsController.cs   # Student CRUD operations (sample)
 │   └── WeatherForecastController.cs
-├── Migrations/                 # Database migrations
+├── Migrations/                 # [DEPRECATED] Move to DataAccess
 ├── Seeders/                    # Database seeders
 │   └── AccountSeeder.cs
-├── Program.cs                  # CORS, Swagger, DbContext, DI configuration
+├── Program.cs                  # DI, CORS, Swagger config
 └── appsettings.json            # Connection strings, API settings
 ```
 
@@ -245,8 +265,14 @@ e360_clone.BusinessObjects/
 ├── Class.cs
 ├── Subject.cs
 ├── Account.cs
+├── AppUser.cs                  # NEW: User model for session auth
+├── StudentSubject.cs           # NEW: Student-Subject enrollment
+├── CourseSession.cs            # NEW: Class sessions
+├── StudentAttendance.cs        # NEW: Attendance records
+├── ExamForm.cs                 # NEW: Exam forms
+├── StudentExam.cs              # NEW: Student-Exam registration
 ├── Common/                     # Shared base classes
-├── Enums/                      # Enum definitions
+├── Enums/                      # Enum definitions (Gender, Status, etc.)
 ├── Helpers/                    # Helper utilities (PasswordHelper)
 └── Utilities/                  # Utility functions
 ```
@@ -254,7 +280,23 @@ e360_clone.BusinessObjects/
 **DataAccess (Class Library):**
 ```
 e360_clone.DataAccess/
-└── AppDbContext.cs             # EF Core DbContext with entity configurations
+├── AppDbContext.cs             # EF Core DbContext
+├── Configurations/             # Entity configurations (IEntityTypeConfiguration)
+│   ├── StudentConfiguration.cs
+│   ├── AccountConfiguration.cs
+│   ├── StudentSubjectConfiguration.cs
+│   ├── CourseSessionConfiguration.cs
+│   ├── StudentAttendanceConfiguration.cs
+│   ├── ExamFormConfiguration.cs
+│   └── StudentExamConfiguration.cs
+├── DAOs/                       # Data Access Objects
+│   ├── BaseDAO.cs              # Base class for all DAOs
+│   └── AccountDAO.cs           # Account-specific DAO
+└── Migrations/                 # [REQUIRED] All EF Core migrations
+    ├── 20260315035226_InitialCreate.cs
+    ├── 20260315081332_SeedInitialData.cs
+    ├── 20260316170242_AddAccountTable.cs
+    └── 20260321000000_AddStudentExamManagement.cs
 ```
 
 **Repositories (Class Library):**
@@ -262,6 +304,8 @@ e360_clone.DataAccess/
 e360_clone.Repositories/
 ├── IRepository.cs              # Generic repository interface
 ├── Repository.cs               # Generic repository implementation
+├── IAccountRepository.cs       # Account-specific repository
+├── AccountRepository.cs        # Account repository (uses AccountDAO)
 └── UnitOfWork.cs               # Unit of Work pattern
 ```
 
@@ -269,71 +313,116 @@ e360_clone.Repositories/
 ```
 e360_clone_fe/
 ├── Controllers/
+│   ├── BaseController.cs       # Base controller with auth helpers
 │   ├── HomeController.cs
-│   └── Auth/
-│       └── AuthController.cs    # MVC controller for Auth views
-├── Views/
-│   ├── Home/
-│   │   └── Index.cshtml         # Dashboard
 │   ├── Auth/
-│   │   └── Login.cshtml         # Login page
+│   │   └── AuthController.cs   # Login, Logout
+│   ├── StudentsController.cs   # Student management
+│   └── Dashboard/
+│       └── DashboardController.cs
+├── Models/
+│   ├── ViewModels/
+│   │   ├── StudentViewModel.cs
+│   │   ├── CreateStudentViewModel.cs
+│   │   └── PagedViewModel.cs
+│   └── AuthViewModels.cs
+├── Views/
 │   ├── Shared/
-│   │   ├── _Layout.cshtml
-│   │   └── _ValidationScriptsPartial.cshtml
+│   │   ├── _Layout.cshtml      # Main layout
+│   │   ├── _LayoutAuth.cshtml  # Auth layout (login page)
+│   │   ├── _Header.cshtml
+│   │   ├── _Sidebar.cshtml
+│   │   ├── _Footer.cshtml
+│   │   ├── _ScriptsPartial.cshtml
+│   │   └── _HeadPartial.cshtml
+│   ├── Auth/
+│   │   └── Login.cshtml
+│   ├── Dashboard/
+│   │   ├── School.cshtml
+│   │   ├── Student.cshtml
+│   │   ├── Teacher.cshtml
+│   │   ├── Parent.cshtml
+│   │   └── Lms.cshtml
 │   └── Students/
-│       └── Index.cshtml         # Students management view
+│       ├── Index.cshtml
+│       ├── Create.cshtml
+│       ├── Edit.cshtml
+│       └── Details.cshtml
+├── Services/
+│   ├── ApiService.cs           # HTTP client for calling backend API
+│   └── ApiSettings.cs          # API settings class
+├── Extensions/
+│   └── AppUserExtensions.cs    # Session-based user extensions
 ├── wwwroot/
 │   ├── css/
-│   │   └── site.css
 │   ├── js/
-│   │   ├── config.js            # Environment config
-│   │   ├── utils.js             # Common utilities
-│   │   ├── core/
-│   │   │   ├── http.js          # Base HTTP client
-│   │   │   └── auth.js          # Auth helper
-│   │   └── modules/
-│   │       ├── auth/
-│   │       │   └── api.js
-│   │       └── students/
-│   │           ├── api.js
-│   │           ├── helpers.js
-│   │           └── ui.js
-│   └── lib/                     # Third-party libraries
-└── Program.cs                   # MVC configuration
+│   │   ├── config.js
+│   │   ├── utils.js
+│   │   └── _archived/          # Old JS modules
+│   └── assets/                 # Template assets (CSS, JS, images)
+├── Program.cs                  # MVC, Auth, Session, DI config
+└── appsettings.json            # ApiSettings, ConnectionStrings
 ```
 
 ### Module Pattern
 
 Each feature module follows this structure:
 
-1. **Backend API Controller** (`e360_clone_api/Controllers/[Feature]Controller.cs`)
-2. **Frontend MVC Controller** (`e360_clone_fe/Controllers/[Feature]Controller.cs`)
-3. **View** (`e360_clone_fe/Views/[Feature]/Index.cshtml`)
-4. **JS Module** (`wwwroot/js/modules/[feature]/api.js` + `helpers.js` + `ui.js`)
+1. **BusinessObjects**: Entity model
+2. **DataAccess**: Configuration + Migration
+3. **Repositories**: Interface + Implementation (uses DAO)
+4. **Backend API**: Controller with CRUD endpoints
+5. **Frontend MVC**: Controller + Views + ViewModels
 
 Example for Students module:
 ```csharp
 // Frontend Controller
-public class StudentsController : Controller
+public class StudentsController : BaseController
 {
-    public IActionResult Index() => View();
-}
-```
+    private readonly IApiService _apiService;
+    
+    public StudentsController(IApiService apiService, ILogger<StudentsController> logger)
+        : base(apiService, logger) { }
 
-```html
-<!-- View (Index.cshtml) -->
-@section Scripts {
-    <script src="/js/core/http.js"></script>
-    <script src="/js/core/auth.js"></script>
-    <script src="/js/config.js"></script>
-    <script src="/js/utils.js"></script>
-    <script src="/js/modules/students/api.js"></script>
-    <script src="/js/modules/students/helpers.js"></script>
-    <script src="/js/modules/students/ui.js"></script>
+    public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string? searchTerm = null)
+    {
+        var authResult = RequireAuth();
+        if (authResult != null) return authResult;
+
+        var queryParams = new Dictionary<string, string>
+        {
+            { "pageNumber", pageNumber.ToString() },
+            { "pageSize", pageSize.ToString() }
+        };
+
+        if (!string.IsNullOrEmpty(searchTerm))
+            queryParams["searchTerm"] = searchTerm;
+
+        var response = await _apiService.GetAsync<PagedResponse<StudentViewModel>>("/students", queryParams);
+        
+        var pagedModel = new PagedViewModel<StudentViewModel>
+        {
+            Items = response.Data?.Items ?? new List<StudentViewModel>(),
+            PageNumber = response.PageNumber,
+            PageSize = response.PageSize,
+            TotalRecords = response.TotalRecords,
+            SearchTerm = searchTerm
+        };
+
+        return View(pagedModel);
+    }
 }
 ```
 
 ### Authentication Flow
+
+**Session-Based Authentication** (NOT Claims-based):
+
+1. User enters email/password on `/Auth/Login`
+2. Frontend validates against `Accounts` table via Repository
+3. On success, create `AppUser` model and save to Session
+4. Subsequent requests check `HttpContext.Session.GetUser()`
+5. Logout clears session
 
 **Default Accounts** (Password: `123456`):
 
@@ -347,12 +436,41 @@ public class StudentsController : Controller
 | librarian | librarian@e360.com | Librarian |
 
 **Login Flow:**
-1. User enters email/password on `/Auth/Login`
-2. Frontend calls API authentication endpoint
-3. API validates credentials against `Accounts` table
-4. On success, API returns JWT token + user info
-5. Frontend stores token and redirects by role
-6. Subsequent requests include token in Authorization header
+```csharp
+// AuthController.cs
+public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+{
+    var account = await _accountRepository.FindByEmailOrUsernameAsync(model.Email);
+    
+    if (account == null || account.Status != "Active")
+    {
+        TempData["ErrorMessage"] = "Email hoặc mật khẩu không đúng";
+        return View(model);
+    }
+
+    if (!PasswordHelper.VerifyPassword(model.Password, account.PasswordHash))
+    {
+        TempData["ErrorMessage"] = "Email hoặc mật khẩu không đúng";
+        return View(model);
+    }
+
+    // Create AppUser and save to session
+    var user = new AppUser
+    {
+        Id = account.Id,
+        Username = account.Username,
+        Email = account.Email,
+        FullName = account.FullName ?? account.Username,
+        Role = account.Role,
+        Status = account.Status
+    };
+
+    HttpContext.Session.SetUser(user);
+    await _accountRepository.UpdateLastLoginAsync(account.Id);
+
+    return RedirectToAction("Index", "Home");
+}
+```
 
 ## Key Files Reference
 
@@ -363,47 +481,117 @@ public class StudentsController : Controller
 | `e360_clone_api/Controllers/BaseApiController.cs` | Base controller with common response patterns |
 | `e360_clone_api/appsettings.json` | Connection strings, JWT settings, CORS origins |
 | `e360_clone.DataAccess/AppDbContext.cs` | EF Core DbContext with all entity configurations |
+| `e360_clone.DataAccess/DAOs/AccountDAO.cs` | Account-specific data access (DB operations) |
 | `e360_clone.Repositories/Repository.cs` | Generic repository with CRUD, paging, search |
-| `e360_clone_fe/Program.cs` | MVC configuration with cookie authentication |
-| `e360_clone_fe/Controllers/` | MVC controllers for each view |
-| `e360_clone_fe/Views/` | Razor views organized by feature |
-| `e360_clone_fe/wwwroot/js/config.js` | Environment configuration (API URL, timeout) |
-| `e360_clone_fe/wwwroot/js/core/http.js` | Base HTTP client with token management |
-| `e360_clone_fe/wwwroot/js/core/auth.js` | Authentication helper |
-| `e360_clone_fe/wwwroot/js/modules/` | Feature modules (API + Helpers + UI) |
+| `e360_clone.Repositories/AccountRepository.cs` | Account repository (uses AccountDAO) |
+| `e360_clone_fe/Program.cs` | MVC, Session, Auth, DI configuration |
+| `e360_clone_fe/Controllers/BaseController.cs` | Base controller with auth helpers |
+| `e360_clone_fe/Controllers/Auth/AuthController.cs` | Login, Logout (session-based) |
+| `e360_clone_fe/Services/ApiService.cs` | HTTP client for calling backend API |
+| `e360_clone_fe/Extensions/AppUserExtensions.cs` | Session-based user extensions |
+| `e360_clone_fe/Views/Shared/_Layout.cshtml` | Main layout with CSS/JS includes |
+| `e360_clone_fe/Views/_ViewStart.cshtml` | Default layout for all views |
+| `e360_clone_fe/Views/_ViewImports.cshtml` | Common using statements for views |
 | `README.md` | Detailed business requirements and functional specifications |
 | `DATABASE_AUTH_SETUP.md` | Database schema and authentication setup |
+| `ARCHITECTURE.md` | Comprehensive architecture documentation |
+| `REFACTORING_SUMMARY.md` | Refactoring history and changes |
 | `docs/` | Comprehensive documentation (modules, workflows, API) |
 
 ## Notes
 
-- **Architecture**: Layered architecture with separation of concerns
-  - **BusinessObjects**: Domain models/entities (no dependencies)
-  - **DataAccess**: EF Core DbContext, entity configurations
-  - **Repositories**: Generic repository pattern + Unit of Work
-  - **API**: Controllers, DI, CORS, Swagger, JWT authentication
-  - **Frontend**: MVC + AJAX calling API with modular JS architecture
-- **Database**: PostgreSQL via Supabase
-- **ORM**: Entity Framework Core 8 with Code-First migrations
-- **CORS**: Configured in API project to allow frontend calls from `http://localhost:5000`
-- **API Response Format**: All responses wrapped in `ApiResponse<T>` or `PagedResponse<T>`
-- **Frontend Architecture**: Modular pattern with Core (http, auth) → Module API → Helpers → UI layers
-- **Running the Application**:
-  1. Configure database connection in `e360_clone_api/appsettings.json`
-  2. Run migrations: `cd e360_clone/e360_clone_api && dotnet ef database update`
-  3. Start API: `cd e360_clone/e360_clone_api && dotnet run` (http://localhost:5104)
-  4. Start Frontend: `cd e360_clone/e360_clone_fe && dotnet run` (http://localhost:5000)
-  5. Open browser: http://localhost:5000
-  6. Login with: `admin@e360.com` / `123456`
-- **Adding New Module**: 
-  1. Create Model in `e360_clone.BusinessObjects/`
-  2. Add DbSet to `AppDbContext.cs` in `e360_clone.DataAccess/`
-  3. (Optional) Create specific repository in `e360_clone.Repositories/`
-  4. Create API Controller in `e360_clone_api/Controllers/`
-  5. Run `dotnet ef migrations add [MigrationName]`
-  6. Run `dotnet ef database update`
-  7. Create Frontend MVC Controller in `e360_clone_fe/Controllers/`
-  8. Create View in `e360_clone_fe/Views/[Feature]/`
-  9. Create JS modules in `e360_clone_fe/wwwroot/js/modules/[feature]/`
-- **Documentation**: Extensive business requirements in `README.md`, detailed docs in `docs/` folder
-- **Current State**: Scaffolded with Student CRUD sample, authentication system, and repository pattern
+### Architecture Principles
+
+1. **Layered Architecture** with separation of concerns:
+   - **BusinessObjects**: Domain models/entities (no dependencies)
+   - **DataAccess**: EF Core DbContext, entity configurations, **Migrations**, DAOs
+   - **Repositories**: Generic repository pattern + Unit of Work (uses DAOs)
+   - **API**: Controllers, DI, CORS, Swagger
+   - **Frontend**: MVC + AJAX calling API with session-based auth
+
+2. **Database**: PostgreSQL via Supabase
+
+3. **ORM**: Entity Framework Core 8 with Code-First migrations
+
+4. **Migrations MUST be in DataAccess project**:
+   ```bash
+   # CORRECT
+   cd e360_clone/e360_clone.DataAccess
+   dotnet ef migrations add <MigrationName>
+   dotnet ef database update
+   
+   # WRONG - Don't create migrations in API project
+   cd e360_clone/e360_clone_api  ❌
+   ```
+
+5. **CORS**: Configured in API project to allow frontend calls from `http://localhost:5000`
+
+6. **API Response Format**: All responses wrapped in `ApiResponse<T>` or `PagedResponse<T>`
+
+7. **Frontend Architecture**: 
+   - Session-based authentication (NOT claims-based)
+   - `AppUser` model stored in session
+   - Extension methods: `SetUser()`, `GetUser()`, `IsLoggedIn()`, `Logout()`
+
+8. **Running the Application**:
+   1. Configure database connection in `e360_clone_api/appsettings.json`
+   2. Run migrations: `cd e360_clone/e360_clone.DataAccess && dotnet ef database update`
+   3. Start API: `cd e360_clone/e360_clone_api && dotnet run` (http://localhost:5104)
+   4. Start Frontend: `cd e360_clone/e360_clone_fe && dotnet run` (http://localhost:5000)
+   5. Open browser: http://localhost:5000
+   6. Login with: `admin@e360.com` / `123456`
+
+9. **Adding New Module**: 
+   1. Create Model in `e360_clone.BusinessObjects/`
+   2. Create Configuration in `e360_clone.DataAccess/Configurations/`
+   3. Add DbSet to `AppDbContext.cs` in `e360_clone.DataAccess/`
+   4. (Optional) Create DAO in `e360_clone.DataAccess/DAOs/`
+   5. (Optional) Create specific repository in `e360_clone.Repositories/`
+   6. **Create Migration**: `cd e360_clone/e360_clone.DataAccess && dotnet ef migrations add <Name>`
+   7. **Update Database**: `dotnet ef database update`
+   8. Create API Controller in `e360_clone_api/Controllers/`
+   9. Create Frontend MVC Controller in `e360_clone_fe/Controllers/`
+   10. Create View in `e360_clone_fe/Views/[Feature]/`
+   11. Create ViewModels in `e360_clone_fe/Models/ViewModels/`
+
+10. **Database Migration Rules**:
+    - ✅ **ADD columns** - Always safe
+    - ✅ **ADD tables** - Always safe
+    - ✅ **ADD indexes** - Always safe
+    - ❌ **DELETE columns** - NEVER (archive instead)
+    - ❌ **DELETE tables** - NEVER (archive instead)
+    - ❌ **RENAME columns** - NEVER (add new, deprecate old)
+    - ⚠️ **MODIFY column types** - Only if backward compatible
+
+11. **Repository Pattern with DAO**:
+    ```
+    Controller → Repository → DAO → DbContext → Database
+    
+    Example:
+    AuthController 
+      → IAccountRepository 
+        → AccountDAO 
+          → AppDbContext 
+            → Accounts table
+    ```
+
+12. **Session-Based Authentication**:
+    - Store `AppUser` object in session
+    - No JWT tokens, no claims
+    - Simple and type-safe
+    - Extension methods in `AppUserExtensions.cs`
+
+13. **Template Usage**:
+    - Frontend uses Bootstrap 5 template
+    - Existing HTML templates in `Views/` folder
+    - Reuse existing tables, cards, forms from template
+    - Convert `.html` to `.cshtml` with Razor syntax
+
+14. **Documentation**: Extensive business requirements in `README.md`, detailed docs in `docs/` folder
+
+15. **Current State**: 
+    - ✅ Auth module with session-based auth
+    - ✅ Students module (CRUD + server-side rendering)
+    - ✅ Dashboard views (Student, Teacher, Parent, LMS, School)
+    - ✅ Entity models for Student Exam Management
+    - ⏳ Pending: Exam Scheduling, Attendance Tracking

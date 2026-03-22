@@ -1,26 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using e360_clone.BusinessObjects;
-using e360_clone.BusinessObjects.Helpers;
-using e360_clone.Repositories;
-using e360_clone_fe.Extensions;
 using e360_clone_fe.Models;
+using e360_clone_fe.Services;
+using System.Text.Json;
 
 namespace e360_clone_fe.Controllers
 {
     /// <summary>
     /// Authentication Controller
-    /// Uses session-based authentication with AppUser model (NO Claims)
+    /// Uses JWT token from Backend API (stored in HttpOnly cookie)
     /// </summary>
     public class AuthController : Controller
     {
-        private readonly IAccountRepository _accountRepository;
+        private readonly IApiService _apiService;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            IAccountRepository accountRepository,
+            IApiService apiService,
             ILogger<AuthController> logger)
         {
-            _accountRepository = accountRepository;
+            _apiService = apiService;
             _logger = logger;
         }
 
@@ -29,8 +27,10 @@ namespace e360_clone_fe.Controllers
         /// </summary>
         public IActionResult Login(string? returnUrl = null)
         {
-            // If already logged in, redirect to home
-            if (HttpContext.Session.IsLoggedIn())
+            // Check if already has JWT token
+            var token = _apiService.GetAuthToken();
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(role))
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -40,7 +40,7 @@ namespace e360_clone_fe.Controllers
         }
 
         /// <summary>
-        /// Handle login form submission
+        /// Handle login - Call Backend API to get JWT token
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -54,65 +54,61 @@ namespace e360_clone_fe.Controllers
 
             try
             {
-                // Trim email and password to remove accidental spaces
                 var email = model.Email?.Trim() ?? string.Empty;
                 var password = model.Password?.Trim() ?? string.Empty;
 
                 _logger.LogInformation("Login attempt for email: {Email}", email);
 
-                // Find account by email or username
-                var account = await _accountRepository.FindByEmailOrUsernameAsync(email);
+                // Call Backend API to authenticate and get JWT token
+                // Backend route: /api/Auth/login
+                var loginData = new { Email = email, Password = password };
+                var response = await _apiService.PostAsync<LoginResponse>("Auth/login", loginData);
 
-                if (account == null)
+                if (!response.Success || response.Data == null)
                 {
-                    _logger.LogWarning("Login failed: Account not found for {Email}", email);
+                    _logger.LogWarning("Login failed: {Message}", response.Message);
                     TempData["ErrorMessage"] = "Email hoặc mật khẩu không đúng";
+                    ViewBag.ReturnUrl = returnUrl;
                     return View(model);
                 }
 
-                // Check account status
-                if (account.Status != "Active")
+                // Save JWT token to HttpOnly cookie
+                _apiService.SetAuthToken(response.Data.Token);
+
+                // Fetch user profile after login
+                var profileResponse = await _apiService.GetWithTokenAsync<UserProfileResponse>(
+                    "Auth/me",
+                    response.Data.Token);
+
+                if (profileResponse.Success && profileResponse.Data != null)
                 {
-                    _logger.LogWarning("Login failed: Account {Username} has status {Status}", account.Username, account.Status);
-                    TempData["ErrorMessage"] = "Tài khoản của bạn đã bị khóa hoặc không hoạt động";
-                    return View(model);
+                    HttpContext.Session.SetString("Role", profileResponse.Data.Role);
+                    HttpContext.Session.SetString("FullName", profileResponse.Data.FullName);
+                    HttpContext.Session.SetString("Username", profileResponse.Data.Username);
+                    HttpContext.Session.SetString("Email", profileResponse.Data.Email);
+                    ViewData["Role"] = profileResponse.Data.Role;
+                }
+                else
+                {
+                    // Fallback to data from login response
+                    HttpContext.Session.SetString("Role", response.Data.Role);
+                    HttpContext.Session.SetString("FullName", response.Data.FullName);
+                    HttpContext.Session.SetString("Username", response.Data.Username);
+                    HttpContext.Session.SetString("Email", response.Data.Email);
+                    ViewData["Role"] = response.Data.Role;
                 }
 
-                // Verify password
-                var passwordMatch = PasswordHelper.VerifyPassword(password, account.PasswordHash);
+                _logger.LogInformation("User {Username} logged in successfully", response.Data.Username);
 
-                if (!passwordMatch)
-                {
-                    _logger.LogWarning("Login failed: Invalid password for {Email}", email);
-                    TempData["ErrorMessage"] = "Email hoặc mật khẩu không đúng";
-                    return View(model);
-                }
-
-                // Create AppUser model and save to session
-                var user = new AppUser
-                {
-                    Id = account.Id,
-                    Username = account.Username,
-                    Email = account.Email,
-                    FullName = account.FullName ?? account.Username,
-                    Role = account.Role,
-                    AvatarUrl = account.AvatarUrl,
-                    Status = account.Status,
-                    LastLoginAt = account.LastLoginAt
-                };
-
-                // Save user to session
-                HttpContext.Session.SetUser(user);
-
-                // Update last login
-                await _accountRepository.UpdateLastLoginAsync(account.Id);
-
-                _logger.LogInformation("User {Username} logged in successfully", account.Username);
-
-                // Redirect to return URL or home
+                // Redirect
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
+                }
+
+                if (response.Data.Role is "Admin" or "SuperAdmin" or "Staff")
+                {
+                    return RedirectToAction("LMS", "Dashboard");
                 }
 
                 return RedirectToAction("Index", "Home");
@@ -121,19 +117,19 @@ namespace e360_clone_fe.Controllers
             {
                 _logger.LogError(ex, "Error during login");
                 TempData["ErrorMessage"] = "Có lỗi xảy ra. Vui lòng thử lại sau.";
+                ViewBag.ReturnUrl = returnUrl;
                 return View(model);
             }
         }
 
         /// <summary>
-        /// Quick login for demo/development (no password required)
+        /// Quick login for demo (bypass password)
         /// </summary>
         [HttpGet]
-        public IActionResult QuickLogin(string role, string? returnUrl = null)
+        public async Task<IActionResult> QuickLogin(string role, string? returnUrl = null)
         {
             try
             {
-                // Validate role
                 var validRoles = new[] { "SuperAdmin", "Admin", "Student", "Teacher", "Parent", "Librarian", "Staff" };
                 if (!validRoles.Contains(role))
                 {
@@ -141,25 +137,34 @@ namespace e360_clone_fe.Controllers
                     return RedirectToAction("Login");
                 }
 
-                var username = $"{role}@demo.com";
+                // Call backend API for quick login
+                var loginData = new { Email = $"{role}@demo.com", Password = "demo123", QuickLogin = true };
+                var response = await _apiService.PostAsync<LoginResponse>("Auth/quick-login", loginData);
 
-                // Create demo user
-                var user = new AppUser
+                if (response.Success && response.Data != null)
                 {
-                    Id = 0,
-                    Username = username,
-                    Email = username,
-                    FullName = $"Demo {role}",
-                    Role = role,
-                    Status = "Active"
-                };
+                    _apiService.SetAuthToken(response.Data.Token);
 
-                // Save to session
-                HttpContext.Session.SetUser(user);
+                    var profileResponse = await _apiService.GetWithTokenAsync<UserProfileResponse>(
+                        "Auth/me",
+                        response.Data.Token);
 
-                _logger.LogInformation("Demo user {Username} logged in via QuickLogin", username);
+                    if (profileResponse.Success && profileResponse.Data != null)
+                    {
+                        HttpContext.Session.SetString("Role", profileResponse.Data.Role);
+                        HttpContext.Session.SetString("FullName", profileResponse.Data.FullName);
+                        HttpContext.Session.SetString("Username", profileResponse.Data.Username);
+                        HttpContext.Session.SetString("Email", profileResponse.Data.Email);
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetString("Role", response.Data.Role);
+                        HttpContext.Session.SetString("FullName", response.Data.FullName);
+                        HttpContext.Session.SetString("Username", response.Data.Username);
+                        HttpContext.Session.SetString("Email", response.Data.Email);
+                    }
+                }
 
-                // Redirect to return URL or home
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
@@ -170,7 +175,7 @@ namespace e360_clone_fe.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during QuickLogin for role {Role}", role);
-                TempData["ErrorMessage"] = "Có lỗi xảy ra. Vui lòng thử lại sau.";
+                TempData["ErrorMessage"] = "Có lỗi xảy ra";
                 return RedirectToAction("Login");
             }
         }
@@ -184,10 +189,13 @@ namespace e360_clone_fe.Controllers
         {
             try
             {
-                var userName = HttpContext.Session.GetUser()?.Username;
+                var userName = HttpContext.Session.GetString("Username");
+
+                // Clear JWT token
+                _apiService.ClearAuthToken();
 
                 // Clear session
-                HttpContext.Session.Logout();
+                HttpContext.Session.Clear();
 
                 _logger.LogInformation("User {UserName} logged out", userName);
 
@@ -208,5 +216,30 @@ namespace e360_clone_fe.Controllers
         {
             return View();
         }
+    }
+
+    /// <summary>
+    /// Login response from Backend API
+    /// </summary>
+    public class LoginResponse
+    {
+        public string Token { get; set; } = string.Empty;
+        public int UserId { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+    }
+
+    public class UserProfileResponse
+    {
+        public int Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
+        public string? Status { get; set; }
     }
 }

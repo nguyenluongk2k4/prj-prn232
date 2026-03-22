@@ -45,15 +45,62 @@
     <!-- Content Area -->
     <div class="content-area p-24">
         <div class="card radius-12">
-            <div class="card-body">
+            <div class="card-body p-0 dataTable-wrapper">
                 <!-- Search & Filter -->
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-20">
-                    <form method="get" class="d-flex align-items-center gap-3">
-                        <div class="search-box position-relative">
-                            <input type="text" name="searchTerm" class="form-control w-300-px" 
-                                   placeholder="Tìm theo tên hoặc mã..." 
-                                   value="@Model.SearchTerm">
-                            <i class="ri-search-line position-absolute top-50 end-0 translate-middle-y me-12 text-secondary-light"></i>
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-bottom border-neutral-200">
+                    <form method="get" class="d-flex align-items-center gap-16 flex-wrap">
+                        <input type="hidden" name="pageNumber" value="1" />
+                        <div class="navbar-search dt-search m-0">
+                            <input type="text" class="dt-input bg-transparent radius-4" name="searchTerm"
+                                   placeholder="Search..." value="@Model.SearchTerm">
+                            <iconify-icon icon="ion:search-outline" class="icon"></iconify-icon>
+                        </div>
+                        <div class="d-flex align-items-center gap-8 text-secondary-light">
+                            <span>Rows per page:</span>
+                            <div class="dt-length">
+                                <select name="pageSize" class="dt-input form-control form-select" onchange="this.form.submit()">
+                                    @if (Model.PageSize == 5)
+                                    {
+                                        <option value="5" selected>5</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="5">5</option>
+                                    }
+                                    @if (Model.PageSize == 10)
+                                    {
+                                        <option value="10" selected>10</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="10">10</option>
+                                    }
+                                    @if (Model.PageSize == 25)
+                                    {
+                                        <option value="25" selected>25</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="25">25</option>
+                                    }
+                                    @if (Model.PageSize == 50)
+                                    {
+                                        <option value="50" selected>50</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="50">50</option>
+                                    }
+                                    @if (Model.PageSize == 100)
+                                    {
+                                        <option value="100" selected>100</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="100">100</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-outline-secondary">
                             <i class="ri-search-line"></i> Tìm kiếm
@@ -68,8 +115,8 @@
                 </div>
 
                 <!-- Data Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
+                <div class="p-0">
+                    <table class="table bordered-table mb-0 data-table">
                         <thead class="bg-neutral-100">
                             <tr>
                                 <th scope="col">STT</th>
@@ -101,27 +148,40 @@
                                             <span class="badge @student.StatusBadgeClass">@student.StatusText</span>
                                         </td>
                                         <td>
-                                            <div class="d-flex gap-2">
-                                                <a asp-action="Details" asp-route-id="@student.Id" 
-                                                   class="btn btn-sm btn-outline-info" 
-                                                   title="Xem chi tiết">
-                                                    <i class="ri-eye-line"></i>
-                                                </a>
-                                                <a asp-action="Edit" asp-route-id="@student.Id" 
-                                                   class="btn btn-sm btn-outline-primary" 
-                                                   title="Sửa">
-                                                    <i class="ri-edit-line"></i>
-                                                </a>
-                                                <form asp-action="Delete" asp-route-id="@student.Id" 
-                                                      method="post" 
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Bạn có chắc muốn xóa sinh viên này?');">
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                            title="Xóa">
-                                                        <i class="ri-delete-bin-line"></i>
-                                                    </button>
-                                                </form>
+                                            <div class="btn-group">
+                                                <button type="button" class="text-primary-light text-xl"
+                                                        data-bs-toggle="dropdown" data-bs-display="static"
+                                                        aria-expanded="false">
+                                                    <iconify-icon icon="tabler:dots-vertical"></iconify-icon>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-lg-end border p-12">
+                                                    <li>
+                                                        <a asp-action="Details" asp-route-id="@student.Id"
+                                                           class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
+                                                            <i class="ri-eye-line"></i>
+                                                            Xem chi tiết
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a asp-action="Edit" asp-route-id="@student.Id"
+                                                           class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
+                                                            <i class="ri-edit-2-line"></i>
+                                                            Sửa
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <form asp-action="Delete" asp-route-id="@student.Id"
+                                                              method="post"
+                                                              onsubmit="return confirm('Bạn có chắc muốn xóa sinh viên này?');">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit"
+                                                                    class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 border-0 bg-transparent w-100 text-start">
+                                                                <i class="ri-delete-bin-6-line"></i>
+                                                                Xóa
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
@@ -144,83 +204,48 @@
                 <!-- Pagination -->
                 @if (Model.TotalPages > 1)
                 {
-                    <nav aria-label="Page navigation" class="mt-20">
-                        <ul class="pagination justify-content-end mb-0">
-                            <!-- First Page -->
-                            @if (Model.HasPrevious)
-                            {
-                                <li class="page-item">
-                                    <a class="page-link" asp-action="Index" 
-                                       asp-route-pageNumber="1" 
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-top border-neutral-200 dataTable-bottom">
+                        <div class="text-secondary-light text-sm dataTable-info">
+                            Hiển thị @Model.StartRecord - @Model.EndRecord trong tổng số @Model.TotalRecords bản ghi
+                        </div>
+                        <div class="dataTable-pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber - 1)"
                                        asp-route-pageSize="@Model.PageSize"
                                        asp-route-searchTerm="@Model.SearchTerm">
-                                        <i class="ri-double-left-line"></i>
+                                        Previous
                                     </a>
                                 </li>
-                            }
 
-                            <!-- Previous Page -->
-                            @if (Model.HasPrevious)
-                            {
-                                <li class="page-item">
-                                    <a class="page-link" asp-action="Index" 
-                                       asp-route-pageNumber="@(Model.PageNumber - 1)" 
+                                @{
+                                    var startPage = Math.Max(1, Model.PageNumber - 2);
+                                    var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                                }
+
+                                @for (var i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                        <a class="page-link" asp-action="Index"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-pageSize="@Model.PageSize"
+                                           asp-route-searchTerm="@Model.SearchTerm">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber + 1)"
                                        asp-route-pageSize="@Model.PageSize"
                                        asp-route-searchTerm="@Model.SearchTerm">
-                                        <i class="ri-arrow-left-s-line"></i>
+                                        Next
                                     </a>
                                 </li>
-                            }
-
-                            <!-- Page Numbers -->
-                            @{
-                                var startPage = Math.Max(1, Model.PageNumber - 2);
-                                var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
-                            }
-
-                            @for (var i = startPage; i <= endPage; i++)
-                            {
-                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                    <a class="page-link" asp-action="Index" 
-                                       asp-route-pageNumber="@i" 
-                                       asp-route-pageSize="@Model.PageSize"
-                                       asp-route-searchTerm="@Model.SearchTerm">
-                                        @i
-                                    </a>
-                                </li>
-                            }
-
-                            <!-- Next Page -->
-                            @if (Model.HasNext)
-                            {
-                                <li class="page-item">
-                                    <a class="page-link" asp-action="Index" 
-                                       asp-route-pageNumber="@(Model.PageNumber + 1)" 
-                                       asp-route-pageSize="@Model.PageSize"
-                                       asp-route-searchTerm="@Model.SearchTerm">
-                                        <i class="ri-arrow-right-s-line"></i>
-                                    </a>
-                                </li>
-                            }
-
-                            <!-- Last Page -->
-                            @if (Model.HasNext)
-                            {
-                                <li class="page-item">
-                                    <a class="page-link" asp-action="Index" 
-                                       asp-route-pageNumber="@Model.TotalPages" 
-                                       asp-route-pageSize="@Model.PageSize"
-                                       asp-route-searchTerm="@Model.SearchTerm">
-                                        <i class="ri-double-right-line"></i>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </nav>
-
-                    <!-- Page Info -->
-                    <div class="text-muted text-end mt-2">
-                        <small>Hiển thị @Model.StartRecord - @Model.EndRecord trong tổng số @Model.TotalRecords bản ghi</small>
+                            </ul>
+                        </div>
                     </div>
                 }
             </div>

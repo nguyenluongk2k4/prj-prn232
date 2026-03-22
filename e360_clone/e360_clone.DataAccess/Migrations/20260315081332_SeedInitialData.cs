@@ -56,11 +56,31 @@ namespace e360_clone.Migrations
 
             // Insert sample Classes
             migrationBuilder.Sql(@"
-                INSERT INTO ""Classes"" (""ClassCode"", ""ClassName"", ""MajorId"", ""CourseId"", ""AcademicYear"", ""Semester"", ""StudentCount"", ""Status"", ""CreatedAt"")
+                INSERT INTO ""Classes"" (""ClassCode"", ""ClassName"", ""MajorId"", ""CourseId"", ""AcademicYear"", ""Cohort"", ""CohortYear"", ""Semester"", ""StudentCount"", ""Status"", ""CreatedAt"")
                 VALUES 
-                ('LopCNTT2020A', N'Lớp CNTT 2020A', 1, 1, '2020-2024', 1, 30, 'Active', NOW()),
-                ('LopCNTT2020B', N'Lớp CNTT 2020B', 1, 1, '2020-2024', 1, 28, 'Active', NOW()),
-                ('LopCNTT2020C', N'Lớp CNTT 2020C', 1, 1, '2020-2024', 1, 25, 'Active', NOW());
+                -- Công nghệ
+                ('SE1801', N'Software Engineering K18 - SE1801', 1, 1, '2018-2022', 18, 2018, 1, 30, 'Active', NOW()),
+                ('SE1802', N'Software Engineering K18 - SE1802', 1, 1, '2018-2022', 18, 2018, 1, 28, 'Active', NOW()),
+                ('AI1801', N'Artificial Intelligence K18 - AI1801', 1, 1, '2018-2022', 18, 2018, 1, 25, 'Active', NOW()),
+                ('IA1801', N'Information Assurance K18 - IA1801', 1, 1, '2018-2022', 18, 2018, 1, 24, 'Active', NOW()),
+                ('SWD1801', N'Software Development K18 - SWD1801', 1, 1, '2018-2022', 18, 2018, 1, 26, 'Active', NOW()),
+                ('PRJ1801', N'Project K18 - PRJ1801', 1, 1, '2018-2022', 18, 2018, 1, 20, 'Active', NOW()),
+
+                -- Kinh tế / Kinh doanh
+                ('BUS1801', N'Business K18 - BUS1801', 1, 1, '2018-2022', 18, 2018, 1, 32, 'Active', NOW()),
+                ('MKT1801', N'Marketing K18 - MKT1801', 1, 1, '2018-2022', 18, 2018, 1, 30, 'Active', NOW()),
+                ('FIN1801', N'Finance K18 - FIN1801', 1, 1, '2018-2022', 18, 2018, 1, 27, 'Active', NOW()),
+                ('ACC1801', N'Accounting K18 - ACC1801', 1, 1, '2018-2022', 18, 2018, 1, 29, 'Active', NOW()),
+
+                -- Ngôn ngữ / Quốc tế
+                ('EN1801', N'English K18 - EN1801', 1, 1, '2018-2022', 18, 2018, 1, 35, 'Active', NOW()),
+                ('JPN1801', N'Japanese K18 - JPN1801', 1, 1, '2018-2022', 18, 2018, 1, 28, 'Active', NOW()),
+                ('KOR1801', N'Korean K18 - KOR1801', 1, 1, '2018-2022', 18, 2018, 1, 26, 'Active', NOW()),
+                ('CHI1801', N'Chinese K18 - CHI1801', 1, 1, '2018-2022', 18, 2018, 1, 26, 'Active', NOW()),
+
+                -- Thiết kế / Truyền thông
+                ('GD1801', N'Graphic Design K18 - GD1801', 1, 1, '2018-2022', 18, 2018, 1, 22, 'Active', NOW()),
+                ('MM1801', N'Multimedia Communication K18 - MM1801', 1, 1, '2018-2022', 18, 2018, 1, 24, 'Active', NOW());
             ");
 
             // Insert sample ExamRooms
@@ -82,7 +102,7 @@ namespace e360_clone.Migrations
             migrationBuilder.Sql("DELETE FROM \"Students\" WHERE \"StudentCode\" LIKE 'SV%';");
             migrationBuilder.Sql("DELETE FROM \"Lecturers\" WHERE \"EmployeeCode\" LIKE 'GV%';");
             migrationBuilder.Sql("DELETE FROM \"Subjects\" WHERE \"SubjectCode\" LIKE '%%00%';");
-            migrationBuilder.Sql("DELETE FROM \"Classes\" WHERE \"ClassCode\" LIKE 'Lop%';");
+            migrationBuilder.Sql("DELETE FROM \"Classes\" WHERE \"ClassCode\" ~ '^(SE|AI|IA|SWD|PRJ|BUS|MKT|FIN|ACC|EN|JPN|KOR|CHI|GD|MM)';");
             migrationBuilder.Sql("DELETE FROM \"ExamRooms\" WHERE \"RoomCode\" LIKE 'P%' OR \"RoomCode\" LIKE 'LAB%';");
         }
     }

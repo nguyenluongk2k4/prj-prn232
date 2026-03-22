@@ -9,6 +9,8 @@ namespace e360_clone_fe.Models.ViewModels
         public string ClassCode { get; set; } = string.Empty;
         public string ClassName { get; set; } = string.Empty;
         public string AcademicYear { get; set; } = string.Empty;
+        public int Cohort { get; set; }
+        public int CohortYear { get; set; }
         public int MajorId { get; set; }
         public string Status { get; set; } = "Active";
 

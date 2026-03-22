@@ -1,0 +1,139 @@
+@{
+    var role = Context.Session.GetString("Role") ?? "";
+    var fullName = Context.Session.GetString("FullName") ?? Context.Session.GetString("Username") ?? "Guest";
+}
+
+<aside class="sidebar">
+  <button type="button" class="sidebar-close-btn">
+    <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+  </button>
+
+  <!-- Logo -->
+  <div class="">
+    <div class="sidebar-logo d-flex align-items-center justify-content-between">
+      <a href="/" class="">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="light-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="dark-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="logo-icon" style="max-height: 32px;">
+      </a>
+      <button type="button" class="text-xxl d-xl-flex d-none line-height-1 sidebar-toggle text-neutral-500"
+        aria-label="Collapse Sidebar">
+        <i class="ri-contract-left-line"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- User Info -->
+  <div class="mx-16 py-12">
+    <div class="dropdown profile-dropdown">
+      <button type="button"
+        class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
+        data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        <span class="d-flex align-items-start gap-10">
+          <img src="/assets/images/thumbs/avatar-img1.png" alt="Avatar"
+            class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
+          <span class="profile-dropdown__contents">
+            <span class="h6 mb-0 text-md d-block text-primary-light">@fullName</span>
+            <span class="text-secondary-light text-sm mb-0 d-block">Teacher</span>
+          </span>
+        </span>
+        <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
+          <i class="ri-arrow-right-s-line"></i>
+        </span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-lg-end border p-12">
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li>
+          <form id="logoutForm" asp-controller="Auth" asp-action="Logout" method="post" class="d-none">
+            @Html.AntiForgeryToken()
+          </form>
+          <button type="button" id="logoutBtn"
+            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 w-100 border-0 bg-transparent">
+            <i class="ri-shut-down-line"></i>
+            Log Out
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="sidebar-menu-area">
+    <ul class="sidebar-menu" id="sidebar-menu">
+      
+      @* Dashboard *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-home-4-line"></i>
+          <span>Dashboard</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Dashboard/Teacher"><i class="ri-circle-fill circle-icon w-auto"></i> My Dashboard</a></li>
+          <li><a href="/Dashboard/LMS"><i class="ri-circle-fill circle-icon w-auto"></i> LMS</a></li>
+        </ul>
+      </li>
+
+      @* My Courses *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-book-open-line"></i>
+          <span>My Courses</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Courses/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Courses</a></li>
+          <li><a href="/Courses/Schedule"><i class="ri-circle-fill circle-icon w-auto"></i> Teaching Schedule</a></li>
+        </ul>
+      </li>
+
+      @* Exam Schedule *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-calendar-line"></i>
+          <span>Exam Schedule</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/ExamSchedules/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Schedule</a></li>
+        </ul>
+      </li>
+
+      @* Grades *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-award-line"></i>
+          <span>Grades</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Grades/Enter"><i class="ri-circle-fill circle-icon w-auto"></i> Enter Grades</a></li>
+          <li><a href="/Grades/Pending"><i class="ri-circle-fill circle-icon w-auto"></i> Pending Approval</a></li>
+        </ul>
+      </li>
+
+      @* Attendance *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-calendar-check-line"></i>
+          <span>Attendance</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Attendance/Take"><i class="ri-circle-fill circle-icon w-auto"></i> Take Attendance</a></li>
+          <li><a href="/Attendance/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Records</a></li>
+        </ul>
+      </li>
+
+      @* Profile *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-user-3-line"></i>
+          <span>Profile</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Profile"><i class="ri-circle-fill circle-icon w-auto"></i> My Profile</a></li>
+          <li><a href="/Profile/Settings"><i class="ri-circle-fill circle-icon w-auto"></i> Settings</a></li>
+        </ul>
+      </li>
+
+    </ul>
+  </div>
+</aside>

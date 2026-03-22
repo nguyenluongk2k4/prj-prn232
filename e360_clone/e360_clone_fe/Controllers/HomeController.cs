@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using e360_clone.BusinessObjects;
-using e360_clone_fe.Extensions;
 
 namespace e360_clone_fe.Controllers
 {
@@ -8,22 +6,23 @@ namespace e360_clone_fe.Controllers
     {
         public IActionResult Index()
         {
-            // Check if user is logged in
-            var user = HttpContext.Session.GetUser();
+            // Get role from Session (set during login)
+            var role = HttpContext.Session.GetString("Role");
             
-            if (user == null)
+            if (string.IsNullOrEmpty(role))
             {
                 return RedirectToAction("Login", "Auth");
             }
 
-            // Redirect to appropriate dashboard based on user role
-            return user.Role switch
+            // Redirect to appropriate dashboard based on role
+            // Admin/Staff → LMS Dashboard (not School)
+            return role switch
             {
                 "Student" => RedirectToAction("Student", "Dashboard"),
                 "Teacher" => RedirectToAction("Teacher", "Dashboard"),
                 "Parent" => RedirectToAction("Parent", "Dashboard"),
-                "Admin" => RedirectToAction("Lms", "Dashboard"),
-                _ => RedirectToAction("School", "Dashboard")
+                "Admin" or "SuperAdmin" or "Staff" => RedirectToAction("LMS", "Dashboard"),
+                _ => RedirectToAction("LMS", "Dashboard")
             };
         }
     }

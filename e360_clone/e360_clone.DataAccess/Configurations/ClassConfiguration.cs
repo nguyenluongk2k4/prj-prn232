@@ -21,9 +21,20 @@ namespace e360_clone.DataAccess.Configurations
             builder.Property(e => e.AcademicYear)
                 .HasMaxLength(20);
 
+            builder.Property(e => e.Cohort)
+                .IsRequired();
+
+            builder.Property(e => e.CohortYear)
+                .IsRequired();
+
             builder.Property(e => e.Status)
                 .HasMaxLength(20)
                 .HasDefaultValue("Active");
+
+            builder.HasOne(e => e.Major)
+                .WithMany(m => m.Classes)
+                .HasForeignKey(e => e.MajorId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(e => e.ClassCode)
                 .IsUnique();

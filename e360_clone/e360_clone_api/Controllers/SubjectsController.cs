@@ -1,4 +1,4 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,23 +14,40 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] PagedRequest request,
+            [FromQuery] string? status,
+            [FromQuery] string? subjectType,
+            [FromQuery] string? department)
         {
             var term = request.SearchTerm?.Trim();
+            var statusFilter = status?.Trim();
+            var typeFilter = subjectType?.Trim();
+            var departmentFilter = department?.Trim();
             Func<IQueryable<Subject>, IOrderedQueryable<Subject>> orderBy = q => q.OrderBy(x => x.SubjectCode);
 
             IEnumerable<Subject> data;
             int totalRecords;
 
-            if (!string.IsNullOrEmpty(term))
+            var hasFilter = !string.IsNullOrEmpty(term)
+                            || !string.IsNullOrEmpty(statusFilter)
+                            || !string.IsNullOrEmpty(typeFilter)
+                            || !string.IsNullOrEmpty(departmentFilter);
+
+            if (hasFilter)
             {
+                System.Linq.Expressions.Expression<Func<Subject, bool>> filter = x =>
+                    (string.IsNullOrEmpty(term) || x.SubjectName.Contains(term) || x.SubjectCode.Contains(term)) &&
+                    (string.IsNullOrEmpty(statusFilter) || x.Status == statusFilter) &&
+                    (string.IsNullOrEmpty(typeFilter) || x.SubjectType == typeFilter) &&
+                    (string.IsNullOrEmpty(departmentFilter) || x.Department.Contains(departmentFilter));
+
                 data = await _repository.GetPagedFilteredAsync(
                     request.PageNumber,
                     request.PageSize,
-                    x => x.SubjectName.Contains(term) || x.SubjectCode.Contains(term),
+                    filter,
                     orderBy);
-                totalRecords = await _repository.CountAsync(
-                    x => x.SubjectName.Contains(term) || x.SubjectCode.Contains(term));
+                totalRecords = await _repository.CountAsync(filter);
             }
             else
             {
@@ -45,7 +62,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Subject>
             {
                 Success = true,
-                Message = "Lấy danh sách môn học thành công",
+                Message = "Láº¥y danh sÃ¡ch mÃ´n há»c thÃ nh cÃ´ng",
                 Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -58,16 +75,16 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
 
-            return HandleResult(item, "Lấy thông tin môn học thành công");
+            return HandleResult(item, "Láº¥y thÃ´ng tin mÃ´n há»c thÃ nh cÃ´ng");
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Subject subject)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Subject> { Success = false, Message = "Dữ liệu không hợp lệ" });
+                return BadRequest(new ApiResponse<Subject> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
 
             subject.CreatedAt = DateTime.UtcNow;
             await _repository.AddAsync(subject);
@@ -75,7 +92,7 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = subject.Id }, new ApiResponse<Subject>
             {
                 Success = true,
-                Message = "Thêm môn học thành công",
+                Message = "ThÃªm mÃ´n há»c thÃ nh cÃ´ng",
                 Data = subject
             });
         }
@@ -85,7 +102,7 @@ namespace e360_clone.Controllers
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
 
             existing.SubjectCode = subject.SubjectCode;
             existing.SubjectName = subject.SubjectName;
@@ -98,7 +115,7 @@ namespace e360_clone.Controllers
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cập nhật môn học thành công");
+            return HandleResult(existing, "Cáº­p nháº­t mÃ´n há»c thÃ nh cÃ´ng");
         }
 
         [HttpDelete("{id}")]
@@ -106,10 +123,11 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "Xóa môn học thành công");
+            return HandleResult(true, "XÃ³a mÃ´n há»c thÃ nh cÃ´ng");
         }
     }
 }
+

@@ -1,15 +1,20 @@
+@{
+    var role = Context.Session.GetString("Role") ?? "";
+    var fullName = Context.Session.GetString("FullName") ?? Context.Session.GetString("Username") ?? "Guest";
+}
+
 <aside class="sidebar">
   <button type="button" class="sidebar-close-btn">
     <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
   </button>
-  
+
   <!-- Logo -->
   <div class="">
     <div class="sidebar-logo d-flex align-items-center justify-content-between">
       <a href="/" class="">
-        <img src="/assets/images/logo.png" alt="site logo" class="light-logo" style="max-height: 50px;">
-        <img src="/assets/images/logo-light.png" alt="site logo" class="dark-logo" style="max-height: 50px;">
-        <img src="/assets/images/logo-icon.png" alt="site logo" class="logo-icon" style="max-height: 32px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="light-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="dark-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="logo-icon" style="max-height: 32px;">
       </a>
       <button type="button" class="text-xxl d-xl-flex d-none line-height-1 sidebar-toggle text-neutral-500"
         aria-label="Collapse Sidebar">
@@ -17,22 +22,19 @@
       </button>
     </div>
   </div>
-  
+
   <!-- User Info -->
   <div class="mx-16 py-12">
-    @{
-        var user = Context.Session.GetUser();
-    }
     <div class="dropdown profile-dropdown">
       <button type="button"
         class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
         data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
         <span class="d-flex align-items-start gap-10">
-          <img src="@(user?.AvatarUrl ?? "/assets/images/thumbs/avatar-img1.png")" alt="Avatar"
+          <img src="/assets/images/thumbs/avatar-img1.png" alt="Avatar"
             class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
           <span class="profile-dropdown__contents">
-            <span class="h6 mb-0 text-md d-block text-primary-light" id="sidebarUserName">@(user?.DisplayName ?? "Guest")</span>
-            <span class="text-secondary-light text-sm mb-0 d-block" id="sidebarUserRole">@(user?.RoleText ?? "...")</span>
+            <span class="h6 mb-0 text-md d-block text-primary-light">@fullName</span>
+            <span class="text-secondary-light text-sm mb-0 d-block">@(role == "Admin" || role == "SuperAdmin" ? "Administrator" : role)</span>
           </span>
         </span>
         <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
@@ -40,20 +42,6 @@
         </span>
       </button>
       <ul class="dropdown-menu dropdown-menu-lg-end border p-12">
-        <li>
-          <a asp-controller="Home" asp-action="Profile"
-            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
-            <i class="ri-user-3-line"></i>
-            My Profile
-          </a>
-        </li>
-        <li>
-          <a asp-controller="Home" asp-action="Settings"
-            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
-            <i class="ri-settings-3-line"></i>
-            Settings
-          </a>
-        </li>
         <li>
           <hr class="dropdown-divider">
         </li>
@@ -70,25 +58,23 @@
       </ul>
     </div>
   </div>
-  
+
   <!-- Sidebar Menu -->
   <div class="sidebar-menu-area">
     <ul class="sidebar-menu" id="sidebar-menu">
-      <!-- Dashboard -->
+      
+      @* Dashboard *@
       <li class="dropdown">
         <a href="javascript:void(0)">
           <i class="ri-home-4-line"></i>
           <span>Dashboard</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Dashboard/School"><i class="ri-circle-fill circle-icon w-auto"></i> School</a></li>
-          <li><a href="/Dashboard/Student"><i class="ri-circle-fill circle-icon w-auto"></i> Student</a></li>
-          <li><a href="/Dashboard/Teacher"><i class="ri-circle-fill circle-icon w-auto"></i> Teacher</a></li>
           <li><a href="/Dashboard/LMS"><i class="ri-circle-fill circle-icon w-auto"></i> LMS</a></li>
         </ul>
       </li>
-      
-      <!-- Students -->
+
+      @* Students Management *@
       <li class="dropdown">
         <a href="javascript:void(0)">
           <i class="ri-graduation-cap-line"></i>
@@ -97,84 +83,120 @@
         <ul class="sidebar-submenu">
           <li><a href="/Students/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Add New Student</a></li>
           <li><a href="/Students"><i class="ri-circle-fill circle-icon w-auto"></i> Student List</a></li>
-          <li><a href="/Students/Details"><i class="ri-circle-fill circle-icon w-auto"></i> Student Details</a></li>
         </ul>
       </li>
-      
-      <!-- Teachers -->
+
+      @* Lecturers Management *@
       <li class="dropdown">
         <a href="javascript:void(0)">
           <i class="ri-user-follow-line"></i>
-          <span>Teachers</span>
+          <span>Lecturers</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Teachers/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Add New Teacher</a></li>
-          <li><a href="/Teachers"><i class="ri-circle-fill circle-icon w-auto"></i> Teacher List</a></li>
-          <li><a href="/Teachers/Details"><i class="ri-circle-fill circle-icon w-auto"></i> Teacher Details</a></li>
+          <li><a href="/Lecturers/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Add New Lecturer</a></li>
+          <li><a href="/Lecturers"><i class="ri-circle-fill circle-icon w-auto"></i> Lecturer List</a></li>
         </ul>
       </li>
-      
-      <!-- Classes -->
+
+      @* Academic *@
       <li class="dropdown">
         <a href="javascript:void(0)">
-          <i class="ri-list-view"></i>
-          <span>Classes</span>
+          <i class="ri-book-open-line"></i>
+          <span>Academic</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Classes"><i class="ri-circle-fill circle-icon w-auto"></i> Class List</a></li>
           <li><a href="/Subjects"><i class="ri-circle-fill circle-icon w-auto"></i> Subjects</a></li>
-          <li><a href="/ClassRooms"><i class="ri-circle-fill circle-icon w-auto"></i> Class Rooms</a></li>
+          <li><a href="/Classes"><i class="ri-circle-fill circle-icon w-auto"></i> Classes</a></li>
         </ul>
       </li>
-      
-      <!-- Examinations -->
+
+      @* Examinations *@
       <li class="dropdown">
         <a href="javascript:void(0)">
           <i class="ri-file-edit-line"></i>
           <span>Examinations</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Exams"><i class="ri-circle-fill circle-icon w-auto"></i> Exam</a></li>
-          <li><a href="/ExamSchedules"><i class="ri-circle-fill circle-icon w-auto"></i> Exam Schedule</a></li>
-          <li><a href="/ExamResults"><i class="ri-circle-fill circle-icon w-auto"></i> Exam Results</a></li>
+          <li><a href="/Exams"><i class="ri-circle-fill circle-icon w-auto"></i> Exam List</a></li>
+          <li><a href="/Exams/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Create Exam</a></li>
         </ul>
       </li>
-      
-      <!-- Attendance -->
+
+      @* Exam Schedule *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-calendar-line"></i>
+          <span>Exam Schedule</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/ExamSchedules"><i class="ri-circle-fill circle-icon w-auto"></i> Schedule List</a></li>
+          <li><a href="/ExamSchedules/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Create Schedule</a></li>
+        </ul>
+      </li>
+
+      @* Proctor Assignment *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-user-star-line"></i>
+          <span>Proctor Assignment</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/ProctorAssignments"><i class="ri-circle-fill circle-icon w-auto"></i> Assignments</a></li>
+          <li><a href="/ProctorAssignments/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Create Assignment</a></li>
+        </ul>
+      </li>
+
+      @* Attendance *@
       <li class="dropdown">
         <a href="javascript:void(0)">
           <i class="ri-calendar-check-line"></i>
           <span>Attendance</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Attendance/Students"><i class="ri-circle-fill circle-icon w-auto"></i> Student Attendance</a></li>
-          <li><a href="/Attendance/Teachers"><i class="ri-circle-fill circle-icon w-auto"></i> Teacher Attendance</a></li>
+          <li><a href="/Attendance"><i class="ri-circle-fill circle-icon w-auto"></i> Manage Attendance</a></li>
+          <li><a href="/Attendance/Reports"><i class="ri-circle-fill circle-icon w-auto"></i> Reports</a></li>
         </ul>
       </li>
-      
-      <!-- Reports -->
+
+      @* Grades *@
       <li class="dropdown">
         <a href="javascript:void(0)">
-          <i class="ri-file-list-3-line"></i>
+          <i class="ri-award-line"></i>
+          <span>Grades</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Grades"><i class="ri-circle-fill circle-icon w-auto"></i> All Grades</a></li>
+          <li><a href="/Grades/Approve"><i class="ri-circle-fill circle-icon w-auto"></i> Approve Grades</a></li>
+        </ul>
+      </li>
+
+      @* Reports *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-file-chart-line"></i>
           <span>Reports</span>
         </a>
         <ul class="sidebar-submenu">
+          <li><a href="/Reports/Students"><i class="ri-circle-fill circle-icon w-auto"></i> Student Reports</a></li>
+          <li><a href="/Reports/Exams"><i class="ri-circle-fill circle-icon w-auto"></i> Exam Reports</a></li>
+          <li><a href="/Reports/Attendance"><i class="ri-circle-fill circle-icon w-auto"></i> Attendance Reports</a></li>
           <li><a href="/Reports/Grades"><i class="ri-circle-fill circle-icon w-auto"></i> Grade Reports</a></li>
-          <li><a href="/Reports/Statistics"><i class="ri-circle-fill circle-icon w-auto"></i> Statistics</a></li>
         </ul>
       </li>
-      
-      <!-- Settings -->
+
+      @* Settings *@
       <li class="dropdown">
         <a href="javascript:void(0)">
-          <i class="ri-settings-line"></i>
+          <i class="ri-settings-3-line"></i>
           <span>Settings</span>
         </a>
         <ul class="sidebar-submenu">
           <li><a href="/Settings/General"><i class="ri-circle-fill circle-icon w-auto"></i> General</a></li>
-          <li><a href="/Settings/Notification"><i class="ri-circle-fill circle-icon w-auto"></i> Notification</a></li>
+          <li><a href="/Settings/Users"><i class="ri-circle-fill circle-icon w-auto"></i> Users</a></li>
+          <li><a href="/Settings/Roles"><i class="ri-circle-fill circle-icon w-auto"></i> Roles</a></li>
         </ul>
       </li>
+
     </ul>
   </div>
 </aside>

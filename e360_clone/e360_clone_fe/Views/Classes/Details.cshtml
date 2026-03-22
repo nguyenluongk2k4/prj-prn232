@@ -1,0 +1,99 @@
+﻿@model e360_clone_fe.Models.ViewModels.ClassFormViewModel
+@{
+    ViewData["Title"] = "Chi tiết lớp";
+    var majorName = ViewBag.MajorName as string ?? "";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Chi tiết lớp học</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Lớp học</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary-600">
+                    <i class="ri-edit-2-line"></i> Sửa
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <h6 class="fw-bold mb-3">Thông tin lớp</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Mã lớp</span>
+                                <span class="fw-medium">@Model.ClassCode</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Tên lớp</span>
+                                <span class="fw-medium">@Model.ClassName</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Ngành</span>
+                                <span class="fw-medium">@majorName</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Khóa</span>
+                                <span class="fw-medium">K@Model.Cohort</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Năm khóa</span>
+                                <span class="fw-medium">@Model.CohortYear</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Năm học</span>
+                                <span class="fw-medium">@Model.AcademicYear</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <h6 class="fw-bold mb-3">Thông tin bổ sung</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Khóa học</span>
+                                <span class="fw-medium">@Model.CourseId</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Học kỳ</span>
+                                <span class="fw-medium">@Model.Semester</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Sĩ số</span>
+                                <span class="fw-medium">@Model.StudentCount</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-secondary-light">Trạng thái</span>
+                                <span class="fw-medium">@Model.Status</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa lớp này?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">
+                            <i class="ri-delete-bin-6-line"></i> Xóa lớp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

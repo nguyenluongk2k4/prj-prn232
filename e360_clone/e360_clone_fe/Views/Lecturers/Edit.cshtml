@@ -1,0 +1,112 @@
+﻿@model e360_clone_fe.Models.ViewModels.LecturerViewModel
+@{
+    ViewData["Title"] = "Cập nhật giảng viên";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Cập nhật giảng viên</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Giảng viên</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cập nhật</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3">Thông tin giảng viên</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="EmployeeCode" class="form-label fw-medium"></label>
+                                    <input asp-for="EmployeeCode" class="form-control" />
+                                    <span asp-validation-for="EmployeeCode" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="FullName" class="form-label fw-medium"></label>
+                                    <input asp-for="FullName" class="form-control" />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="DateOfBirth" class="form-label fw-medium"></label>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Gender" class="form-label fw-medium"></label>
+                                    <select asp-for="Gender" class="form-select">
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Email" class="form-label fw-medium"></label>
+                                    <input asp-for="Email" type="email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="PhoneNumber" class="form-label fw-medium"></label>
+                                    <input asp-for="PhoneNumber" class="form-control" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Department" class="form-label fw-medium"></label>
+                                    <input asp-for="Department" class="form-control" />
+                                    <span asp-validation-for="Department" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Position" class="form-label fw-medium"></label>
+                                    <input asp-for="Position" class="form-control" />
+                                    <span asp-validation-for="Position" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Status" class="form-label fw-medium"></label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary-600">
+                                    <i class="ri-save-line"></i> Lưu thay đổi
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="ri-close-line"></i> Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

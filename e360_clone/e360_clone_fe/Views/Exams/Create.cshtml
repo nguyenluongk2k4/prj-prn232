@@ -1,0 +1,182 @@
+﻿@model e360_clone_fe.Models.ViewModels.ExamFormViewModel
+@{
+    ViewData["Title"] = "Thêm kỳ thi";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Thêm kỳ thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Kỳ thi</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card h-100">
+            <div class="card-body p-24">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.ExamCode" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.ExamCode" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.ExamName" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.ExamName" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.ExamType" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <select asp-for="Exam.ExamType" class="form-control form-select">
+                                <option value="ClassExam">Class Exam</option>
+                                <option value="GraduationExam">Graduation Exam</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Môn</label>
+                            <select asp-for="Exam.SubjectId" class="form-control form-select">
+                                <option value="">Chọn môn</option>
+                                @foreach (var s in Model.Subjects)
+                                {
+                                    <option value="@s.Id">@s.SubjectCode - @s.SubjectName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Lớp</label>
+                            <select asp-for="Exam.ClassId" class="form-control form-select" id="classSelect">
+                                <option value="">Chọn lớp</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Phòng thi</label>
+                            <select asp-for="Exam.RoomId" class="form-control form-select" id="roomSelect">
+                                <option value="">Chọn phòng</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.ExamDate" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.ExamDate" type="date" class="form-control" id="examDateInput" />
+                        </div>
+                        <div class="col-sm-3">
+                            <label asp-for="Exam.StartTime" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.StartTime" type="time" class="form-control" id="startTimeInput" />
+                        </div>
+                        <div class="col-sm-3">
+                            <label asp-for="Exam.EndTime" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.EndTime" type="time" class="form-control" id="endTimeInput" />
+                        </div>
+                        <div class="col-sm-3">
+                            <label asp-for="Exam.Duration" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.Duration" type="number" class="form-control" />
+                        </div>
+                        <div class="col-sm-3">
+                            <label asp-for="Exam.Semester" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.Semester" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.AcademicYear" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <input asp-for="Exam.AcademicYear" class="form-control" placeholder="2024-2025" />
+                        </div>
+                        <div class="col-sm-6">
+                            <label asp-for="Exam.Status" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <select asp-for="Exam.Status" class="form-control form-select">
+                                <option value="Planned">Planned</option>
+                                <option value="InProgress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Exam.Notes" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <textarea asp-for="Exam.Notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex gap-10">
+                                <button type="submit" class="btn btn-primary-600">Lưu</button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const apiBase = window.APP_CONFIG?.API_BASE_URL || '/api';
+            const subjectSelect = document.getElementById('Exam_SubjectId');
+            const classSelect = document.getElementById('classSelect');
+            const roomSelect = document.getElementById('roomSelect');
+            const examDateInput = document.getElementById('examDateInput');
+            const startTimeInput = document.getElementById('startTimeInput');
+            const endTimeInput = document.getElementById('endTimeInput');
+
+            function resetSelect(select, placeholder) {
+                select.innerHTML = `<option value="">${placeholder}</option>`;
+            }
+
+            async function loadClassesBySubject() {
+                const subjectId = subjectSelect.value;
+                if (!subjectId) {
+                    resetSelect(classSelect, 'Chọn lớp');
+                    return;
+                }
+                const url = `${apiBase}/classes?pageNumber=1&pageSize=1000&subjectId=${encodeURIComponent(subjectId)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const json = await res.json();
+                const classes = Array.isArray(json.data) ? json.data : [];
+                resetSelect(classSelect, 'Chọn lớp');
+                classes.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.textContent = `${c.classCode} - ${c.className}`;
+                    classSelect.appendChild(option);
+                });
+            }
+
+            async function loadAvailableRooms() {
+                const date = examDateInput.value;
+                const start = startTimeInput.value;
+                const end = endTimeInput.value;
+                if (!date || !start || !end) {
+                    resetSelect(roomSelect, 'Chọn phòng');
+                    return;
+                }
+                const url = `${apiBase}/rooms/available?examDate=${encodeURIComponent(date)}&startTime=${encodeURIComponent(start)}&endTime=${encodeURIComponent(end)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const json = await res.json();
+                const rooms = Array.isArray(json.data) ? json.data : [];
+                resetSelect(roomSelect, 'Chọn phòng');
+                rooms.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id;
+                    option.textContent = `${r.roomCode} - ${r.roomName}`;
+                    roomSelect.appendChild(option);
+                });
+            }
+
+            subjectSelect?.addEventListener('change', loadClassesBySubject);
+            examDateInput?.addEventListener('change', loadAvailableRooms);
+            startTimeInput?.addEventListener('change', loadAvailableRooms);
+            endTimeInput?.addEventListener('change', loadAvailableRooms);
+        })();
+    </script>
+}

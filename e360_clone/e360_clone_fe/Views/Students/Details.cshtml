@@ -1,180 +1,175 @@
 @model e360_clone_fe.Models.ViewModels.StudentViewModel
 @{
     ViewData["Title"] = "Chi tiết sinh viên";
+    var statusClass = Model.Status switch
+    {
+        "Active" => "bg-success-100 text-success-600",
+        "Inactive" => "bg-warning-100 text-warning-600",
+        "Graduated" => "bg-info-100 text-info-600",
+        _ => "bg-neutral-100 text-secondary-light"
+    };
+    var classInfo = Model.Class != null
+        ? $"{Model.Class.ClassCode} - {Model.Class.ClassName}"
+        : $"Lớp {Model.ClassId}";
 }
 
 <div class="main-content__wrapper">
-    <!-- Breadcrumb -->
     <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h1 class="fw-semibold mb-4 h6 text-primary-light">Chi tiết sinh viên</h1>
             <div>
-                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Chi tiết sinh viên</h1>
-                <nav aria-label="breadcrumb">
-                    <ul class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a asp-action="Index">Sinh viên</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
-                    </ul>
-                </nav>
-            </div>
-            <div>
-                <div class="d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary-600">
-                        <i class="ri-edit-line"></i> Sửa
-                    </a>
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="ri-arrow-left-line"></i> Quay lại
-                    </a>
-                </div>
+                <a href="/" class="text-secondary-light hover-text-primary hover-underline">Dashboard</a>
+                <a asp-action="Index" class="text-secondary-light hover-text-primary hover-underline"> / Sinh viên</a>
+                <span class="text-secondary-light">/ Chi tiết</span>
             </div>
         </div>
     </div>
 
-    <!-- Content Area -->
     <div class="content-area p-24">
-        <div class="row g-4">
-            <!-- Basic Information Card -->
-            <div class="col-lg-8">
-                <div class="card radius-12">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4">Thông tin cơ bản</h5>
-                        
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="ri-id-card-line text-secondary"></i>
-                                    <span class="text-muted">Mã sinh viên:</span>
-                                </div>
-                                <p class="fw-semibold ms-24">@Model.StudentCode</p>
+        <div class="d-flex justify-content-end gap-8 mb-24">
+            <a asp-action="Edit" asp-route-id="@Model.Id"
+               class="btn btn-primary-600 d-flex align-items-center gap-6">
+                <span class="d-flex text-md"><i class="ri-edit-line"></i></span>
+                Sửa
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center gap-6">
+                <span class="d-flex text-md"><i class="ri-arrow-left-line"></i></span>
+                Quay lại
+            </a>
+        </div>
+
+            <div class="card h-100">
+            <div class="card-body p-24">
+                <div class="d-flex gap-32 flex-md-row flex-column">
+                    <div class="max-w-300-px w-100 text-center">
+                        <figure class="mb-24 w-120-px h-120-px mx-auto rounded-circle overflow-hidden">
+                            <img src="/assets/images/thumbs/student-details-img.png"
+                                 alt="Student Image"
+                                 class="w-100 h-100 object-fit-cover">
+                        </figure>
+                        <h2 class="h6 text-primary-light mb-16 fw-semibold">@Model.FullName</h2>
+                        <p class="mb-0">Mã sinh viên:
+                            <span class="text-primary-600 fw-semibold">@Model.StudentCode</span>
+                        </p>
+                        <p class="mb-0">ID:
+                            <span class="text-primary-light fw-semibold">@Model.Id</span>
+                        </p>
+                        <div class="mt-32 d-flex gap-16 w-100">
+                            <form asp-action="Delete" method="post" class="flex-grow-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit"
+                                        class="btn border fw-medium border-danger-600 bg-hover-danger-200 text-danger-600 text-md d-flex justify-content-center align-items-center gap-8 w-100 px-12 py-8 radius-8">
+                                    <span class="d-flex text-lg"><i class="ri-delete-bin-2-line"></i></span>
+                                    Xóa
+                                </button>
+                            </form>
+                            <a asp-action="Edit" asp-route-id="@Model.Id"
+                               class="btn btn-primary-600 border fw-medium border-primary-600 text-md d-flex justify-content-center align-items-center gap-8 flex-grow-1 px-12 py-8 radius-8">
+                                <span class="d-flex text-lg"><i class="ri-edit-line"></i></span>
+                                Sửa
+                            </a>
+                        </div>
+                    </div>
+                    <div class="d-none d-md-flex">
+                        <span class="h-100 w-1-px bg-neutral-200"></span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="pb-16 border-bottom d-flex align-items-center justify-content-between gap-20">
+                            <h3 class="h6 text-primary-light text-lg mb-0 fw-semibold">Thông tin cá nhân</h3>
+                            <span class="@statusClass px-16 py-4 radius-4 fw-medium text-sm">@Model.StatusText</span>
+                        </div>
+                        <div class="mt-16 d-flex flex-column gap-8">
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Lớp</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @classInfo</span>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="ri-user-line text-secondary"></i>
-                                    <span class="text-muted">Họ và tên:</span>
-                                </div>
-                                <p class="fw-semibold ms-24">@Model.FullName</p>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Khóa</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @(Model.Class?.Cohort > 0 ? $"K{Model.Class.Cohort}" : "N/A")</span>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="ri-calendar-line text-secondary"></i>
-                                    <span class="text-muted">Ngày sinh:</span>
-                                </div>
-                                <p class="fw-semibold ms-24">@Model.DateOfBirth.ToString("dd/MM/yyyy")</p>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Năm khóa</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @(Model.Class?.CohortYear > 0 ? Model.Class.CohortYear.ToString() : "N/A")</span>
                             </div>
-                            
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="ri-gender-line text-secondary"></i>
-                                    <span class="text-muted">Giới tính:</span>
-                                </div>
-                                <p class="fw-semibold ms-24">@Model.GenderText</p>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Giảng viên</span>
+                                <span class="fw-normal text-sm text-secondary-light">: Chưa liên kết</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Giới tính</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.GenderText</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Ngày sinh</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.DateOfBirth.ToString("dd MMM yyyy")</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Năm học</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @(Model.Class?.AcademicYear ?? "N/A")</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Điện thoại</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.PhoneNumber</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Email</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.Email</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Địa chỉ</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Address</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Status Card -->
-            <div class="col-lg-4">
-                <div class="card radius-12">
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            <div class="avatar avatar-xxl rounded-circle bg-primary-100 text-primary-600 mb-3">
-                                <span class="fs-3">@string.Join("", Model.FullName.Split(' ').Select(n => n.FirstOrDefault()).Take(2))</span>
-                            </div>
-                        </div>
-                        <h5 class="fw-bold mb-2">@Model.FullName</h5>
-                        <p class="text-muted mb-3">@Model.StudentCode</p>
-                        <span class="badge @Model.StatusBadgeClass fs-6">@Model.StatusText</span>
-                    </div>
-                </div>
-            </div>
+        <div class="my-16">
+            <ul class="nav nav-pills bordered-tab mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link d-flex align-items-center gap-8 text-secondary-light fw-medium text-sm text-hover-primary-600 text-capitalize bg-transparent px-20 py-12 active"
+                            id="pills-studentDetails-tab" data-bs-toggle="pill" data-bs-target="#pills-studentDetails"
+                            type="button" role="tab" aria-controls="pills-studentDetails" aria-selected="true">
+                        <span class="d-flex tab-icon line-height-1 text-md"><i class="ri-group-line"></i></span>
+                        Student Details
+                    </button>
+                </li>
+            </ul>
 
-            <!-- Contact Information Card -->
-            <div class="col-lg-6">
-                <div class="card radius-12">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4">
-                            <i class="ri-contact-book-line me-2"></i>Thông tin liên hệ
-                        </h5>
-                        
-                        <div class="d-flex align-items-start gap-3 mb-3">
-                            <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                <i class="ri-mail-line fs-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">Email</p>
-                                <p class="fw-semibold mb-0">@Model.Email</p>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex align-items-start gap-3 mb-3">
-                            <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                <i class="ri-phone-line fs-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">Số điện thoại</p>
-                                <p class="fw-semibold mb-0">@Model.PhoneNumber</p>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                <i class="ri-map-pin-line fs-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">Địa chỉ</p>
-                                <p class="fw-semibold mb-0">@Model.Address</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Academic Information Card -->
-            <div class="col-lg-6">
-                <div class="card radius-12">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4">
-                            <i class="ri-school-line me-2"></i>Thông tin học tập
-                        </h5>
-                        
-                        <div class="d-flex align-items-start gap-3 mb-3">
-                            <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                <i class="ri-team-line fs-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">Lớp</p>
-                                <p class="fw-semibold mb-0">
-                                    @(Model.Class?.ClassName ?? "Chưa phân lớp")
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex align-items-start gap-3 mb-3">
-                            <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                <i class="ri-time-line fs-5"></i>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">Ngày tạo</p>
-                                <p class="fw-semibold mb-0">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
-                            </div>
-                        </div>
-                        
-                        @if (Model.UpdatedAt.HasValue)
-                        {
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="icon-box bg-primary-100 text-primary-600 p-2 radius-8">
-                                    <i class="ri-history-line fs-5"></i>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-studentDetails" role="tabpanel"
+                     aria-labelledby="pills-studentDetails-tab" tabindex="0">
+                    <div class="row gy-4">
+                        <div class="col-12">
+                            <div class="shadow-1 radius-12 bg-base h-100 overflow-hidden">
+                                <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+                                    <h6 class="text-lg fw-semibold mb-0">Liên hệ khẩn</h6>
                                 </div>
-                                <div>
-                                    <p class="text-muted mb-1">Cập nhật lần cuối</p>
-                                    <p class="fw-semibold mb-0">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                                <div class="card-body p-0">
+                                    <div class="bg-hover-neutral-50 p-20">
+                                        <div class="row g-4">
+                                            <div class="col-sm-6">
+                                                <div class="d-flex align-items-center gap-12">
+                                                    <figure class="w-48-px h-48-px rounded-circle overflow-hidden mb-0">
+                                                        <img src="/assets/images/thumbs/avatar-img1.png"
+                                                             alt="Guardian Image" class="flex-shrink-0 w-100 h-100 object-fit-cover">
+                                                    </figure>
+                                                    <div>
+                                                        <h6 class="text-md mb-2 fw-medium flex-grow-1">Chưa cập nhật</h6>
+                                                        <span class="text-sm text-secondary-light">Phụ huynh</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="text-sm text-secondary-light">Thông tin liên hệ sĽ bổ sung sau</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,8 +177,5 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        // Add any page-specific scripts here
-    </script>
-}
+
+

@@ -10,9 +10,27 @@
   
   <!-- Overlay -->
   <div class="overlay bg-black bg-opacity-50 w-100 h-100 position-fixed z-9 visibility-hidden opacity-0 duration-300"></div>
-  
-  <!-- Sidebar -->
-  @await Html.PartialAsync("_Sidebar")
+
+  <!-- Sidebar - Render based on role -->
+  @{
+      var role = Context.Session.GetString("Role") ?? ViewData["Role"]?.ToString();
+  }
+  @if (!string.IsNullOrEmpty(role))
+  {
+      var sidebarName = role switch
+      {
+          "Student" => "_Sidebar-Student",
+          "Teacher" => "_Sidebar-Teacher",
+          "Parent" => "_Sidebar-Parent",
+          _ => "_Sidebar-Admin"
+      };
+      @await Html.PartialAsync(sidebarName)
+  }
+  else
+  {
+      <!-- Default sidebar for auth pages -->
+      @await Html.PartialAsync("_Sidebar-Admin")
+  }
   
   <!-- Main Content -->
   <main class="dashboard-main">
