@@ -1,0 +1,99 @@
+@model e360_clone_fe.Models.ViewModels.ProctorAssignmentFormViewModel
+@{
+    ViewData["Title"] = "Thêm phân công coi thi";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Thêm phân công coi thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Proctor Assignment</li>
+                        <li class="breadcrumb-item active" aria-current="page">Tạo mới</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-medium">Ca thi</label>
+                            <select asp-for="Assignment.ExamId" class="form-select" required>
+                                <option value="">-- Chọn ca thi --</option>
+                                @foreach (var exam in Model.Exams)
+                                {
+                                    if (Model.Assignment.ExamId == exam.Id)
+                                    {
+                                        <option value="@exam.Id" selected>@exam.DisplayName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@exam.Id">@exam.DisplayName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Giảng viên</label>
+                            <select asp-for="Assignment.LecturerId" class="form-select" required>
+                                <option value="">-- Chọn giảng viên --</option>
+                                @foreach (var lecturer in Model.Lecturers)
+                                {
+                                    <option value="@lecturer.Id">@lecturer.EmployeeCode - @lecturer.FullName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Vai trò</label>
+                            <select asp-for="Assignment.Role" class="form-select">
+                                <option value="ChiefProctor">ChiefProctor</option>
+                                <option value="Proctor">Proctor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Trạng thái</label>
+                            <select asp-for="Assignment.Status" class="form-select">
+                                <option value="Assigned">Assigned</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Declined">Declined</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Ghi chú</label>
+                            <input asp-for="Assignment.Notes" class="form-control" placeholder="Ghi chú thêm..." />
+                        </div>
+                    </div>
+                    <div class="mt-24 d-flex gap-12">
+                        <button type="submit" class="btn btn-primary-600">
+                            <i class="ri-save-line"></i> Lưu phân công
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

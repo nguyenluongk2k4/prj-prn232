@@ -1,0 +1,312 @@
+﻿@model e360_clone_fe.Models.ViewModels.ExamSchedulePageViewModel
+@{
+    ViewData["Title"] = "Lịch thi";
+    var selectedSlot = Model.SelectedStartTime.HasValue && Model.SelectedEndTime.HasValue
+        ? Model.Slots.FirstOrDefault(s => s.StartTime == Model.SelectedStartTime.Value && s.EndTime == Model.SelectedEndTime.Value)
+        : null;
+    var selectedItems = selectedSlot == null
+        ? new List<e360_clone_fe.Models.ViewModels.ExamScheduleItemViewModel>()
+        : (Model.SelectedSubjectId.HasValue
+            ? selectedSlot.Items.Where(i => i.SubjectId == Model.SelectedSubjectId.Value).ToList()
+            : selectedSlot.Items.ToList());
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Lịch thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Exam Schedule</li>
+                        <li class="breadcrumb-item active" aria-current="page">Lịch trong ngày</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-controller="Exams" asp-action="Create" class="btn btn-primary-600 d-flex align-items-center gap-6">
+                    <span class="d-flex text-md">
+                        <i class="ri-add-large-line"></i>
+                    </span>
+                    Thêm lịch thi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-16" role="alert">
+                <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mb-16" role="alert">
+                <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        <div class="card radius-12">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Chọn ngày</label>
+                        <input type="date" name="date" class="form-control" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Môn thi (tùy chọn)</label>
+                        <select name="subjectId" class="form-select">
+                            <option value="">-- Tất cả môn --</option>
+                            @foreach (var subject in Model.Subjects)
+                            {
+                                if (Model.SelectedSubjectId.HasValue && Model.SelectedSubjectId.Value == subject.Id)
+                                {
+                                    <option value="@subject.Id" selected>@subject.SubjectCode - @subject.SubjectName</option>
+                                }
+                                else
+                                {
+                                    <option value="@subject.Id">@subject.SubjectCode - @subject.SubjectName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary-600 w-100">
+                            <i class="ri-search-line"></i> Xem lịch
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-24">
+            <div class="row gy-4">
+                <div class="col-xxl-4 col-lg-5">
+                    <div class="card h-100 p-0">
+                        <div class="card-body p-24">
+                            <div class="d-flex align-items-center justify-content-between mb-16">
+                                <h6 class="text-md fw-semibold mb-0">Các ca thi trong ngày</h6>
+                                <a asp-action="Index" class="text-primary-600 fw-semibold text-sm">Xóa lọc</a>
+                            </div>
+
+                            @if (Model.Slots.Any())
+                            {
+                                foreach (var slot in Model.Slots)
+                                {
+                                    var isSelected = Model.SelectedStartTime.HasValue && Model.SelectedEndTime.HasValue
+                                        && slot.StartTime == Model.SelectedStartTime.Value && slot.EndTime == Model.SelectedEndTime.Value;
+                                    var slotCount = Model.SelectedSubjectId.HasValue
+                                        ? slot.Items.Count(i => i.SubjectId == Model.SelectedSubjectId.Value)
+                                        : slot.Items.Count;
+                                    <div class="event-item d-flex align-items-center justify-content-between gap-4 pb-16 mb-16 border border-start-0 border-end-0 border-top-0">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-10">
+                                                <span class="w-12-px h-12-px @(isSelected ? "bg-primary-600" : "bg-warning-600") rounded-circle fw-medium"></span>
+                                                <span class="text-secondary-light">@slot.StartTime:hh\:mm - @slot.EndTime:hh\:mm</span>
+                                            </div>
+                                            <span class="text-primary-light fw-semibold text-md mt-4">@slotCount môn/lớp</span>
+                                        </div>
+                                        <a class="btn btn-sm btn-outline-primary"
+                                           href="@Url.Action("Index", new { date = Model.SelectedDate.ToString("yyyy-MM-dd"), subjectId = Model.SelectedSubjectId, startTime = slot.StartTime.ToString("hh\\:mm"), endTime = slot.EndTime.ToString("hh\\:mm") })">
+                                            Xem
+                                        </a>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                    <p class="text-muted mt-2">Không có ca thi trong ngày đã chọn</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-8 col-lg-7">
+                    <div class="card h-100">
+                        <div class="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-lg fw-semibold mb-0">Phòng thi & môn thi</h6>
+                                <span class="text-secondary-light text-sm">
+                                    @if (selectedSlot != null)
+                                    {
+                                        <text>@selectedSlot.StartTime:hh\:mm - @selectedSlot.EndTime:hh\:mm</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Chọn ca thi ở bên trái</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (selectedSlot != null)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table bordered-table mb-0">
+                                        <thead class="bg-neutral-100">
+                                            <tr>
+                                                <th>Phòng thi</th>
+                                                <th>Môn thi trong phòng</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var group in selectedItems
+                                                .GroupBy(x => new { x.RoomId, x.RoomCode, x.RoomName })
+                                                .OrderBy(g => g.Key.RoomCode))
+                                            {
+                                                var items = group.OrderBy(x => x.SubjectCode).ThenBy(x => x.ClassCode).ToList();
+                                                <tr>
+                                                    <td>@group.Key.RoomCode - @group.Key.RoomName</td>
+                                                    <td>
+                                                        <div class="d-flex flex-column gap-6">
+                                                            @foreach (var item in items)
+                                                            {
+                                                                <div class="text-sm">
+                                                                    <span class="fw-semibold">@item.SubjectCode - @item.SubjectName</span>
+                                                                    <span class="text-secondary-light">(@item.ClassCode)</span>
+                                                                    @if (item.HasAssignment)
+                                                                    {
+                                                                        <div class="text-xs text-success mt-4">
+                                                                            Đã phân công: @item.AssignedLecturers
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="text-xs text-warning mt-4">Chưa phân công</div>
+                                                                    }
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex flex-column gap-6">
+                                                            @foreach (var item in items)
+                                                            {
+                                                                var btnText = item.HasAssignment ? "Cập nhật" : "Phân công";
+                                                                <button type="button"
+                                                                        class="btn btn-sm btn-outline-primary assign-btn"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#assignProctorModal"
+                                                                        data-exam-id="@item.ExamId"
+                                                                        data-exam-label="@($"{item.SubjectCode} - {item.SubjectName} ({item.ClassCode})")"
+                                                                        data-exam-room="@($"{group.Key.RoomCode} - {group.Key.RoomName}")"
+                                                                        data-exam-time="@($"{selectedSlot.StartTime:hh\\:mm}-{selectedSlot.EndTime:hh\\:mm}")"
+                                                                        data-blocked="@string.Join(",", Model.BlockedLecturerIds.TryGetValue(item.ExamId, out var blocked) ? blocked : new List<int>())">
+                                                                    @btnText @item.SubjectCode
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="ri-calendar-check-line text-muted" style="font-size: 48px;"></i>
+                                    <p class="text-muted mt-2">Chọn một ca thi để xem phòng thi và môn thi</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignProctorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-controller="ProctorAssignments" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Phân công giảng viên</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Assignment.ExamId" id="assignExamId" />
+                    <input type="hidden" name="Assignment.Role" value="Proctor" />
+                    <input type="hidden" name="Assignment.Status" value="Assigned" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                    <div class="mb-12">
+                        <div class="text-sm text-secondary-light">Ca thi</div>
+                        <div class="fw-semibold" id="assignExamLabel">--</div>
+                        <div class="text-sm text-secondary-light" id="assignExamMeta"></div>
+                    </div>
+
+                    <label class="form-label fw-medium">Chọn giảng viên</label>
+                    <select class="form-select" name="Assignment.LecturerId" id="assignLecturerId" required>
+                        <option value="">-- Chọn giảng viên --</option>
+                        @foreach (var lecturer in Model.Lecturers)
+                        {
+                            <option value="@lecturer.Id">@lecturer.EmployeeCode - @lecturer.FullName</option>
+                        }
+                    </select>
+
+                    <label class="form-label fw-medium mt-12">Ghi chú</label>
+                    <input class="form-control" name="Assignment.Notes" placeholder="Ghi chú thêm..." />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary-600">Lưu phân công</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.assign-btn');
+            const examIdInput = document.getElementById('assignExamId');
+            const examLabel = document.getElementById('assignExamLabel');
+            const examMeta = document.getElementById('assignExamMeta');
+            const lecturerSelect = document.getElementById('assignLecturerId');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const examId = btn.getAttribute('data-exam-id');
+                    const label = btn.getAttribute('data-exam-label') || '';
+                    const room = btn.getAttribute('data-exam-room') || '';
+                    const time = btn.getAttribute('data-exam-time') || '';
+                    const blockedRaw = btn.getAttribute('data-blocked') || '';
+                    const blockedIds = blockedRaw
+                        .split(',')
+                        .map(x => x.trim())
+                        .filter(x => x.length > 0);
+
+                    if (examIdInput) examIdInput.value = examId;
+                    if (examLabel) examLabel.textContent = label;
+                    if (examMeta) examMeta.textContent = `${room} | ${time}`;
+
+                    if (lecturerSelect) {
+                        Array.from(lecturerSelect.options).forEach(option => {
+                            if (!option.value) {
+                                option.hidden = false;
+                                return;
+                            }
+                            option.hidden = blockedIds.includes(option.value);
+                        });
+                        lecturerSelect.value = '';
+                    }
+                });
+            });
+        });
+    </script>
+}

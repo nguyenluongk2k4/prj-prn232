@@ -1,0 +1,145 @@
+@model e360_clone_fe.Models.ViewModels.PagedViewModel<e360_clone_fe.Models.ViewModels.ProctorAssignmentListItemViewModel>
+@{
+    ViewData["Title"] = "Phân công coi thi";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Phân công coi thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Proctor Assignment</li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh sách</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Create" class="btn btn-primary-600">
+                    <i class="ri-add-line"></i> Thêm phân công
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body p-0 dataTable-wrapper">
+                <div class="p-0">
+                    <table class="table bordered-table mb-0 data-table">
+                        <thead class="bg-neutral-100">
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Ngày/giờ thi</th>
+                                <th scope="col">Môn</th>
+                                <th scope="col">Lớp</th>
+                                <th scope="col">Phòng</th>
+                                <th scope="col">Giảng viên</th>
+                                <th scope="col">Vai trò</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Ngày phân công</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items.Any())
+                            {
+                                var index = Model.StartRecord;
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>@item.ExamDate.ToString("dd/MM/yyyy") @item.StartTime.ToString("hh\\:mm")-@item.EndTime.ToString("hh\\:mm")</td>
+                                        <td>@item.SubjectCode - @item.SubjectName</td>
+                                        <td>@item.ClassCode</td>
+                                        <td>@item.RoomCode</td>
+                                        <td>@item.LecturerName (@item.LecturerCode)</td>
+                                        <td>@item.Role</td>
+                                        <td>@item.Status</td>
+                                        <td>@item.AssignedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                                  onsubmit="return confirm('Xóa phân công này?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="10" class="text-center py-4">
+                                        <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                        <p class="text-muted mt-2">Chưa có phân công nào</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-top border-neutral-200 dataTable-bottom">
+                        <div class="text-secondary-light text-sm dataTable-info">
+                            Hiển thị @Model.StartRecord - @Model.EndRecord trong tổng số @Model.TotalRecords bản ghi
+                        </div>
+                        <div class="dataTable-pagination">
+                            <ul class="pagination mb-0">
+                                <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                                       asp-route-pageSize="@Model.PageSize">
+                                        Previous
+                                    </a>
+                                </li>
+                                @{
+                                    var startPage = Math.Max(1, Model.PageNumber - 2);
+                                    var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                                }
+                                @for (var i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                        <a class="page-link" asp-action="Index"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-pageSize="@Model.PageSize">
+                                            @i
+                                        </a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                                       asp-route-pageSize="@Model.PageSize">
+                                        Next
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

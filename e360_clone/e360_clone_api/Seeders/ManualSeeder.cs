@@ -22,6 +22,9 @@ namespace e360_clone.Seeders
             await SeedStudentsAsync(context);
             await SeedStudentAccountsAsync(context);
             await SeedStudentSubjectsAsync(context);
+            await SeedExamSchedulesAsync(context);
+            await SeedStudentExamsAsync(context);
+            await AllocateExamRoomsAsync(context);
         }
 
         private static async Task SeedAccountsAsync(AppDbContext context)
@@ -338,6 +341,371 @@ namespace e360_clone.Seeders
             }
         }
 
+        private static async Task SeedStudentExamsAsync(AppDbContext context)
+        {
+            var exams = await context.Exams.AsNoTracking().ToListAsync();
+            if (exams.Count == 0)
+            {
+                Console.WriteLine("No exams found. Skip student-exam seeding.");
+                return;
+            }
+
+            var studentSubjects = await context.StudentSubjects.AsNoTracking().ToListAsync();
+            var existing = await context.StudentExams
+                .Select(se => new { se.ExamId, se.StudentId })
+                .ToListAsync();
+            var existingSet = new HashSet<(int ExamId, int StudentId)>(existing.Select(x => (x.ExamId, x.StudentId)));
+
+            var toAdd = new List<StudentExam>();
+            foreach (var exam in exams)
+            {
+                var semesterFilter = ParseSemester(exam.Semester);
+                var candidates = studentSubjects.Where(ss =>
+                        ss.SubjectId == exam.SubjectId &&
+                        (ss.ClassId == null || ss.ClassId == exam.ClassId || ss.ClassId == 0))
+                    .ToList();
+
+                if (!string.IsNullOrWhiteSpace(exam.AcademicYear))
+                {
+                    candidates = candidates
+                        .Where(ss => ss.AcademicYear == exam.AcademicYear)
+                        .ToList();
+                }
+
+                if (semesterFilter.HasValue)
+                {
+                    candidates = candidates
+                        .Where(ss => ss.Semester == semesterFilter.Value)
+                        .ToList();
+                }
+
+                foreach (var ss in candidates)
+                {
+                    var key = (exam.Id, ss.StudentId);
+                    if (existingSet.Contains(key))
+                        continue;
+
+                    toAdd.Add(new StudentExam
+                    {
+                        ExamId = exam.Id,
+                        StudentId = ss.StudentId,
+                        Status = "Registered",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    existingSet.Add(key);
+                }
+            }
+
+            if (toAdd.Count > 0)
+            {
+                await context.StudentExams.AddRangeAsync(toAdd);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"Seeded {toAdd.Count} student-exam records.");
+            }
+            else
+            {
+                Console.WriteLine("No new student-exam records to seed.");
+            }
+        }
+
+        private static async Task SeedExamSchedulesAsync(AppDbContext context)
+        {
+            var rooms = await context.ExamRooms.AsNoTracking()
+                .Where(r => r.Status == "Available" || string.IsNullOrWhiteSpace(r.Status))
+                .ToListAsync();
+            if (rooms.Count == 0)
+            {
+                Console.WriteLine("No rooms found. Skip exam schedule seeding.");
+                return;
+            }
+
+            var subjects = await context.Subjects.AsNoTracking().ToListAsync();
+            var classes = await context.Classes.AsNoTracking().ToListAsync();
+            var majors = await context.Majors.AsNoTracking()
+                .ToDictionaryAsync(m => m.Id, m => m.MajorCode);
+
+            if (subjects.Count == 0 || classes.Count == 0)
+            {
+                Console.WriteLine("No subjects or classes found. Skip exam schedule seeding.");
+                return;
+            }
+
+            var subjectByCode = subjects.ToDictionary(s => s.SubjectCode, s => s);
+            var adminAccountId = await context.Accounts
+                .Where(a => a.Role == "Admin" || a.Role == "SuperAdmin")
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync();
+
+            if (adminAccountId == 0)
+            {
+                adminAccountId = await context.Accounts.Select(a => a.Id).FirstOrDefaultAsync();
+            }
+
+            var year = DateTime.UtcNow.Year;
+            var targetDates = new[]
+            {
+                UtcDate(year, 3, 22),
+                UtcDate(year, 3, 23),
+                UtcDate(year, 3, 24)
+            };
+
+            var slotTimes = new List<(TimeSpan Start, TimeSpan End)>
+            {
+                (new TimeSpan(7, 30, 0), new TimeSpan(9, 10, 0)),
+                (new TimeSpan(9, 20, 0), new TimeSpan(10, 40, 0)),
+                (new TimeSpan(10, 50, 0), new TimeSpan(12, 20, 0)),
+                (new TimeSpan(12, 50, 0), new TimeSpan(14, 20, 0)),
+                (new TimeSpan(14, 30, 0), new TimeSpan(16, 0, 0)),
+                (new TimeSpan(16, 10, 0), new TimeSpan(17, 40, 0))
+            };
+
+            var existing = await context.Exams
+                .Where(e => targetDates.Contains(e.ExamDate.Date))
+                .Select(e => new { e.ExamDate, e.StartTime, e.EndTime, e.SubjectId, e.ClassId })
+                .ToListAsync();
+            var existingSet = new HashSet<string>(existing.Select(e => BuildExamKey(e.ExamDate.Date, e.StartTime, e.EndTime, e.SubjectId, e.ClassId)));
+
+            var rand = new Random();
+            var seeds = new List<ExamSeed>();
+
+            foreach (var cls in classes)
+            {
+                if (!majors.TryGetValue(cls.MajorId, out var majorCode))
+                    continue;
+
+                var subjectCodes = ResolveSubjectCodesForMajor(majorCode)
+                    .Where(code => subjectByCode.ContainsKey(code))
+                    .ToList();
+                if (subjectCodes.Count == 0)
+                    continue;
+
+                var takeCount = Math.Min(subjectCodes.Count, 3);
+                var selectedCodes = subjectCodes.OrderBy(_ => rand.Next()).Take(takeCount).ToList();
+
+                foreach (var code in selectedCodes)
+                {
+                    var subject = subjectByCode[code];
+                    var date = targetDates[rand.Next(targetDates.Length)];
+                    var slot = slotTimes[rand.Next(slotTimes.Count)];
+                    var key = BuildExamKey(date, slot.Start, slot.End, subject.Id, cls.Id);
+
+                    if (existingSet.Contains(key) || seeds.Any(s => s.Key == key))
+                        continue;
+
+                    seeds.Add(new ExamSeed
+                    {
+                        ClassId = cls.Id,
+                        ClassCode = cls.ClassCode,
+                        SubjectId = subject.Id,
+                        SubjectCode = subject.SubjectCode,
+                        SubjectName = subject.SubjectName,
+                        ExamDate = date,
+                        StartTime = slot.Start,
+                        EndTime = slot.End,
+                        AcademicYear = string.IsNullOrWhiteSpace(cls.AcademicYear) ? $"{year}-{year + 1}" : cls.AcademicYear,
+                        Semester = cls.Semester > 0 ? cls.Semester.ToString() : "1"
+                    });
+                }
+            }
+
+            if (seeds.Count == 0)
+            {
+                Console.WriteLine("No new exam schedules to seed.");
+                return;
+            }
+
+            var roomAssignments = new Dictionary<(DateTime Date, TimeSpan Start, TimeSpan End, int SubjectId), int>();
+            var grouped = seeds.GroupBy(s => new { s.ExamDate, s.StartTime, s.EndTime }).ToList();
+            foreach (var group in grouped)
+            {
+                var subjectsInSlot = group.Select(s => s.SubjectId).Distinct().OrderBy(_ => rand.Next()).ToList();
+                var shuffledRooms = rooms.OrderBy(_ => rand.Next()).ToList();
+                if (shuffledRooms.Count == 0)
+                    break;
+
+                var roomIndex = 0;
+                var cursor = 0;
+                while (cursor < subjectsInSlot.Count)
+                {
+                    var remaining = subjectsInSlot.Count - cursor;
+                    var chunk = remaining >= 3 ? rand.Next(2, 4) : Math.Min(remaining, 2);
+                    var room = shuffledRooms[roomIndex % shuffledRooms.Count];
+
+                    for (var i = 0; i < chunk; i++)
+                    {
+                        var subjectId = subjectsInSlot[cursor + i];
+                        roomAssignments[(group.Key.ExamDate, group.Key.StartTime, group.Key.EndTime, subjectId)] = room.Id;
+                    }
+
+                    cursor += chunk;
+                    roomIndex++;
+                }
+            }
+
+            var examsToAdd = new List<Exam>();
+            foreach (var seed in seeds)
+            {
+                var roomId = roomAssignments.TryGetValue((seed.ExamDate, seed.StartTime, seed.EndTime, seed.SubjectId), out var assigned)
+                    ? assigned
+                    : rooms[rand.Next(rooms.Count)].Id;
+
+                var duration = (int)(seed.EndTime - seed.StartTime).TotalMinutes;
+
+                var exam = new Exam
+                {
+                    ExamCode = BuildExamCode(seed),
+                    ExamName = $"{seed.SubjectCode} - {seed.ClassCode}",
+                    ExamType = "ClassExam",
+                    SubjectId = seed.SubjectId,
+                    ClassId = seed.ClassId,
+                    ExamDate = seed.ExamDate,
+                    StartTime = seed.StartTime,
+                    EndTime = seed.EndTime,
+                    Duration = duration,
+                    RoomId = roomId,
+                    AcademicYear = seed.AcademicYear,
+                    Semester = seed.Semester,
+                    Status = "Planned",
+                    Notes = "Seeded schedule",
+                    CreatedBy = adminAccountId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                examsToAdd.Add(exam);
+            }
+
+            if (examsToAdd.Count > 0)
+            {
+                await context.Exams.AddRangeAsync(examsToAdd);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"Seeded {examsToAdd.Count} exam schedules for 22-24/03.");
+            }
+        }
+
+        private static async Task AllocateExamRoomsAsync(AppDbContext context)
+        {
+            try
+            {
+                await context.ExamRoomAllocations.AsNoTracking().Take(1).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ExamRoomAllocations table missing or unavailable. Skip room allocation. ({ex.Message})");
+                return;
+            }
+
+            var exams = await context.Exams.AsNoTracking().ToListAsync();
+            var rooms = await context.ExamRooms.AsNoTracking()
+                .Where(r => r.Status == "Available" || string.IsNullOrWhiteSpace(r.Status))
+                .ToListAsync();
+
+            if (exams.Count == 0 || rooms.Count == 0)
+            {
+                Console.WriteLine("No exams or rooms found. Skip room allocation.");
+                return;
+            }
+
+            var rand = new Random();
+            var grouped = exams.GroupBy(e => new { e.ExamDate.Date, e.StartTime, e.EndTime }).ToList();
+
+            foreach (var slot in grouped)
+            {
+                var slotExamIds = slot.Select(e => e.Id).ToList();
+                var studentExams = await context.StudentExams
+                    .Where(se => slotExamIds.Contains(se.ExamId))
+                    .ToListAsync();
+
+                var allocationsToRemove = await context.ExamRoomAllocations
+                    .Where(a => slotExamIds.Contains(a.ExamId))
+                    .ToListAsync();
+                if (allocationsToRemove.Count > 0)
+                {
+                    context.ExamRoomAllocations.RemoveRange(allocationsToRemove);
+                    await context.SaveChangesAsync();
+                }
+
+                var examQueues = studentExams
+                    .GroupBy(se => se.ExamId)
+                    .ToDictionary(g => g.Key, g => new Queue<int>(g.Select(x => x.StudentId).OrderBy(_ => rand.Next())));
+
+                var remainingExamIds = new HashSet<int>(examQueues.Keys.Where(id => examQueues[id].Count > 0));
+                if (remainingExamIds.Count == 0)
+                    continue;
+
+                var shuffledRooms = rooms.OrderBy(_ => rand.Next()).ToList();
+                var allocations = new List<ExamRoomAllocation>();
+
+                foreach (var room in shuffledRooms)
+                {
+                    if (remainingExamIds.Count == 0)
+                        break;
+
+                    var capacity = room.Capacity > 0 ? Math.Min(room.Capacity, 30) : 30;
+                    var subjectCount = remainingExamIds.Count >= 3 ? rand.Next(2, 4) : Math.Min(remainingExamIds.Count, 2);
+                    if (subjectCount <= 0)
+                        break;
+
+                    var selectedExams = remainingExamIds
+                        .OrderByDescending(id => examQueues[id].Count)
+                        .ThenBy(_ => rand.Next())
+                        .Take(subjectCount)
+                        .ToList();
+                    var active = new List<int>(selectedExams);
+                    var seatNumber = 1;
+
+                    while (capacity > 0 && active.Count > 0)
+                    {
+                        for (var i = 0; i < active.Count && capacity > 0; i++)
+                        {
+                            var examId = active[i];
+                            var queue = examQueues[examId];
+                            if (queue.Count == 0)
+                            {
+                                active.RemoveAt(i);
+                                i--;
+                                continue;
+                            }
+
+                            var studentId = queue.Dequeue();
+                            allocations.Add(new ExamRoomAllocation
+                            {
+                                ExamId = examId,
+                                StudentId = studentId,
+                                RoomId = room.Id,
+                                SeatNumber = seatNumber,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                            seatNumber++;
+                            capacity--;
+                        }
+                    }
+
+                    foreach (var examId in selectedExams)
+                    {
+                        if (examQueues[examId].Count == 0)
+                        {
+                            remainingExamIds.Remove(examId);
+                        }
+                    }
+                }
+
+                if (allocations.Count > 0)
+                {
+                    await context.ExamRoomAllocations.AddRangeAsync(allocations);
+                    await context.SaveChangesAsync();
+                    Console.WriteLine($"Allocated {allocations.Count} students to rooms for slot {slot.Key.Date:yyyy-MM-dd} {slot.Key.StartTime:hh\\:mm}-{slot.Key.EndTime:hh\\:mm}.");
+                }
+            }
+        }
+
+        private static int? ParseSemester(string? semester)
+        {
+            if (string.IsNullOrWhiteSpace(semester))
+                return null;
+
+            return int.TryParse(semester, out var value) ? value : null;
+        }
+
         private static List<string> ResolveSubjectCodesForMajor(string majorCode)
         {
             var codes = new List<string>();
@@ -433,6 +801,38 @@ namespace e360_clone.Seeders
                 new SubjectSeed("CSI104", "Critical Thinking", "General Skills"),
                 new SubjectSeed("ENT101", "Entrepreneurship", "General Skills")
             };
+        }
+
+        private sealed record ExamSeed
+        {
+            public int ClassId { get; init; }
+            public string ClassCode { get; init; } = string.Empty;
+            public int SubjectId { get; init; }
+            public string SubjectCode { get; init; } = string.Empty;
+            public string SubjectName { get; init; } = string.Empty;
+            public DateTime ExamDate { get; init; }
+            public TimeSpan StartTime { get; init; }
+            public TimeSpan EndTime { get; init; }
+            public string AcademicYear { get; init; } = string.Empty;
+            public string Semester { get; init; } = string.Empty;
+
+            public string Key => BuildExamKey(ExamDate, StartTime, EndTime, SubjectId, ClassId);
+        }
+
+        private static string BuildExamKey(DateTime date, TimeSpan start, TimeSpan end, int subjectId, int classId)
+        {
+            return $"{date:yyyyMMdd}-{start:hhmm}-{end:hhmm}-{subjectId}-{classId}";
+        }
+
+        private static string BuildExamCode(ExamSeed seed)
+        {
+            // Keep within varchar(20) while staying unique per class/subject/slot
+            return $"EX{seed.SubjectId}-{seed.ClassId}-{seed.ExamDate:MMdd}{seed.StartTime:hhmm}";
+        }
+
+        private static DateTime UtcDate(int year, int month, int day)
+        {
+            return new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc);
         }
 
         private sealed record SubjectSeed(

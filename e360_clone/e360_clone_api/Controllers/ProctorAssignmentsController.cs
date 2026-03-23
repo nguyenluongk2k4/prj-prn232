@@ -9,16 +9,12 @@ namespace e360_clone.Controllers
     {
         private readonly IProctorAssignmentRepository _repository;
         private readonly IExamRepository _examRepository;
-        private readonly ITeachingAssignmentRepository _teachingAssignmentRepository;
-
         public ProctorAssignmentsController(
             IProctorAssignmentRepository repository,
-            IExamRepository examRepository,
-            ITeachingAssignmentRepository teachingAssignmentRepository)
+            IExamRepository examRepository)
         {
             _repository = repository;
             _examRepository = examRepository;
-            _teachingAssignmentRepository = teachingAssignmentRepository;
         }
 
         [HttpGet]
@@ -62,14 +58,13 @@ namespace e360_clone.Controllers
             if (exam == null)
                 return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
 
-            var isTeachingSameClass = await _teachingAssignmentRepository.ExistsForLecturerAndExamAsync(
-                assignment.LecturerId, exam);
-            if (isTeachingSameClass)
+            var hasConflict = await HasScheduleConflictAsync(assignment.LecturerId, exam, null);
+            if (hasConflict)
             {
                 return BadRequest(new ApiResponse<ProctorAssignment>
                 {
                     Success = false,
-                    Message = "Không thể phân công giảng viên coi thi chính lớp và môn mình đang dạy"
+                    Message = "Giảng viên đã có lịch coi thi trùng thời gian"
                 });
             }
 
@@ -95,14 +90,13 @@ namespace e360_clone.Controllers
             if (exam == null)
                 return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
 
-            var isTeachingSameClass = await _teachingAssignmentRepository.ExistsForLecturerAndExamAsync(
-                assignment.LecturerId, exam);
-            if (isTeachingSameClass)
+            var hasConflict = await HasScheduleConflictAsync(assignment.LecturerId, exam, id);
+            if (hasConflict)
             {
                 return BadRequest(new ApiResponse<ProctorAssignment>
                 {
                     Success = false,
-                    Message = "Không thể phân công giảng viên coi thi chính lớp và môn mình đang dạy"
+                    Message = "Giảng viên đã có lịch coi thi trùng thời gian"
                 });
             }
 
@@ -125,6 +119,35 @@ namespace e360_clone.Controllers
 
             await _repository.DeleteAsync(item);
             return HandleResult(true, "Xóa phân công coi thi thành công");
+        }
+
+        private async Task<bool> HasScheduleConflictAsync(int lecturerId, Exam exam, int? excludeId)
+        {
+            var assignments = await _repository.GetPagedFilteredAsync(
+                1,
+                int.MaxValue,
+                x => x.LecturerId == lecturerId && (!excludeId.HasValue || x.Id != excludeId.Value),
+                q => q.OrderBy(x => x.Id));
+
+            foreach (var assignment in assignments)
+            {
+                var otherExam = await _examRepository.GetByIdAsync(assignment.ExamId);
+                if (otherExam == null)
+                    continue;
+
+                if (otherExam.ExamDate.Date != exam.ExamDate.Date)
+                    continue;
+
+                if (IsTimeOverlap(otherExam.StartTime, otherExam.EndTime, exam.StartTime, exam.EndTime))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsTimeOverlap(TimeSpan start1, TimeSpan end1, TimeSpan start2, TimeSpan end2)
+        {
+            return start1 < end2 && start2 < end1;
         }
     }
 }

@@ -29,6 +29,7 @@ namespace e360_clone.DataAccess
         public DbSet<ExamForm> ExamForms { get; set; }
         public DbSet<StudentExam> StudentExams { get; set; }
         public DbSet<TeachingAssignment> TeachingAssignments { get; set; }
+        public DbSet<ExamRoomAllocation> ExamRoomAllocations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
