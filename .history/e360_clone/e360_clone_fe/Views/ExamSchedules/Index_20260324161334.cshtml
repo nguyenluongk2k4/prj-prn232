@@ -16,23 +16,21 @@
             ? selectedSlot.Items.Where(i => i.SubjectId == Model.SelectedSubjectId.Value).ToList()
             : selectedSlot.Items.ToList());
     var returnUrl = Context.Request.Path + Context.Request.QueryString;
-    Func<TimeSpan, string> fmtTime = t => $"{t.Hours:00}:{t.Minutes:00}";
     var calendarEvents = useCalendar
-        ? Model.CalendarItems.Select(item => new
+        ? Model.Slots.SelectMany(slot => slot.Items.Select(item => new
         {
             title = $"{item.SubjectCode} - {item.ClassCode}",
-            start = $"{item.ExamDate:yyyy-MM-dd}T{fmtTime(item.StartTime)}",
-            end = $"{item.ExamDate:yyyy-MM-dd}T{fmtTime(item.EndTime)}",
-            allDay = false,
+            start = $"{Model.SelectedDate:yyyy-MM-dd}T{slot.StartTime.ToString("hh\\:mm")}",
+            end = $"{Model.SelectedDate:yyyy-MM-dd}T{slot.EndTime.ToString("hh\\:mm")}",
             className = "info",
             url = Url.Action(listAction, new
             {
-                date = item.ExamDate.ToString("yyyy-MM-dd"),
+                date = Model.SelectedDate.ToString("yyyy-MM-dd"),
                 subjectId = item.SubjectId,
-                startTime = fmtTime(item.StartTime),
-                endTime = fmtTime(item.EndTime)
+                startTime = slot.StartTime.ToString("hh\\:mm"),
+                endTime = slot.EndTime.ToString("hh\\:mm")
             })
-        })
+        }))
         : Enumerable.Empty<object>();
     var calendarColClass = useCalendar ? "col-12" : "col-xxl-9 col-lg-8";
 }
@@ -80,41 +78,38 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
-        @if (!useCalendar)
-        {
-            <div class="card radius-12">
-                <div class="card-body">
-                    <form method="get" class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label fw-medium">Chọn ngày</label>
-                            <input type="date" name="date" class="form-control" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-medium">Môn thi (tùy chọn)</label>
-                            <select name="subjectId" class="form-select">
-                                <option value="">-- Tất cả môn --</option>
-                                @foreach (var subject in Model.Subjects)
+        <div class="card radius-12">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Chọn ngày</label>
+                        <input type="date" name="date" class="form-control" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Môn thi (tùy chọn)</label>
+                        <select name="subjectId" class="form-select">
+                            <option value="">-- Tất cả môn --</option>
+                            @foreach (var subject in Model.Subjects)
+                            {
+                                if (Model.SelectedSubjectId.HasValue && Model.SelectedSubjectId.Value == subject.Id)
                                 {
-                                    if (Model.SelectedSubjectId.HasValue && Model.SelectedSubjectId.Value == subject.Id)
-                                    {
-                                        <option value="@subject.Id" selected>@subject.SubjectCode - @subject.SubjectName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@subject.Id">@subject.SubjectCode - @subject.SubjectName</option>
-                                    }
+                                    <option value="@subject.Id" selected>@subject.SubjectCode - @subject.SubjectName</option>
                                 }
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary-600 w-100">
-                                <i class="ri-search-line"></i> Xem lịch
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                                else
+                                {
+                                    <option value="@subject.Id">@subject.SubjectCode - @subject.SubjectName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary-600 w-100">
+                            <i class="ri-search-line"></i> Xem lịch
+                        </button>
+                    </div>
+                </form>
             </div>
-        }
+        </div>
 
         <div class="mt-24">
             <div class="row gy-4">
@@ -368,23 +363,6 @@
                 const events = @Html.Raw(JsonSerializer.Serialize(calendarEvents));
                 const calendarEl = $('#calendar');
                 if (!calendarEl.length) return;
-                const defaultView = '@(ViewData["CalendarView"]?.ToString() ?? "agendaWeek")';
-                const baseUrl = '@Url.Action(listAction)';
-                const serverDate = '@Model.SelectedDate:yyyy-MM-dd';
-                const params = new URLSearchParams(window.location.search);
-                const qsView = params.get('view') || defaultView;
-                const qsDate = params.get('date') || serverDate;
-                const dateParts = qsDate.split('-');
-                let initYear = dateParts.length === 3 ? parseInt(dateParts[0], 10) : @Model.SelectedDate.Year;
-                let initMonth = dateParts.length === 3 ? (parseInt(dateParts[1], 10) - 1) : @Model.SelectedDate.Month - 1;
-                let initDay = dateParts.length === 3 ? parseInt(dateParts[2], 10) : @Model.SelectedDate.Day;
-                if (Number.isNaN(initYear) || Number.isNaN(initMonth) || Number.isNaN(initDay)) {
-                    const now = new Date();
-                    initYear = now.getFullYear();
-                    initMonth = now.getMonth();
-                    initDay = now.getDate();
-                }
-                window.__examCalState = window.__examCalState || { view: qsView, date: qsDate };
 
                 setTimeout(function () {
                     try {
@@ -407,76 +385,19 @@
                             editable: false,
                             firstDay: 1,
                             selectable: false,
-                            defaultView: qsView,
-                            year: initYear,
-                            month: initMonth,
-                            date: initDay,
+                            defaultView: 'agendaWeek',
                             allDaySlot: false,
                             axisFormat: 'h:mm',
                             events: events,
-                            eventColor: '#111',
-                            eventTextColor: '#fff',
-                            eventBorderColor: '#111',
                             eventClick: function (event) {
                                 if (event.url) {
                                     window.location = event.url;
                                     return false;
                                 }
-                            },
-                            viewDisplay: function (view) {
-                                try {
-                                    var viewName = view && (view.name || view.type || view.viewName);
-                                    if (!viewName) {
-                                        var v = calendarEl.fullCalendar('getView');
-                                        viewName = v && (v.name || v.type) ? (v.name || v.type) : defaultView;
-                                    }
-
-                                    var date = calendarEl.fullCalendar('getDate');
-                                    var y = date.getFullYear();
-                                    var m = (date.getMonth() + 1).toString().padStart(2, '0');
-                                    var d = date.getDate().toString().padStart(2, '0');
-                                    var dateStr = y + '-' + m + '-' + d;
-
-                                    var state = window.__examCalState || {};
-                                    if (state.view === viewName && state.date === dateStr) {
-                                        return;
-                                    }
-
-                                    window.__examCalState = { view: viewName, date: dateStr };
-
-                                    var currentParams = new URLSearchParams(window.location.search);
-                                    var currentView = currentParams.get('view');
-                                    var currentDate = currentParams.get('date');
-
-                                    if (viewName === 'agendaWeek') {
-                                        // If week data is not loaded for this date, reload once with date
-                                        if (currentView !== 'agendaWeek' || currentDate !== dateStr) {
-                                            var weekLoadUrl = baseUrl + '?view=agendaWeek&date=' + dateStr;
-                                            window.location = weekLoadUrl;
-                                            return;
-                                        }
-
-                                        // Week data already loaded: keep URL clean (no date)
-                                        var weekUrl = baseUrl + '?view=agendaWeek';
-                                        window.history.replaceState({}, '', weekUrl);
-                                        return;
-                                    }
-
-                                    var url = baseUrl + '?view=' + encodeURIComponent(viewName) + '&date=' + dateStr;
-                                    if (url !== window.location.pathname + window.location.search) {
-                                        window.location = url;
-                                    }
-                                } catch (e) {
-                                    console.warn('Calendar view sync failed', e);
-                                }
                             }
                         });
 
-                        calendarEl.fullCalendar('removeEvents');
-                        calendarEl.fullCalendar('addEventSource', events);
-                        calendarEl.fullCalendar('refetchEvents');
-                        calendarEl.fullCalendar('gotoDate', initYear, initMonth, initDay);
-                        console.log('ExamSchedules/My events', events);
+                        calendarEl.fullCalendar('gotoDate', y, m, d);
                     } catch (e) {
                         console.warn('Calendar init failed', e);
                     }

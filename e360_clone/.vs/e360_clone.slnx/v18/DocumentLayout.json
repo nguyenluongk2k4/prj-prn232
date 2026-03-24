@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "C:\\Git\\prj-prn232\\e360_clone\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\controllers\\examschedulescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\examschedulescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\controllers\\proctorassignmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\controllers\\proctorassignmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_api\\controllers\\proctorassignmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FF43C311-ED30-F870-11F7-E0CFE9D4FFA5}|e360_clone_api\\e360_clone.csproj|solutionrelative:e360_clone_api\\controllers\\proctorassignmentscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|c:\\git\\prj-prn232\\e360_clone\\e360_clone_fe\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{BC8B6840-D5F4-BA1A-88F5-A6C400DD48A7}|e360_clone_fe\\e360_clone_fe.csproj|solutionrelative:e360_clone_fe\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -142,7 +154,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 84,
+          "SelectedChildIndex": 83,
           "Children": [
             {
               "$type": "Bookmark",
@@ -478,7 +490,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
+              "Title": "ExamSchedulesController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\ExamSchedulesController.cs",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\ExamSchedulesController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\ExamSchedulesController.cs",
+              "RelativeToolTip": "e360_clone_fe\\Controllers\\ExamSchedulesController.cs",
+              "ViewState": "AgIAAAIBAAAAAAAAAAAIwAYBAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-24T12:08:39.001Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ProctorAssignmentsController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\ProctorAssignmentsController.cs",
+              "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\ProctorAssignmentsController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\ProctorAssignmentsController.cs",
+              "RelativeToolTip": "e360_clone_fe\\Controllers\\ProctorAssignmentsController.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAswHYAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-24T09:16:01.971Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ProctorAssignmentsController.cs",
+              "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\ProctorAssignmentsController.cs",
+              "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\ProctorAssignmentsController.cs",
+              "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\ProctorAssignmentsController.cs",
+              "RelativeToolTip": "e360_clone_api\\Controllers\\ProctorAssignmentsController.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-24T09:15:37.818Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Attendance\\Index.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Attendance\\Index.cshtml",
@@ -486,25 +537,24 @@
               "RelativeToolTip": "e360_clone_fe\\Views\\Attendance\\Index.cshtml",
               "ViewState": "AgIAADIAAAAAAAAAAAAQwDoAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-03-24T02:50:47.636Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T02:50:47.636Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\appsettings.json",
               "RelativeDocumentMoniker": "e360_clone_fe\\appsettings.json",
               "ToolTip": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\appsettings.json",
               "RelativeToolTip": "e360_clone_fe\\appsettings.json",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAQwBEAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAQwBEAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-03-21T18:10:12.35Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "TeachingAssignmentsController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\TeachingAssignmentsController.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\TeachingAssignmentsController.cs",
@@ -512,12 +562,11 @@
               "RelativeToolTip": "e360_clone_api\\Controllers\\TeachingAssignmentsController.cs",
               "ViewState": "AgIAAA0AAAAAAAAAAAAUwBQAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-24T03:37:04.995Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-24T03:37:04.995Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\appsettings.json",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\appsettings.json",
@@ -529,7 +578,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "StudentsController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\StudentsController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\StudentsController.cs",
@@ -541,7 +590,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "HomeController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\HomeController.cs",
@@ -553,7 +602,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\appsettings.json",
               "RelativeDocumentMoniker": "e360_clone_api\\appsettings.json",
@@ -561,12 +610,11 @@
               "RelativeToolTip": "e360_clone_api\\appsettings.json",
               "ViewState": "AgIAAAoAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-15T03:39:59.609Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-15T03:39:59.609Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\AuthController.cs",
@@ -574,12 +622,11 @@
               "RelativeToolTip": "e360_clone_api\\Controllers\\AuthController.cs",
               "ViewState": "AgIAALMAAAAAAAAAAADwv7sAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-21T15:05:35.503Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-21T15:05:35.503Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "e360_clone.http",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\e360_clone.http",
               "RelativeDocumentMoniker": "e360_clone_api\\e360_clone.http",
@@ -591,7 +638,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "AccountRepository.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\AccountRepository.cs",
               "RelativeDocumentMoniker": "e360_clone.Repositories\\AccountRepository.cs",
@@ -603,7 +650,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\Auth\\AuthController.cs",
@@ -615,7 +662,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 10,
               "Title": "ApiService.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Services\\ApiService.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Services\\ApiService.cs",
@@ -627,7 +674,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "Repository.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\Repository.cs",
               "RelativeDocumentMoniker": "e360_clone.Repositories\\Repository.cs",
@@ -639,7 +686,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 22,
               "Title": "utils.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\utils.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\utils.js",
@@ -651,7 +698,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "_ViewImports.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\_ViewImports.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\_ViewImports.cshtml",
@@ -663,7 +710,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 23,
               "Title": "config.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\config.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\config.js",
@@ -675,7 +722,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "AttendancesController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\AttendancesController.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\AttendancesController.cs",
@@ -687,7 +734,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 27,
               "Title": "Login.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Auth\\Login.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Auth\\Login.cshtml",
@@ -699,7 +746,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 20,
               "Title": "Lms.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Lms.cshtml",
@@ -711,7 +758,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 18,
               "Title": "IAccountRepository.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.Repositories\\IAccountRepository.cs",
               "RelativeDocumentMoniker": "e360_clone.Repositories\\IAccountRepository.cs",
@@ -723,7 +770,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 24,
               "Title": "Teacher.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Teacher.cshtml",
@@ -735,7 +782,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 19,
               "Title": "School.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\School.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\School.cshtml",
@@ -747,7 +794,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 21,
               "Title": "auth.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\_archived\\core\\auth.js",
@@ -759,7 +806,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 26,
               "Title": "Parent.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Parent.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Parent.cshtml",
@@ -771,7 +818,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 25,
               "Title": "Student.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Dashboard\\Student.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Dashboard\\Student.cshtml",
@@ -783,7 +830,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 28,
               "Title": "DashboardController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Controllers\\DashboardController.cs",
               "RelativeDocumentMoniker": "e360_clone_fe\\Controllers\\DashboardController.cs",
@@ -795,7 +842,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 32,
               "Title": "Account.js",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\wwwroot\\js\\_archived\\models\\Account.js",
               "RelativeDocumentMoniker": "e360_clone_fe\\wwwroot\\js\\_archived\\models\\Account.js",
@@ -807,7 +854,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 30,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\AppDbContext.cs",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\AppDbContext.cs",
@@ -819,7 +866,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 29,
               "Title": "AccountDAO.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\DAOs\\AccountDAO.cs",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\DAOs\\AccountDAO.cs",
@@ -831,7 +878,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 31,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Home\\Index.cshtml",
@@ -843,7 +890,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 33,
               "Title": "BaseApiController.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_api\\Controllers\\BaseApiController.cs",
               "RelativeDocumentMoniker": "e360_clone_api\\Controllers\\BaseApiController.cs",
@@ -855,7 +902,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 34,
               "Title": "BaseDAO.cs",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone.DataAccess\\DAOs\\BaseDAO.cs",
               "RelativeDocumentMoniker": "e360_clone.DataAccess\\DAOs\\BaseDAO.cs",
@@ -867,7 +914,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 35,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Git\\prj-prn232\\e360_clone\\e360_clone_fe\\Views\\Students\\Index.cshtml",
               "RelativeDocumentMoniker": "e360_clone_fe\\Views\\Students\\Index.cshtml",

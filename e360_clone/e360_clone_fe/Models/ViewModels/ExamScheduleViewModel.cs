@@ -29,11 +29,24 @@
     {
         public DateTime SelectedDate { get; set; } = DateTime.Today;
         public List<ExamScheduleSlotViewModel> Slots { get; set; } = new();
+        public List<ExamScheduleCalendarItemViewModel> CalendarItems { get; set; } = new();
         public List<SubjectFormViewModel> Subjects { get; set; } = new();
         public List<LecturerViewModel> Lecturers { get; set; } = new();
         public Dictionary<int, List<int>> BlockedLecturerIds { get; set; } = new();
         public int? SelectedSubjectId { get; set; }
         public TimeSpan? SelectedStartTime { get; set; }
         public TimeSpan? SelectedEndTime { get; set; }
+    }
+
+    public class ExamScheduleCalendarItemViewModel
+    {
+        public DateTime ExamDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public int SubjectId { get; set; }
+        public string SubjectCode { get; set; } = string.Empty;
+        public string SubjectName { get; set; } = string.Empty;
+        public string ClassCode { get; set; } = string.Empty;
+        public string RoomCode { get; set; } = string.Empty;
     }
 }

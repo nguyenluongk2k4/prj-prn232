@@ -11,7 +11,7 @@
                 <h1 class="text-2xl fw-bold mb-2 text-primary-light">Danh sách sinh viên</h1>
                 <nav aria-label="breadcrumb">
                     <ul class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/">Trang ch?</a></li>
                         <li class="breadcrumb-item">Sinh viên</li>
                         <li class="breadcrumb-item active" aria-current="page">Danh sách</li>
                     </ul>
@@ -107,12 +107,12 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-outline-secondary">
-                            <i class="ri-search-line"></i> Tìm kiếm
+                            <i class="ri-search-line"></i> Tìm ki?m
                         </button>
                         @if (!string.IsNullOrEmpty(Model.SearchTerm))
                         {
                             <a asp-action="Index" asp-route-classId="@ViewBag.ClassId" class="btn btn-outline-secondary">
-                                <i class="ri-close-line"></i> Xóa bộ lọc
+                                <i class="ri-close-line"></i> Xóa b? l?c
                             </a>
                         }
                     </form>
@@ -126,12 +126,12 @@
                                 <th scope="col">STT</th>
                                 <th scope="col">Avatar</th>
                                 <th scope="col">Mã SV</th>
-                                <th scope="col">Họ và tên</th>
+                                <th scope="col">H? và tên</th>
                                 <th scope="col">Ngày sinh</th>
-                                <th scope="col">Giới tính</th>
+                                <th scope="col">Gi?i tính</th>
                                 <th scope="col">Email</th>
-                                <th scope="col">Số điện thoại</th>
-                                <th scope="col">Trạng thái</th>
+                                <th scope="col">S? di?n tho?i</th>
+                                <th scope="col">Tr?ng thái</th>
                                 <th scope="col">Thao tác</th>
                             </tr>
                         </thead>
@@ -180,20 +180,20 @@
                                                         <a asp-action="Details" asp-route-id="@student.Id"
                                                            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
                                                             <i class="ri-eye-line"></i>
-                                                            Xem chi tiết
+                                                            Xem chi ti?t
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <a asp-action="Edit" asp-route-id="@student.Id"
                                                            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6">
                                                             <i class="ri-edit-2-line"></i>
-                                                            Sửa
+                                                            S?a
                                                         </a>
                                                     </li>
                                                     <li>
                                                         <form asp-action="Delete" asp-route-id="@student.Id"
                                                               method="post"
-                                                              onsubmit="return confirm('Bạn có chắc muốn xóa sinh viên này?');">
+                                                              onsubmit="return confirm('B?n có ch?c mu?n xóa sinh viên này?');">
                                                             @Html.AntiForgeryToken()
                                                             <button type="submit"
                                                                     class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 border-0 bg-transparent w-100 text-start">
@@ -227,7 +227,7 @@
                 {
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-top border-neutral-200 dataTable-bottom">
                         <div class="text-secondary-light text-sm dataTable-info">
-                            Hiển thị @Model.StartRecord - @Model.EndRecord trong tổng số @Model.TotalRecords bản ghi
+                            Hi?n th? @Model.StartRecord - @Model.EndRecord trong t?ng s? @Model.TotalRecords b?n ghi
                         </div>
                         <div class="dataTable-pagination">
                             <ul class="pagination mb-0">
@@ -281,7 +281,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="modal-title" id="studentAvatarModalLabel">Avatar sinh vi�n</h6>
+                <h6 class="modal-title" id="studentAvatarModalLabel">Avatar sinh viên</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
@@ -322,6 +322,8 @@
             }        });
     </script>
 }
+
+
 
 
 
