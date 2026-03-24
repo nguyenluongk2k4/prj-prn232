@@ -1,0 +1,184 @@
+@model e360_clone_fe.Models.ViewModels.AttendanceReportPageViewModel
+@{
+    ViewData["Title"] = "Báo cáo điểm danh";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Báo cáo điểm danh</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Attendance</li>
+                        <li class="breadcrumb-item active" aria-current="page">Reports</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end" id="reportFilterForm">
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Từ ngày</label>
+                        <input type="date" name="fromDate" class="form-control" value="@Model.Filter.FromDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Đến ngày</label>
+                        <input type="date" name="toDate" class="form-control" value="@Model.Filter.ToDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Môn thi</label>
+                        <select name="subjectId" class="form-select">
+                            <option value="">-- Tất cả môn --</option>
+                            @foreach (var subject in Model.Subjects)
+                            {
+                                <option value="@subject.Id" selected="@(Model.Filter.SubjectId == subject.Id)">
+                                    @subject.SubjectCode - @subject.SubjectName
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Lớp</label>
+                        <select name="classId" class="form-select">
+                            <option value="">-- Tất cả lớp --</option>
+                            @foreach (var cls in Model.Classes)
+                            {
+                                <option value="@cls.Id" selected="@(Model.Filter.ClassId == cls.Id)">
+                                    @cls.ClassCode
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-12 d-flex gap-12">
+                        <button type="submit" class="btn btn-primary-600">
+                            <i class="ri-search-line"></i> Lọc dữ liệu
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="exportReportBtn">
+                            <i class="ri-file-excel-2-line"></i> Xuất Excel
+                        </button>
+                        <a asp-action="Reports" class="btn btn-outline-secondary">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-24">
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Tổng SV</div>
+                    <div class="text-xl fw-bold">@Model.Total</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Present</div>
+                    <div class="text-xl fw-bold text-success">@Model.Present</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Absent</div>
+                    <div class="text-xl fw-bold text-danger">@Model.Absent</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Late</div>
+                    <div class="text-xl fw-bold text-warning">@Model.Late</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Excused</div>
+                    <div class="text-xl fw-bold">@Model.Excused</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Đã ký</div>
+                    <div class="text-xl fw-bold text-primary">@Model.Confirmed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card radius-12 mt-24">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table bordered-table mb-0">
+                        <thead class="bg-neutral-100">
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Ca</th>
+                                <th>Môn</th>
+                                <th>Lớp</th>
+                                <th>Tổng</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Late</th>
+                                <th>Excused</th>
+                                <th>Đã ký</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items.Any())
+                            {
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@item.ExamDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@item.StartTime.ToString("hh\\:mm") - @item.EndTime.ToString("hh\\:mm")</td>
+                                        <td>@item.SubjectCode - @item.SubjectName</td>
+                                        <td>@item.ClassCode</td>
+                                        <td>@item.Total</td>
+                                        <td>@item.Present</td>
+                                        <td>@item.Absent</td>
+                                        <td>@item.Late</td>
+                                        <td>@item.Excused</td>
+                                        <td>@item.Confirmed</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="10" class="text-center py-4">
+                                        <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                        <p class="text-muted mt-2">Chưa có dữ liệu báo cáo</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const exportBtn = document.getElementById('exportReportBtn');
+            const form = document.getElementById('reportFilterForm');
+            exportBtn?.addEventListener('click', () => {
+                if (!form) return;
+                const params = new URLSearchParams(new FormData(form));
+                window.location.href = `/Attendance/ExportReport?${params.toString()}`;
+            });
+        });
+    </script>
+}

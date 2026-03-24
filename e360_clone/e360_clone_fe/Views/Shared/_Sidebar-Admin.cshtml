@@ -29,8 +29,14 @@
       <button type="button"
         class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
         data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        @{
+          var avatarUrl = Context.Session.GetString("AvatarUrl");
+          var avatarSrc = !string.IsNullOrWhiteSpace(avatarUrl)
+              ? avatarUrl
+              : "/assets/images/thumbs/avatar-img1.png";
+        }
         <span class="d-flex align-items-start gap-10">
-          <img src="/assets/images/thumbs/avatar-img1.png" alt="Avatar"
+          <img src="@avatarSrc" alt="Avatar"
             class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
           <span class="profile-dropdown__contents">
             <span class="h6 mb-0 text-md d-block text-primary-light">@fullName</span>

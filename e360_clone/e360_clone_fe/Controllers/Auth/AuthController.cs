@@ -86,6 +86,18 @@ namespace e360_clone_fe.Controllers
                     HttpContext.Session.SetString("FullName", profileResponse.Data.FullName);
                     HttpContext.Session.SetString("Username", profileResponse.Data.Username);
                     HttpContext.Session.SetString("Email", profileResponse.Data.Email);
+                    if (!string.IsNullOrWhiteSpace(profileResponse.Data.AvatarUrl))
+                    {
+                        HttpContext.Session.SetString("AvatarUrl", profileResponse.Data.AvatarUrl);
+                    }
+                    if (profileResponse.Data.LecturerId.HasValue)
+                    {
+                        HttpContext.Session.SetInt32("LecturerId", profileResponse.Data.LecturerId.Value);
+                    }
+                    if (profileResponse.Data.StudentId.HasValue)
+                    {
+                        HttpContext.Session.SetInt32("StudentId", profileResponse.Data.StudentId.Value);
+                    }
                     ViewData["Role"] = profileResponse.Data.Role;
                 }
                 else
@@ -95,6 +107,14 @@ namespace e360_clone_fe.Controllers
                     HttpContext.Session.SetString("FullName", response.Data.FullName);
                     HttpContext.Session.SetString("Username", response.Data.Username);
                     HttpContext.Session.SetString("Email", response.Data.Email);
+                    if (response.Data.LecturerId.HasValue)
+                    {
+                        HttpContext.Session.SetInt32("LecturerId", response.Data.LecturerId.Value);
+                    }
+                    if (response.Data.StudentId.HasValue)
+                    {
+                        HttpContext.Session.SetInt32("StudentId", response.Data.StudentId.Value);
+                    }
                     ViewData["Role"] = response.Data.Role;
                 }
 
@@ -155,6 +175,18 @@ namespace e360_clone_fe.Controllers
                         HttpContext.Session.SetString("FullName", profileResponse.Data.FullName);
                         HttpContext.Session.SetString("Username", profileResponse.Data.Username);
                         HttpContext.Session.SetString("Email", profileResponse.Data.Email);
+                        if (!string.IsNullOrWhiteSpace(profileResponse.Data.AvatarUrl))
+                        {
+                            HttpContext.Session.SetString("AvatarUrl", profileResponse.Data.AvatarUrl);
+                        }
+                        if (profileResponse.Data.LecturerId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("LecturerId", profileResponse.Data.LecturerId.Value);
+                        }
+                        if (profileResponse.Data.StudentId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("StudentId", profileResponse.Data.StudentId.Value);
+                        }
                     }
                     else
                     {
@@ -162,6 +194,14 @@ namespace e360_clone_fe.Controllers
                         HttpContext.Session.SetString("FullName", response.Data.FullName);
                         HttpContext.Session.SetString("Username", response.Data.Username);
                         HttpContext.Session.SetString("Email", response.Data.Email);
+                        if (response.Data.LecturerId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("LecturerId", response.Data.LecturerId.Value);
+                        }
+                        if (response.Data.StudentId.HasValue)
+                        {
+                            HttpContext.Session.SetInt32("StudentId", response.Data.StudentId.Value);
+                        }
                     }
                 }
 
@@ -230,6 +270,8 @@ namespace e360_clone_fe.Controllers
         public string FullName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public DateTime ExpiresAt { get; set; }
+        public int? LecturerId { get; set; }
+        public int? StudentId { get; set; }
     }
 
     public class UserProfileResponse
@@ -241,5 +283,7 @@ namespace e360_clone_fe.Controllers
         public string Role { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
         public string? Status { get; set; }
+        public int? LecturerId { get; set; }
+        public int? StudentId { get; set; }
     }
 }

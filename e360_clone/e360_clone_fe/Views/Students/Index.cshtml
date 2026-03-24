@@ -1,4 +1,4 @@
-@model e360_clone_fe.Models.ViewModels.PagedViewModel<e360_clone_fe.Models.ViewModels.StudentViewModel>
+﻿@model e360_clone_fe.Models.ViewModels.PagedViewModel<e360_clone_fe.Models.ViewModels.StudentViewModel>
 @{
     ViewData["Title"] = "Danh sách sinh viên";
 }
@@ -50,6 +50,10 @@
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-16 px-20 py-12 border-bottom border-neutral-200">
                     <form method="get" class="d-flex align-items-center gap-16 flex-wrap">
                         <input type="hidden" name="pageNumber" value="1" />
+                        @if (ViewBag.ClassId != null)
+                        {
+                            <input type="hidden" name="classId" value="@ViewBag.ClassId" />
+                        }
                         <div class="navbar-search dt-search m-0">
                             <input type="text" class="dt-input bg-transparent radius-4" name="searchTerm"
                                    placeholder="Search..." value="@Model.SearchTerm">
@@ -107,7 +111,7 @@
                         </button>
                         @if (!string.IsNullOrEmpty(Model.SearchTerm))
                         {
-                            <a asp-action="Index" class="btn btn-outline-secondary">
+                            <a asp-action="Index" asp-route-classId="@ViewBag.ClassId" class="btn btn-outline-secondary">
                                 <i class="ri-close-line"></i> Xóa bộ lọc
                             </a>
                         }
@@ -120,6 +124,7 @@
                         <thead class="bg-neutral-100">
                             <tr>
                                 <th scope="col">STT</th>
+                                <th scope="col">Avatar</th>
                                 <th scope="col">Mã SV</th>
                                 <th scope="col">Họ và tên</th>
                                 <th scope="col">Ngày sinh</th>
@@ -138,6 +143,22 @@
                                 {
                                     <tr>
                                         <td>@index</td>
+                                        <td>
+                                            @{
+                                                var avatarSrc = !string.IsNullOrWhiteSpace(student.AvatarUrl)
+                                                    ? student.AvatarUrl
+                                                    : "/assets/images/thumbs/avatar-img1.png";
+                                            }
+                                            <button type="button"
+                                                    class="btn p-0 border-0 bg-transparent"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#studentAvatarModal"
+                                                    data-avatar-src="@avatarSrc"
+                                                    data-avatar-name="@student.FullName">
+                                                <img src="@avatarSrc" alt="@student.FullName"
+                                                     class="w-32-px h-32-px rounded-circle object-fit-cover">
+                                            </button>
+                                        </td>
                                         <td>@student.StudentCode</td>
                                         <td>@student.FullName</td>
                                         <td>@student.DateOfBirth.ToString("dd/MM/yyyy")</td>
@@ -191,7 +212,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="10" class="text-center py-4">
                                         <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
                                         <p class="text-muted mt-2">Không có sinh viên nào</p>
                                     </td>
@@ -214,7 +235,8 @@
                                     <a class="page-link" asp-action="Index"
                                        asp-route-pageNumber="@(Model.PageNumber - 1)"
                                        asp-route-pageSize="@Model.PageSize"
-                                       asp-route-searchTerm="@Model.SearchTerm">
+                                       asp-route-searchTerm="@Model.SearchTerm"
+                                       asp-route-classId="@ViewBag.ClassId">
                                         Previous
                                     </a>
                                 </li>
@@ -230,7 +252,8 @@
                                         <a class="page-link" asp-action="Index"
                                            asp-route-pageNumber="@i"
                                            asp-route-pageSize="@Model.PageSize"
-                                           asp-route-searchTerm="@Model.SearchTerm">
+                                           asp-route-searchTerm="@Model.SearchTerm"
+                                           asp-route-classId="@ViewBag.ClassId">
                                             @i
                                         </a>
                                     </li>
@@ -240,7 +263,8 @@
                                     <a class="page-link" asp-action="Index"
                                        asp-route-pageNumber="@(Model.PageNumber + 1)"
                                        asp-route-pageSize="@Model.PageSize"
-                                       asp-route-searchTerm="@Model.SearchTerm">
+                                       asp-route-searchTerm="@Model.SearchTerm"
+                                       asp-route-classId="@ViewBag.ClassId">
                                         Next
                                     </a>
                                 </li>
@@ -253,6 +277,21 @@
     </div>
 </div>
 
+<div class="modal fade" id="studentAvatarModal" tabindex="-1" aria-labelledby="studentAvatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="studentAvatarModalLabel">Avatar sinh vi�n</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="studentAvatarModalImage" src="/assets/images/thumbs/avatar-img1.png" alt="Student Avatar"
+                     class="rounded-circle object-fit-cover" style="width: 180px; height: 180px;">
+                <div class="mt-12 fw-semibold" id="studentAvatarModalName"></div>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         // Auto-dismiss alerts after 5 seconds
@@ -264,6 +303,25 @@
                     bsAlert.close();
                 }, 5000);
             });
-        });
+            const avatarModal = document.getElementById('studentAvatarModal');
+            if (avatarModal) {
+                avatarModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    if (!button) return;
+                    const src = button.getAttribute('data-avatar-src');
+                    const name = button.getAttribute('data-avatar-name');
+                    const img = document.getElementById('studentAvatarModalImage');
+                    const label = document.getElementById('studentAvatarModalName');
+                    if (img) {
+                        img.src = src || '/assets/images/thumbs/avatar-img1.png';
+                    }
+                    if (label) {
+                        label.textContent = name || '';
+                    }
+                });
+            }        });
     </script>
 }
+
+
+

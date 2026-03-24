@@ -1,6 +1,7 @@
 using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq.Expressions;
 
 namespace e360_clone.Controllers
 {
@@ -15,14 +16,22 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
+        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request, [FromQuery] int? lecturerId)
         {
+            Expression<Func<TeachingAssignment, bool>>? filter = null;
+            if (lecturerId.HasValue)
+            {
+                filter = x => x.LecturerId == lecturerId.Value;
+            }
+
             var data = await _repository.GetPagedFilteredAsync(
                 request.PageNumber,
                 request.PageSize,
-                null,
+                filter,
                 q => q.OrderBy(x => x.Id));
-            var totalRecords = await _repository.CountAsync();
+            var totalRecords = filter == null
+                ? await _repository.CountAsync()
+                : await _repository.CountAsync(filter);
 
             return Ok(new PagedResponse<TeachingAssignment>
             {

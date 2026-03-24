@@ -29,18 +29,12 @@
       <button type="button"
         class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
         data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-        @{
-          var avatarUrl = Context.Session.GetString("AvatarUrl");
-          var avatarSrc = !string.IsNullOrWhiteSpace(avatarUrl)
-              ? avatarUrl
-              : "/assets/images/thumbs/avatar-img1.png";
-        }
         <span class="d-flex align-items-start gap-10">
-          <img src="@avatarSrc" alt="Avatar"
+          <img src="/assets/images/thumbs/avatar-img1.png" alt="Avatar"
             class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
           <span class="profile-dropdown__contents">
             <span class="h6 mb-0 text-md d-block text-primary-light">@fullName</span>
-            <span class="text-secondary-light text-sm mb-0 d-block">Student</span>
+            <span class="text-secondary-light text-sm mb-0 d-block">Teacher</span>
           </span>
         </span>
         <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
@@ -75,10 +69,10 @@
           <i class="ri-home-4-line"></i>
           <span>Dashboard</span>
         </a>
-        <ul class="sidebar-submenu">
-          <li><a href="/Dashboard/Student"><i class="ri-circle-fill circle-icon w-auto"></i> My Dashboard</a></li>
+        @* <ul class="sidebar-submenu">
+          <li><a href="/Dashboard/Teacher"><i class="ri-circle-fill circle-icon w-auto"></i> My Dashboard</a></li>
           <li><a href="/Dashboard/LMS"><i class="ri-circle-fill circle-icon w-auto"></i> LMS</a></li>
-        </ul>
+        </ul> *@
       </li>
 
       @* My Courses *@
@@ -89,7 +83,7 @@
         </a>
         <ul class="sidebar-submenu">
           <li><a href="/Courses/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Courses</a></li>
-          <li><a href="/Courses/Catalog"><i class="ri-circle-fill circle-icon w-auto"></i> Course Catalog</a></li>
+          <li><a href="/Courses/Schedule"><i class="ri-circle-fill circle-icon w-auto"></i> Teaching Schedule</a></li>
         </ul>
       </li>
 
@@ -111,8 +105,8 @@
           <span>Grades</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Grades/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Grades</a></li>
-          <li><a href="/Grades/Transcript"><i class="ri-circle-fill circle-icon w-auto"></i> Transcript</a></li>
+          <li><a href="/Grades/Enter"><i class="ri-circle-fill circle-icon w-auto"></i> Enter Grades</a></li>
+          <li><a href="/Grades/Pending"><i class="ri-circle-fill circle-icon w-auto"></i> Pending Approval</a></li>
         </ul>
       </li>
 
@@ -123,7 +117,8 @@
           <span>Attendance</span>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="/Attendance/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Attendance</a></li>
+          <li><a href="/Attendance/Take"><i class="ri-circle-fill circle-icon w-auto"></i> Take Attendance</a></li>
+          <li><a href="/Attendance/My"><i class="ri-circle-fill circle-icon w-auto"></i> My Records</a></li>
         </ul>
       </li>
 

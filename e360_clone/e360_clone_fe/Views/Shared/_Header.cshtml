@@ -86,8 +86,14 @@
         
         <!-- User Profile -->
         <div class="dropdown">
+          @{
+              var avatarUrl = Context.Session.GetString("AvatarUrl");
+              var avatarSrc = !string.IsNullOrWhiteSpace(avatarUrl)
+                  ? avatarUrl
+                  : "/assets/images/thumbs/avatar-img1.png";
+          }
           <button type="button" data-bs-toggle="dropdown" aria-label="User Menu">
-            <img src="/assets/images/thumbs/avatar-img1.png" alt="User" 
+            <img src="@avatarSrc" alt="User"
               class="w-40-px h-40-px rounded-circle object-fit-cover">
           </button>
           <ul class="dropdown-menu dropdown-menu-lg-end border p-12">

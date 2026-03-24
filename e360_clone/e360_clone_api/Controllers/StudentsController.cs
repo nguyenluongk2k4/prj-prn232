@@ -1,4 +1,5 @@
 using e360_clone.BusinessObjects;
+using e360_clone.Models;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,14 +8,16 @@ namespace e360_clone.Controllers
     public class StudentsController : BaseApiController
     {
         private readonly IStudentRepository _studentRepository;
+        private readonly IAccountRepository _accountRepository;
 
-        public StudentsController(IStudentRepository studentRepository)
+        public StudentsController(IStudentRepository studentRepository, IAccountRepository accountRepository)
         {
             _studentRepository = studentRepository;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
+        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request, [FromQuery] int? classId)
         {
             var term = request.SearchTerm?.Trim();
             Func<IQueryable<Student>, IOrderedQueryable<Student>> orderBy = q => q.OrderBy(s => s.StudentCode);
@@ -22,7 +25,27 @@ namespace e360_clone.Controllers
             IEnumerable<Student> data;
             int totalRecords;
 
-            if (!string.IsNullOrEmpty(term))
+            if (!string.IsNullOrEmpty(term) && classId.HasValue)
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => s.ClassId == classId.Value && (s.FullName.Contains(term) || s.StudentCode.Contains(term)),
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(
+                    s => s.ClassId == classId.Value && (s.FullName.Contains(term) || s.StudentCode.Contains(term)));
+            }
+            else if (classId.HasValue)
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => s.ClassId == classId.Value,
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(
+                    s => s.ClassId == classId.Value);
+            }
+            else if (!string.IsNullOrEmpty(term))
             {
                 data = await _studentRepository.GetPagedFilteredAsync(
                     request.PageNumber,
@@ -42,11 +65,35 @@ namespace e360_clone.Controllers
                 totalRecords = await _studentRepository.CountAsync();
             }
 
-            return Ok(new PagedResponse<Student>
+            var students = data.ToList();
+            var accounts = await _accountRepository.GetByStudentIdsAsync(students.Select(s => s.Id));
+            var avatarMap = accounts
+                .Where(a => a.StudentId.HasValue)
+                .GroupBy(a => a.StudentId!.Value)
+                .ToDictionary(g => g.Key, g => g.First().AvatarUrl);
+
+            var dtoList = students.Select(s => new StudentDto
+            {
+                Id = s.Id,
+                StudentCode = s.StudentCode,
+                FullName = s.FullName,
+                DateOfBirth = s.DateOfBirth,
+                Gender = s.Gender,
+                Email = s.Email,
+                PhoneNumber = s.PhoneNumber,
+                Address = s.Address,
+                ClassId = s.ClassId,
+                Status = s.Status,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                AvatarUrl = avatarMap.TryGetValue(s.Id, out var avatar) ? avatar : null
+            }).ToList();
+
+            return Ok(new PagedResponse<StudentDto>
             {
                 Success = true,
                 Message = "Lấy danh sách sinh viên thành công",
-                Data = data.ToList(),
+                Data = dtoList,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
                 TotalRecords = totalRecords
@@ -62,7 +109,25 @@ namespace e360_clone.Controllers
                 return HandleNotFound($"Không tìm thấy sinh viên có ID = {id}");
             }
 
-            return HandleResult(student, "Lấy thông tin sinh viên thành công");
+            var account = (await _accountRepository.GetByStudentIdsAsync(new[] { id })).FirstOrDefault();
+            var dto = new StudentDto
+            {
+                Id = student.Id,
+                StudentCode = student.StudentCode,
+                FullName = student.FullName,
+                DateOfBirth = student.DateOfBirth,
+                Gender = student.Gender,
+                Email = student.Email,
+                PhoneNumber = student.PhoneNumber,
+                Address = student.Address,
+                ClassId = student.ClassId,
+                Status = student.Status,
+                CreatedAt = student.CreatedAt,
+                UpdatedAt = student.UpdatedAt,
+                AvatarUrl = account?.AvatarUrl
+            };
+
+            return HandleResult(dto, "Lấy thông tin sinh viên thành công");
         }
 
         [HttpPost]
@@ -128,3 +193,4 @@ namespace e360_clone.Controllers
         }
     }
 }
+

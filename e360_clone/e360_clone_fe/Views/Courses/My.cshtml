@@ -1,0 +1,85 @@
+@model e360_clone_fe.Models.ViewModels.MyCoursesPageViewModel
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">My Courses</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Teacher</li>
+                        <li class="breadcrumb-item active" aria-current="page">My Courses</li>
+                    </ul>
+                </nav>
+                <p class="text-secondary-light mt-2">Giảng viên: @Model.LecturerName</p>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table bordered-table mb-0">
+                        <thead class="bg-neutral-100">
+                            <tr>
+                                <th>Môn học</th>
+                                <th>Năm học</th>
+                                <th>Học kỳ</th>
+                                <th>Lớp đang dạy</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Courses.Any())
+                            {
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">@course.SubjectCode - @course.SubjectName</div>
+                                        </td>
+                                        <td>@course.AcademicYear</td>
+                                        <td>@course.Semester</td>
+                                        <td>
+                                            <span class="badge bg-primary-100 text-primary-600">@course.ClassCode</span>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-primary-600"
+                                               asp-controller="Students"
+                                               asp-action="Index"
+                                               asp-route-classId="@course.ClassId">
+                                                Xem
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
+                                        <p class="text-muted mt-2">Chưa có phân công giảng dạy</p>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

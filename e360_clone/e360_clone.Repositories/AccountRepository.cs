@@ -47,6 +47,11 @@ namespace e360_clone.Repositories
             return await _accountDao.GetByRoleAsync(role);
         }
 
+        public async Task<IEnumerable<Account>> GetByStudentIdsAsync(IEnumerable<int> studentIds)
+        {
+            return await _accountDao.GetByStudentIdsAsync(studentIds);
+        }
+
         public async Task<IEnumerable<Account>> GetActiveAccountsAsync()
         {
             return await _accountDao.GetActiveAccountsAsync();

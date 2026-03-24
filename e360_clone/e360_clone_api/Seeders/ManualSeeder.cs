@@ -19,9 +19,12 @@ namespace e360_clone.Seeders
 
             await SeedAccountsAsync(context);
             await SeedSubjectsAsync(context);
+            await SeedLecturersAsync(context);
+            await SeedLecturerAccountsAsync(context);
             await SeedStudentsAsync(context);
             await SeedStudentAccountsAsync(context);
             await SeedStudentSubjectsAsync(context);
+            await SeedTeachingAssignmentsAsync(context);
             await SeedExamSchedulesAsync(context);
             await SeedStudentExamsAsync(context);
             await AllocateExamRoomsAsync(context);
@@ -257,6 +260,110 @@ namespace e360_clone.Seeders
             Console.WriteLine($"Seeded/updated {seeds.Count} subjects.");
         }
 
+        private static async Task SeedLecturersAsync(AppDbContext context)
+        {
+            if (await context.Lecturers.AnyAsync())
+            {
+                Console.WriteLine($"Database already has {await context.Lecturers.CountAsync()} lecturers.");
+                return;
+            }
+
+            Console.WriteLine("Seeding lecturers...");
+            var faker = new Faker("vi");
+            var genderValues = new[] { "Nam", "Nữ" };
+
+            var lecturers = new List<Lecturer>();
+            for (var i = 1; i <= 12; i++)
+            {
+                var code = $"GV{i:0000}";
+                var gender = faker.PickRandom(genderValues);
+                var dob = faker.Date.Between(DateTime.Today.AddYears(-50), DateTime.Today.AddYears(-28)).Date;
+
+                lecturers.Add(new Lecturer
+                {
+                    EmployeeCode = code,
+                    FullName = faker.Name.FullName(),
+                    Gender = gender,
+                    DateOfBirth = DateTime.SpecifyKind(dob, DateTimeKind.Utc),
+                    Email = $"{code.ToLowerInvariant()}@fpt.edu.vn",
+                    PhoneNumber = faker.Random.ReplaceNumbers("0#########"),
+                    Department = faker.PickRandom(new[] { "Software Engineering", "AI", "Business", "Design", "Language" }),
+                    Position = faker.PickRandom(new[] { "Lecturer", "Senior Lecturer" }),
+                    Status = "Active",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+
+            await context.Lecturers.AddRangeAsync(lecturers);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"Seeded {lecturers.Count} lecturers.");
+        }
+
+        private static async Task SeedLecturerAccountsAsync(AppDbContext context)
+        {
+            var lecturers = await context.Lecturers.AsNoTracking().ToListAsync();
+            if (lecturers.Count == 0)
+            {
+                Console.WriteLine("No lecturers found. Skip lecturer account seeding.");
+                return;
+            }
+
+            var accounts = await context.Accounts.ToListAsync();
+            var passwordHash = PasswordHelper.HashPassword("123456");
+
+            var byUsername = accounts.ToDictionary(a => a.Username, a => a);
+            var byEmail = accounts.ToDictionary(a => a.Email, a => a);
+
+            var teacherAccounts = accounts.Where(a => a.Role == "Teacher").ToList();
+            var firstLecturer = lecturers.FirstOrDefault();
+            if (firstLecturer != null)
+            {
+                var primaryTeacher = teacherAccounts.FirstOrDefault();
+                if (primaryTeacher != null && primaryTeacher.LecturerId == null)
+                {
+                    primaryTeacher.LecturerId = firstLecturer.Id;
+                    primaryTeacher.FullName = firstLecturer.FullName;
+                    primaryTeacher.Email = firstLecturer.Email;
+                    primaryTeacher.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var toAdd = new List<Account>();
+            foreach (var lecturer in lecturers)
+            {
+                if (accounts.Any(a => a.LecturerId == lecturer.Id))
+                    continue;
+
+                var username = lecturer.EmployeeCode.ToLowerInvariant();
+                if (byUsername.ContainsKey(username) || byEmail.ContainsKey(lecturer.Email))
+                    continue;
+
+                var account = new Account
+                {
+                    Username = username,
+                    Email = lecturer.Email,
+                    PasswordHash = passwordHash,
+                    Role = "Teacher",
+                    FullName = lecturer.FullName,
+                    PhoneNumber = lecturer.PhoneNumber,
+                    Status = "Active",
+                    LecturerId = lecturer.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+                toAdd.Add(account);
+                byUsername[username] = account;
+                byEmail[lecturer.Email] = account;
+            }
+
+            if (toAdd.Count > 0)
+            {
+                await context.Accounts.AddRangeAsync(toAdd);
+            }
+
+            await context.SaveChangesAsync();
+            Console.WriteLine($"Seeded {toAdd.Count} lecturer accounts.");
+        }
+
         private static async Task SeedStudentSubjectsAsync(AppDbContext context)
         {
             var subjects = await context.Subjects.AsNoTracking().ToListAsync();
@@ -338,6 +445,84 @@ namespace e360_clone.Seeders
             else
             {
                 Console.WriteLine("No new student-subject enrollments to seed.");
+            }
+        }
+
+        private static async Task SeedTeachingAssignmentsAsync(AppDbContext context)
+        {
+            var lecturers = await context.Lecturers.AsNoTracking().ToListAsync();
+            var classes = await context.Classes.AsNoTracking().ToListAsync();
+            var subjects = await context.Subjects.AsNoTracking().ToListAsync();
+            var majors = await context.Majors.AsNoTracking().ToDictionaryAsync(m => m.Id, m => m.MajorCode);
+
+            if (lecturers.Count == 0 || classes.Count == 0 || subjects.Count == 0)
+            {
+                Console.WriteLine("Missing lecturers/classes/subjects. Skip teaching assignment seeding.");
+                return;
+            }
+
+            var subjectByCode = subjects.ToDictionary(s => s.SubjectCode, s => s.Id);
+            var existing = await context.TeachingAssignments
+                .Select(t => new { t.LecturerId, t.SubjectId, t.ClassId, t.Semester })
+                .ToListAsync();
+            var existingSet = new HashSet<(int LecturerId, int SubjectId, int ClassId, string Semester)>(
+                existing.Select(x => (x.LecturerId, x.SubjectId, x.ClassId, x.Semester)));
+
+            var rand = new Random();
+            var toAdd = new List<TeachingAssignment>();
+
+            foreach (var lecturer in lecturers)
+            {
+                var assignedClasses = classes.OrderBy(_ => rand.Next()).Take(3).ToList();
+                foreach (var cls in assignedClasses)
+                {
+                    if (!majors.TryGetValue(cls.MajorId, out var majorCode))
+                        continue;
+
+                    var subjectCodes = ResolveSubjectCodesForMajor(majorCode)
+                        .Where(code => subjectByCode.ContainsKey(code))
+                        .ToList();
+                    if (subjectCodes.Count == 0)
+                        continue;
+
+                    var takeCount = Math.Min(subjectCodes.Count, 2);
+                    var selected = subjectCodes.OrderBy(_ => rand.Next()).Take(takeCount);
+
+                    foreach (var code in selected)
+                    {
+                        var subjectId = subjectByCode[code];
+                        var semester = cls.Semester > 0 ? cls.Semester.ToString() : "1";
+
+                        var key = (lecturer.Id, subjectId, cls.Id, semester);
+                        if (existingSet.Contains(key))
+                            continue;
+
+                        toAdd.Add(new TeachingAssignment
+                        {
+                            LecturerId = lecturer.Id,
+                            SubjectId = subjectId,
+                            ClassId = cls.Id,
+                            AcademicYear = string.IsNullOrWhiteSpace(cls.AcademicYear)
+                                ? $"{DateTime.UtcNow.Year}-{DateTime.UtcNow.Year + 1}"
+                                : cls.AcademicYear,
+                            Semester = semester,
+                            Status = "Active",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        existingSet.Add(key);
+                    }
+                }
+            }
+
+            if (toAdd.Count > 0)
+            {
+                await context.TeachingAssignments.AddRangeAsync(toAdd);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"Seeded {toAdd.Count} teaching assignments.");
+            }
+            else
+            {
+                Console.WriteLine("No new teaching assignments to seed.");
             }
         }
 

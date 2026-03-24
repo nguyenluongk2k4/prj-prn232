@@ -86,7 +86,9 @@ namespace e360_clone.Controllers
                     Email = account.Email,
                     FullName = account.FullName ?? account.Username,
                     Role = account.Role,
-                    AvatarUrl = account.AvatarUrl
+                    AvatarUrl = account.AvatarUrl,
+                    LecturerId = account.LecturerId,
+                    StudentId = account.StudentId
                 }
             });
         }
@@ -183,7 +185,9 @@ namespace e360_clone.Controllers
                 FullName = account.FullName ?? account.Username,
                 Role = account.Role,
                 AvatarUrl = account.AvatarUrl,
-                Status = account.Status
+                Status = account.Status,
+                LecturerId = account.LecturerId,
+                StudentId = account.StudentId
             }, "Lấy thông tin người dùng thành công");
         }
 
@@ -255,6 +259,8 @@ namespace e360_clone.Controllers
         public string FullName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
+        public int? LecturerId { get; set; }
+        public int? StudentId { get; set; }
     }
 
     public class UserProfileResponse
@@ -266,5 +272,9 @@ namespace e360_clone.Controllers
         public string Role { get; set; } = string.Empty;
         public string? AvatarUrl { get; set; }
         public string? Status { get; set; }
+        public int? LecturerId { get; set; }
+        public int? StudentId { get; set; }
     }
 }
+
+

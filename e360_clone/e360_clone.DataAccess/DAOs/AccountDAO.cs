@@ -68,6 +68,22 @@ namespace e360_clone.DataAccess.DAOs
         }
 
         /// <summary>
+        /// Get accounts by student IDs
+        /// </summary>
+        public async Task<IEnumerable<Account>> GetByStudentIdsAsync(IEnumerable<int> studentIds)
+        {
+            var ids = studentIds.Distinct().ToList();
+            if (ids.Count == 0)
+            {
+                return new List<Account>();
+            }
+
+            return await _dbSet
+                .Where(a => a.StudentId.HasValue && ids.Contains(a.StudentId.Value))
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Get active accounts only
         /// </summary>
         public async Task<IEnumerable<Account>> GetActiveAccountsAsync()

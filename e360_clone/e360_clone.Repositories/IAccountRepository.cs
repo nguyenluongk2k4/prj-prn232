@@ -39,6 +39,11 @@ namespace e360_clone.Repositories
         Task<IEnumerable<Account>> GetByRoleAsync(string role);
 
         /// <summary>
+        /// Get accounts by student IDs
+        /// </summary>
+        Task<IEnumerable<Account>> GetByStudentIdsAsync(IEnumerable<int> studentIds);
+
+        /// <summary>
         /// Get active accounts only
         /// </summary>
         Task<IEnumerable<Account>> GetActiveAccountsAsync();

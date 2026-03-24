@@ -45,6 +45,8 @@ namespace e360_clone_fe.Models.ViewModels
         [Display(Name = "Lớp")]
         public int ClassId { get; set; }
 
+        public string? AvatarUrl { get; set; }
+
         [Display(Name = "Trạng thái")]
         public string Status { get; set; } = "Active";
 
@@ -127,6 +129,8 @@ namespace e360_clone_fe.Models.ViewModels
         [Required(ErrorMessage = "Lớp là bắt buộc")]
         public int ClassId { get; set; }
 
+        public string? AvatarUrl { get; set; }
+
         [Display(Name = "Trạng thái")]
         public string Status { get; set; } = "Active";
     }
@@ -175,7 +179,10 @@ namespace e360_clone_fe.Models.ViewModels
         [Required(ErrorMessage = "Lớp là bắt buộc")]
         public int ClassId { get; set; }
 
+        public string? AvatarUrl { get; set; }
+
         [Display(Name = "Trạng thái")]
         public string Status { get; set; } = "Active";
     }
 }
+

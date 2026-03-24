@@ -11,6 +11,9 @@
     var classInfo = Model.Class != null
         ? $"{Model.Class.ClassCode} - {Model.Class.ClassName}"
         : $"Lớp {Model.ClassId}";
+    var avatarSrc = !string.IsNullOrWhiteSpace(Model.AvatarUrl)
+        ? Model.AvatarUrl
+        : "/assets/images/thumbs/student-details-img.png";
 }
 
 <div class="main-content__wrapper">
@@ -43,7 +46,7 @@
                 <div class="d-flex gap-32 flex-md-row flex-column">
                     <div class="max-w-300-px w-100 text-center">
                         <figure class="mb-24 w-120-px h-120-px mx-auto rounded-circle overflow-hidden">
-                            <img src="/assets/images/thumbs/student-details-img.png"
+                            <img src="@avatarSrc"
                                  alt="Student Image"
                                  class="w-100 h-100 object-fit-cover">
                         </figure>
@@ -176,6 +179,7 @@
         </div>
     </div>
 </div>
+
 
 
 

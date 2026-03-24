@@ -21,7 +21,7 @@ namespace e360_clone_fe.Controllers
         /// <summary>
         /// Get all students with pagination and search
         /// </summary>
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string? searchTerm = null)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string? searchTerm = null, int? classId = null)
         {
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
@@ -35,6 +35,11 @@ namespace e360_clone_fe.Controllers
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 queryParams["searchTerm"] = searchTerm;
+            }
+
+            if (classId.HasValue)
+            {
+                queryParams["classId"] = classId.Value.ToString();
             }
 
             var response = await _apiService.GetAsync<List<StudentViewModel>>(ApiEndpoint, queryParams);
@@ -54,6 +59,7 @@ namespace e360_clone_fe.Controllers
                 SearchTerm = searchTerm
             };
 
+            ViewBag.ClassId = classId;
             return View(pagedModel);
         }
 

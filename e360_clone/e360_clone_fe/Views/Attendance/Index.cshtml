@@ -1,0 +1,271 @@
+@model e360_clone_fe.Models.ViewModels.AttendancePageViewModel
+@{
+    ViewData["Title"] = "Điểm danh thi";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Điểm danh thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Attendance</li>
+                        <li class="breadcrumb-item active" aria-current="page">Quản lý</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="card radius-12">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end" id="attendanceFilterForm">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Chọn ngày</label>
+                        <input type="date" name="date" class="form-control" value="@Model.Filter.SelectedDate.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Môn thi</label>
+                        <select name="subjectId" class="form-select">
+                            <option value="">-- Tất cả môn --</option>
+                            @foreach (var subject in Model.Subjects)
+                            {
+                                <option value="@subject.Id" selected="@(Model.Filter.SubjectId == subject.Id)">
+                                    @subject.SubjectCode - @subject.SubjectName
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Tìm sinh viên</label>
+                        <input type="text" name="searchTerm" class="form-control" placeholder="Mã SV / Họ tên / Lớp"
+                               value="@Model.Filter.SearchTerm" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Chọn ca</label>
+                        <select name="startTime" class="form-select" id="slotSelect">
+                            <option value="">-- Chọn ca --</option>
+                            @foreach (var slot in Model.Slots)
+                            {
+                                <option value="@slot.StartTime.ToString("hh\\:mm")"
+                                        data-end="@slot.EndTime.ToString("hh\\:mm")"
+                                        selected="@(Model.Filter.StartTime == slot.StartTime)">
+                                    @slot.StartTime.ToString("hh\\:mm") - @slot.EndTime.ToString("hh\\:mm")
+                                </option>
+                            }
+                        </select>
+                        <input type="hidden" name="endTime" id="endTimeInput" value="@Model.Filter.EndTime?.ToString("hh\\:mm")" />
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-medium">Môn thi trong ca</label>
+                        <select name="examId" class="form-select" id="examSelect" @(Model.Filter.StartTime.HasValue ? "" : "disabled")>
+                            <option value="">@(Model.Filter.StartTime.HasValue ? "-- Chọn môn --" : "Chọn ca trước")</option>
+                            @foreach (var exam in Model.Exams)
+                            {
+                                <option value="@exam.Id" selected="@(Model.Filter.ExamId == exam.Id)">
+                                    @exam.DisplayName
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-12 d-flex gap-12">
+                        <button type="submit" class="btn btn-primary-600">
+                            <i class="ri-search-line"></i> Lọc dữ liệu
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="exportBtn">
+                            <i class="ri-file-excel-2-line"></i> Xuất Excel
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-24">
+            <div class="card h-100">
+                <div class="card-header border-bottom bg-base py-16 px-24">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-12">
+                        <div>
+                            <h6 class="text-lg fw-semibold mb-0">Danh sách điểm danh</h6>
+                            <span class="text-secondary-light text-sm">
+                                @if (Model.Filter.StartTime.HasValue && Model.Filter.EndTime.HasValue)
+                                {
+                                    <text>@Model.Filter.StartTime:hh\:mm - @Model.Filter.EndTime:hh\:mm</text>
+                                }
+                                else
+                                {
+                                    <text>Chọn ca thi để xem danh sách</text>
+                                }
+                            </span>
+                        </div>
+                        <div class="text-secondary-light text-sm">
+                            Dùng bộ lọc phía trên và bấm “Lọc dữ liệu” để tải danh sách.
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Filter.ExamId.HasValue && Model.Roster.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table bordered-table mb-0">
+                                <thead class="bg-neutral-100">
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Ảnh</th>
+                                        <th>Mã SV</th>
+                                        <th>Họ tên</th>
+                                        <th>Lớp</th>
+                                        <th>Trạng thái</th>
+                                        <th>Đã ký</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        var index = 1;
+                                    }
+                                    @foreach (var student in Model.Roster)
+                                    {
+                                        var initials = string.Join("", student.FullName
+                                            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                            .TakeLast(2)
+                                            .Select(s => s[0])).ToUpperInvariant();
+                                        <tr>
+                                            <td>@index</td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center bg-neutral-200 rounded-circle"
+                                                     style="width:36px;height:36px;font-weight:600;">
+                                                    @initials
+                                                </div>
+                                            </td>
+                                            <td>@student.StudentCode</td>
+                                            <td>
+                                                <a class="text-primary-600 fw-semibold" href="/Students/Details/@student.StudentId">
+                                                    @student.FullName
+                                                </a>
+                                            </td>
+                                            <td>@student.ClassCode</td>
+                                            <td>
+                                                <select class="form-select form-select-sm" name="status" form="att-form-@student.AttendanceId">
+                                                    <option value="Pending" selected="@(student.Status == "Pending")">Pending</option>
+                                                    <option value="Present" selected="@(student.Status == "Present")">Present</option>
+                                                    <option value="Absent" selected="@(student.Status == "Absent")">Absent</option>
+                                                    <option value="Late" selected="@(student.Status == "Late")">Late</option>
+                                                    <option value="Excused" selected="@(student.Status == "Excused")">Excused</option>
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="studentConfirmed" form="att-form-@student.AttendanceId"
+                                                       value="true" @(student.StudentConfirmed ? "checked" : "") />
+                                            </td>
+                                            <td>
+                                                <form id="att-form-@student.AttendanceId" asp-action="Update" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="attendanceId" value="@student.AttendanceId" />
+                                                    <input type="hidden" name="examId" value="@student.ExamId" />
+                                                    <input type="hidden" name="studentId" value="@student.StudentId" />
+                                                    <input type="hidden" name="checkInTime" value="@(student.CheckInTime?.ToString("o") ?? string.Empty)" />
+                                                    <input type="hidden" name="checkOutTime" value="@(student.CheckOutTime?.ToString("o") ?? string.Empty)" />
+                                                    <input type="hidden" name="violation" value="@student.Violation" />
+                                                    <input type="hidden" name="notes" value="" />
+                                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">Lưu</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="ri-calendar-check-line text-muted" style="font-size: 48px;"></i>
+                            <p class="text-muted mt-2">Chọn ca thi và môn/phòng để xem danh sách sinh viên</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const slotSelect = document.getElementById('slotSelect');
+            const endTimeInput = document.getElementById('endTimeInput');
+            const exportBtn = document.getElementById('exportBtn');
+            const filterForm = document.getElementById('attendanceFilterForm');
+            const examSelect = document.getElementById('examSelect');
+            if (!slotSelect || !endTimeInput) return;
+
+            const syncEndTime = () => {
+                const selected = slotSelect.options[slotSelect.selectedIndex];
+                const end = selected?.getAttribute('data-end') || '';
+                endTimeInput.value = end;
+            };
+
+            syncEndTime();
+            slotSelect.addEventListener('change', async () => {
+                syncEndTime();
+                if (!examSelect) return;
+
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData);
+                params.delete('examId');
+                const url = `/Attendance/ExamOptions?${params.toString()}`;
+
+                examSelect.disabled = true;
+                examSelect.innerHTML = '<option value="">Đang tải...</option>';
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        examSelect.innerHTML = '<option value="">Không tải được môn</option>';
+                        return;
+                    }
+                    const data = await response.json();
+                    examSelect.innerHTML = '<option value="">-- Chọn môn --</option>';
+                    data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.textContent = item.displayName;
+                        examSelect.appendChild(opt);
+                    });
+                } catch (e) {
+                    examSelect.innerHTML = '<option value="">Không tải được môn</option>';
+                } finally {
+                    examSelect.disabled = false;
+                }
+            });
+
+            exportBtn?.addEventListener('click', () => {
+                if (!filterForm) return;
+                const params = new URLSearchParams(new FormData(filterForm));
+                window.location.href = `/Attendance/Export?${params.toString()}`;
+            });
+        });
+    </script>
+}
