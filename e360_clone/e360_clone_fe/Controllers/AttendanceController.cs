@@ -36,10 +36,104 @@ namespace e360_clone_fe.Controllers
             var selectedDate = (date ?? DateTime.Today).Date;
             var selectedStart = ParseTime(startTime);
             var selectedEnd = ParseTime(endTime);
+            if (examId.HasValue && examId.Value <= 0) examId = null;
+            if (selectedStart.HasValue && selectedStart.Value == default) selectedStart = null;
+            if (selectedEnd.HasValue && selectedEnd.Value == default) selectedEnd = null;
+
+            var role = HttpContext.Session.GetString("Role");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            var autoSelected = false;
+            List<ProctorAssignmentListItemViewModel> lecturerAssignments = new();
+            if (!examId.HasValue && IsTeacherLike(role, lecturerId))
+            {
+                var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentListItemViewModel>>(
+                    "proctors",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (proctorResponse.Success && proctorResponse.Data != null)
+                {
+                    var now = DateTime.Now;
+                    lecturerAssignments = proctorResponse.Data
+                        .Where(p => p.LecturerId == lecturerId.Value)
+                        .ToList();
+
+                    if (lecturerAssignments.Count > 0)
+                    {
+                        var sameDate = lecturerAssignments
+                            .Where(a => a.ExamDate.Date == selectedDate)
+                            .ToList();
+
+                        var ongoing = sameDate.FirstOrDefault(a =>
+                            selectedDate == now.Date &&
+                            now.TimeOfDay >= a.StartTime &&
+                            now.TimeOfDay <= a.EndTime);
+
+                        var next = ongoing != null
+                            ? new { Item = ongoing, DateTime = ongoing.ExamDate.Date + ongoing.StartTime }
+                            : (sameDate.Count > 0
+                                ? sameDate
+                                    .Select(a => new { Item = a, DateTime = a.ExamDate.Date + a.StartTime })
+                                    .OrderBy(x => x.DateTime)
+                                    .FirstOrDefault()
+                                : lecturerAssignments
+                                    .Select(a => new { Item = a, DateTime = a.ExamDate.Date + a.StartTime })
+                                    .OrderBy(x => x.DateTime >= now ? 0 : 1)
+                                    .ThenBy(x => x.DateTime >= now ? x.DateTime : now.AddTicks(-x.DateTime.Ticks))
+                                    .FirstOrDefault());
+
+                        if (next != null && next.Item.ExamDate > DateTime.MinValue && next.Item.StartTime != default && next.Item.EndTime != default)
+                        {
+                            examId = next.Item.ExamId;
+                            selectedDate = next.Item.ExamDate.Date;
+                            selectedStart = next.Item.StartTime;
+                            selectedEnd = next.Item.EndTime;
+                            autoSelected = true;
+                        }
+                    }
+                }
+            }
+
+            if (autoSelected)
+            {
+                return RedirectToAction(nameof(Index), new
+                {
+                    date = selectedDate.ToString("yyyy-MM-dd"),
+                    startTime = selectedStart?.ToString("hh\\:mm"),
+                    endTime = selectedEnd?.ToString("hh\\:mm"),
+                    examId
+                });
+            }
 
             var exams = await LoadExamsAsync();
             var subjects = await LoadSubjectsAsync();
             var classes = await LoadClassesAsync();
+
+            if (IsTeacherLike(role, lecturerId))
+            {
+                if (lecturerAssignments.Count == 0)
+                {
+                    var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentListItemViewModel>>(
+                        "proctors",
+                        new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                    if (proctorResponse.Success && proctorResponse.Data != null)
+                    {
+                        lecturerAssignments = proctorResponse.Data
+                            .Where(p => p.LecturerId == lecturerId.Value)
+                            .ToList();
+                    }
+                }
+
+                if (lecturerAssignments.Count > 0)
+                {
+                    var assignedExamIds = lecturerAssignments.Select(x => x.ExamId).ToHashSet();
+                    exams = exams.Where(e => assignedExamIds.Contains(e.Id)).ToList();
+                    if (examId.HasValue && !assignedExamIds.Contains(examId.Value))
+                    {
+                        examId = null;
+                    }
+                }
+            }
 
             var slots = BuildSlots(exams, selectedDate, subjectId);
             var examOptions = BuildExamOptions(exams, subjects, classes, selectedDate, subjectId, selectedStart, selectedEnd);
@@ -91,6 +185,12 @@ namespace e360_clone_fe.Controllers
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
 
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.Equals(role, "Student", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var studentId = HttpContext.Session.GetInt32("StudentId");
             if (!studentId.HasValue)
             {
@@ -114,6 +214,15 @@ namespace e360_clone_fe.Controllers
             };
 
             return View("Student", model);
+        }
+
+        [HttpGet]
+        public IActionResult Take(DateTime? date)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            return RedirectToAction(nameof(My), new { date = date?.ToString("yyyy-MM-dd") });
         }
 
         [HttpPost]
@@ -198,8 +307,61 @@ namespace e360_clone_fe.Controllers
             var subjects = await LoadSubjectsAsync();
             var classes = await LoadClassesAsync();
 
+            var role = HttpContext.Session.GetString("Role");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (IsTeacherLike(role, lecturerId))
+            {
+                var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentListItemViewModel>>(
+                    "proctors",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (proctorResponse.Success && proctorResponse.Data != null)
+                {
+                    var assignedExamIds = proctorResponse.Data
+                        .Where(p => p.LecturerId == lecturerId!.Value)
+                        .Select(p => p.ExamId)
+                        .ToHashSet();
+                    exams = exams.Where(e => assignedExamIds.Contains(e.Id)).ToList();
+                }
+            }
+
             var examOptions = BuildExamOptions(exams, subjects, classes, selectedDate, subjectId, selectedStart, selectedEnd);
             return Ok(examOptions);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SlotOptions(DateTime? date, int? subjectId)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var selectedDate = (date ?? DateTime.Today).Date;
+            var exams = await LoadExamsAsync();
+
+            var role = HttpContext.Session.GetString("Role");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (IsTeacherLike(role, lecturerId))
+            {
+                var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentListItemViewModel>>(
+                    "proctors",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (proctorResponse.Success && proctorResponse.Data != null)
+                {
+                    var assignedExamIds = proctorResponse.Data
+                        .Where(p => p.LecturerId == lecturerId!.Value)
+                        .Select(p => p.ExamId)
+                        .ToHashSet();
+                    exams = exams.Where(e => assignedExamIds.Contains(e.Id)).ToList();
+                }
+            }
+
+            var slots = BuildSlots(exams, selectedDate, subjectId);
+            return Ok(slots.Select(s => new
+            {
+                startTime = s.StartTime.ToString("hh\\:mm"),
+                endTime = s.EndTime.ToString("hh\\:mm")
+            }));
         }
 
         [HttpPost]
@@ -255,6 +417,68 @@ namespace e360_clone_fe.Controllers
                 return Redirect(returnUrl);
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BulkPresent(int examId, string? returnUrl)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            if (examId <= 0)
+            {
+                TempData["ErrorMessage"] = "Chưa chọn ca thi.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var rosterResponse = await _apiService.GetAsync<List<AttendanceRosterItemViewModel>>(
+                $"{AttendanceEndpoint}/roster",
+                new Dictionary<string, string> { { "examId", examId.ToString() } });
+
+            if (!rosterResponse.Success || rosterResponse.Data == null)
+            {
+                TempData["ErrorMessage"] = rosterResponse.Message;
+                return RedirectToAction(nameof(Index), new { examId });
+            }
+
+            var pending = rosterResponse.Data.Where(r => r.Status == "Pending").ToList();
+            var updated = 0;
+            foreach (var item in pending)
+            {
+                var payload = new
+                {
+                    Id = item.AttendanceId,
+                    ExamId = examId,
+                    StudentId = item.StudentId,
+                    Status = "Present",
+                    CheckInTime = item.CheckInTime,
+                    CheckOutTime = item.CheckOutTime,
+                    Notes = item.Notes ?? string.Empty,
+                    Violation = item.Violation ?? string.Empty,
+                    StudentConfirmed = item.StudentConfirmed,
+                    StudentConfirmedAt = item.StudentConfirmedAt
+                };
+
+                var response = await _apiService.PutAsync<object>($"{AttendanceEndpoint}/{item.AttendanceId}", payload);
+                if (response.Success) updated++;
+            }
+
+            TempData["SuccessMessage"] = $"Đã cập nhật {updated} sinh viên sang Present.";
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(Index), new { examId });
+        }
+
+        [HttpGet]
+        public IActionResult BulkPresent()
+        {
+            TempData["ErrorMessage"] = "Vui lòng dùng nút 'Chuyển Pending → Present' trong trang điểm danh.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -542,6 +766,19 @@ namespace e360_clone_fe.Controllers
                     };
                 })
                 .ToList();
+        }
+
+        private static bool IsTeacherLike(string? role, int? lecturerId)
+        {
+            if (!lecturerId.HasValue) return false;
+            if (string.IsNullOrWhiteSpace(role)) return true;
+            if (role.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                role.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+                role.Equals("Staff", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return true;
         }
 
         private async Task<List<ExamViewModel>> LoadExamsAsync()

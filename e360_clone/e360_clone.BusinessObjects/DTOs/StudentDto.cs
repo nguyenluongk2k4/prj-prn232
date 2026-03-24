@@ -1,4 +1,4 @@
-namespace e360_clone.Models
+namespace e360_clone.BusinessObjects.DTOs
 {
     public class StudentDto
     {

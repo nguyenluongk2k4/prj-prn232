@@ -1,5 +1,5 @@
 using e360_clone.BusinessObjects;
-using e360_clone.Models;
+using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
 

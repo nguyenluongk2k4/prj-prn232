@@ -95,15 +95,6 @@
                         <button type="button" class="btn btn-outline-primary" id="exportBtn">
                             <i class="ri-file-excel-2-line"></i> Xuất Excel
                         </button>
-                        <form asp-action="BulkPresent" method="post" class="m-0">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="examId" value="@(Model.Filter.ExamId ?? 0)" />
-                            <input type="hidden" name="returnUrl" value="@returnUrl" />
-                            
-                            <button type="submit" class="btn btn-outline-primary" @(Model.Filter.ExamId.HasValue ? "" : "disabled")>
-                                Điểm danh tất cả
-                            </button>
-                        </form>
                         <a asp-action="Index" class="btn btn-outline-secondary">Xóa lọc</a>
                     </div>
                 </form>
@@ -208,8 +199,10 @@
                                                 </select>
                                             </td>
                                             <td class="text-center">
-                                                <span class="js-confirm-icon text-success-600" style="display:@(student.StudentConfirmed ? "inline" : "none");">✓</span>
-                                                <span class="js-unconfirm-icon text-neutral-400" style="display:@(student.StudentConfirmed ? "none" : "inline");">✗</span>
+                                                <div class="d-flex align-items-center justify-content-center gap-6">
+                                                    <i class="ri-check-line text-success-600 js-confirm-icon" style="display:@(student.StudentConfirmed ? "inline" : "none");"></i>
+                                                    <i class="ri-close-line text-neutral-400 js-unconfirm-icon" style="display:@(student.StudentConfirmed ? "none" : "inline");"></i>
+                                                </div>
                                             </td>
                                             <td>
                                                 <form id="att-form-@student.AttendanceId" asp-action="Update" method="post">
@@ -292,8 +285,10 @@
                                                 </select>
                                             </td>
                                             <td class="text-center">
-                                                <span class="js-confirm-icon text-success-600" style="display:@(student.StudentConfirmed ? "inline" : "none");">✓</span>
-                                                <span class="js-unconfirm-icon text-neutral-400" style="display:@(student.StudentConfirmed ? "none" : "inline");">✗</span>
+                                                <div class="d-flex align-items-center justify-content-center gap-6">
+                                                    <i class="ri-check-line text-success-600 js-confirm-icon" style="display:@(student.StudentConfirmed ? "inline" : "none");"></i>
+                                                    <i class="ri-close-line text-neutral-400 js-unconfirm-icon" style="display:@(student.StudentConfirmed ? "none" : "inline");"></i>
+                                                </div>
                                             </td>
                                             <td>
                                                 <form id="att-form-@student.AttendanceId" asp-action="Update" method="post">

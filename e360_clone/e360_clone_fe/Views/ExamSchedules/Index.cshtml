@@ -20,7 +20,7 @@
     var calendarEvents = useCalendar
         ? Model.CalendarItems.Select(item => new
         {
-            title = $"{item.SubjectCode} - {item.ClassCode}",
+            title = $"{item.SubjectCode} - {item.RoomCode}",
             start = $"{item.ExamDate:yyyy-MM-dd}T{fmtTime(item.StartTime)}",
             end = $"{item.ExamDate:yyyy-MM-dd}T{fmtTime(item.EndTime)}",
             allDay = false,
@@ -456,7 +456,7 @@
                                                 return `${h}:${mm}`;
                                             };
                                             const evts = payload.data.map(item => ({
-                                                title: `${item.subjectCode} - ${item.classCode}`,
+                                                title: `${item.subjectCode} - ${item.roomCode}`,
                                                 start: `${item.examDate.split('T')[0]}T${fmt(item.startTime)}`,
                                                 end: `${item.examDate.split('T')[0]}T${fmt(item.endTime)}`,
                                                 allDay: false,
