@@ -9,11 +9,16 @@ namespace e360_clone.Controllers
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IAccountRepository _accountRepository;
+        private readonly IStudentSubjectRepository _studentSubjectRepository;
 
-        public StudentsController(IStudentRepository studentRepository, IAccountRepository accountRepository)
+        public StudentsController(
+            IStudentRepository studentRepository,
+            IAccountRepository accountRepository,
+            IStudentSubjectRepository studentSubjectRepository)
         {
             _studentRepository = studentRepository;
             _accountRepository = accountRepository;
+            _studentSubjectRepository = studentSubjectRepository;
         }
 
         [HttpGet]
@@ -128,6 +133,89 @@ namespace e360_clone.Controllers
             };
 
             return HandleResult(dto, "Lấy thông tin sinh viên thành công");
+        }
+
+        [HttpGet("by-subject")]
+        public async Task<IActionResult> GetBySubject([FromQuery] PagedRequest request, [FromQuery] int subjectId, [FromQuery] int? classId)
+        {
+            if (subjectId <= 0)
+            {
+                return BadRequest(new ApiResponse<List<StudentDto>>
+                {
+                    Success = false,
+                    Message = "SubjectId không hợp lệ",
+                    Data = new List<StudentDto>()
+                });
+            }
+
+            var term = request.SearchTerm?.Trim();
+            Func<IQueryable<Student>, IOrderedQueryable<Student>> orderBy = q => q.OrderBy(s => s.StudentCode);
+
+            var subjectStudents = await _studentSubjectRepository.FindAsync(s =>
+                s.SubjectId == subjectId && (!classId.HasValue || s.ClassId == classId.Value));
+            var studentIds = subjectStudents.Select(s => s.StudentId).Distinct().ToList();
+
+            IEnumerable<Student> data;
+            int totalRecords;
+
+            if (studentIds.Count == 0)
+            {
+                data = new List<Student>();
+                totalRecords = 0;
+            }
+            else if (!string.IsNullOrEmpty(term))
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => studentIds.Contains(s.Id) && (s.FullName.Contains(term) || s.StudentCode.Contains(term)),
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(
+                    s => studentIds.Contains(s.Id) && (s.FullName.Contains(term) || s.StudentCode.Contains(term)));
+            }
+            else
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => studentIds.Contains(s.Id),
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(s => studentIds.Contains(s.Id));
+            }
+
+            var students = data.ToList();
+            var accounts = await _accountRepository.GetByStudentIdsAsync(students.Select(s => s.Id));
+            var avatarMap = accounts
+                .Where(a => a.StudentId.HasValue)
+                .GroupBy(a => a.StudentId!.Value)
+                .ToDictionary(g => g.Key, g => g.First().AvatarUrl);
+
+            var dtoList = students.Select(s => new StudentDto
+            {
+                Id = s.Id,
+                StudentCode = s.StudentCode,
+                FullName = s.FullName,
+                DateOfBirth = s.DateOfBirth,
+                Gender = s.Gender,
+                Email = s.Email,
+                PhoneNumber = s.PhoneNumber,
+                Address = s.Address,
+                ClassId = s.ClassId,
+                Status = s.Status,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                AvatarUrl = avatarMap.TryGetValue(s.Id, out var avatar) ? avatar : null
+            }).ToList();
+
+            return Ok(new PagedResponse<StudentDto>
+            {
+                Success = true,
+                Message = "Láº¥y danh sÃ¡ch sinh viÃªn theo mÃ´n thÃ nh cÃ´ng",
+                Data = dtoList,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalRecords = totalRecords
+            });
         }
 
         [HttpPost]

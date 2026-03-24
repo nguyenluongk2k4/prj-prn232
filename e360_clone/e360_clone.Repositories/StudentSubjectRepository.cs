@@ -18,5 +18,15 @@ namespace e360_clone.Repositories
                 .Distinct()
                 .ToListAsync();
         }
+
+        public async Task<List<StudentSubject>> GetByStudentIdAsync(int studentId)
+        {
+            return await _dbSet
+                .Include(x => x.Subject)
+                .Include(x => x.Class)
+                .Where(x => x.StudentId == studentId)
+                .OrderBy(x => x.Subject != null ? x.Subject.SubjectCode : string.Empty)
+                .ToListAsync();
+        }
     }
 }

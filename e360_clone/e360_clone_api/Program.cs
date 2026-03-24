@@ -1,6 +1,7 @@
 ﻿
 using e360_clone.DataAccess;
 using e360_clone.Repositories;
+using e360_clone_api.Services;
 using e360_clone.DataAccess.DAOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -55,6 +56,8 @@ namespace e360_clone
             builder.Services.AddScoped<IGradeRepository, GradeRepository>();
             builder.Services.AddScoped<ProctorAssignmentDAO>();
             builder.Services.AddScoped<IProctorAssignmentRepository, ProctorAssignmentRepository>();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");

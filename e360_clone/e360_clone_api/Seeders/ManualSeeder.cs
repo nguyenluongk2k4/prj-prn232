@@ -374,17 +374,71 @@ namespace e360_clone.Seeders
             }
 
             var subjectMap = subjects.ToDictionary(s => s.SubjectCode, s => s.Id);
+            var subjectCodeById = subjects.ToDictionary(s => s.Id, s => s.SubjectCode);
             var majorCodeMap = await context.Majors.AsNoTracking()
                 .ToDictionaryAsync(m => m.Id, m => m.MajorCode);
 
             var classes = await context.Classes.AsNoTracking().ToListAsync();
             var students = await context.Students.AsNoTracking().ToListAsync();
+            var rand = new Random();
+            var classById = classes.ToDictionary(c => c.Id, c => c);
+            var studentById = students.ToDictionary(s => s.Id, s => s);
+
+            var classesByMajorCohort = classes
+                .GroupBy(c => (c.MajorId, Cohort: c.Cohort > 0 ? c.Cohort : ResolveCohort(c)))
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var subjectClassMap = new Dictionary<(int MajorId, int Cohort, string SubjectCode), int>();
+
+            int ResolveClassIdForSubject(int majorId, int cohort, string code, int fallbackClassId)
+            {
+                var classKey = (majorId, cohort, code);
+                if (subjectClassMap.TryGetValue(classKey, out var existingClassId))
+                {
+                    return existingClassId;
+                }
+
+                if (classesByMajorCohort.TryGetValue((majorId, cohort), out var cohortClasses)
+                    && cohortClasses.Count > 0)
+                {
+                    existingClassId = cohortClasses[rand.Next(cohortClasses.Count)].Id;
+                }
+                else
+                {
+                    existingClassId = fallbackClassId;
+                }
+
+                subjectClassMap[classKey] = existingClassId;
+                return existingClassId;
+            }
 
             var existing = await context.StudentSubjects
                 .Select(s => new { s.StudentId, s.SubjectId, s.Semester })
                 .ToListAsync();
             var existingSet = new HashSet<(int StudentId, int SubjectId, int Semester)>(
                 existing.Select(x => (x.StudentId, x.SubjectId, x.Semester)));
+
+            var existingEntities = await context.StudentSubjects.ToListAsync();
+            var updatedExisting = 0;
+            foreach (var enrollment in existingEntities)
+            {
+                if (!studentById.TryGetValue(enrollment.StudentId, out var student))
+                    continue;
+                if (!classById.TryGetValue(student.ClassId, out var studentClass))
+                    continue;
+                if (!subjectCodeById.TryGetValue(enrollment.SubjectId, out var subjectCode))
+                    continue;
+
+                var cohort = studentClass.Cohort > 0 ? studentClass.Cohort : ResolveCohort(studentClass);
+                var classIdForSubject = ResolveClassIdForSubject(studentClass.MajorId, cohort, subjectCode, studentClass.Id);
+
+                if (enrollment.ClassId != classIdForSubject)
+                {
+                    enrollment.ClassId = classIdForSubject;
+                    enrollment.UpdatedAt = DateTime.UtcNow;
+                    updatedExisting++;
+                }
+            }
 
             var semesterDefault = 1;
             var academicYearDefault = $"{DateTime.UtcNow.Year}-{DateTime.UtcNow.Year + 1}";
@@ -405,6 +459,7 @@ namespace e360_clone.Seeders
 
                 var semester = cls.Semester > 0 ? cls.Semester : semesterDefault;
                 var academicYear = string.IsNullOrWhiteSpace(cls.AcademicYear) ? academicYearDefault : cls.AcademicYear;
+                var cohort = cls.Cohort > 0 ? cls.Cohort : ResolveCohort(cls);
 
                 foreach (var student in classStudents)
                 {
@@ -417,11 +472,13 @@ namespace e360_clone.Seeders
                         if (existingSet.Contains(key))
                             continue;
 
+                        var classIdForSubject = ResolveClassIdForSubject(cls.MajorId, cohort, code, cls.Id);
+
                         toAdd.Add(new StudentSubject
                         {
                             StudentId = student.Id,
                             SubjectId = subjectId,
-                            ClassId = cls.Id,
+                            ClassId = classIdForSubject,
                             AcademicYear = academicYear,
                             Semester = semester,
                             Status = "Enrolled",
@@ -439,8 +496,19 @@ namespace e360_clone.Seeders
             if (toAdd.Count > 0)
             {
                 await context.StudentSubjects.AddRangeAsync(toAdd);
+            }
+
+            if (toAdd.Count > 0 || updatedExisting > 0)
+            {
                 await context.SaveChangesAsync();
-                Console.WriteLine($"Seeded {toAdd.Count} student-subject enrollments.");
+                if (toAdd.Count > 0)
+                {
+                    Console.WriteLine($"Seeded {toAdd.Count} student-subject enrollments.");
+                }
+                if (updatedExisting > 0)
+                {
+                    Console.WriteLine($"Updated {updatedExisting} existing student-subject class mappings.");
+                }
             }
             else
             {

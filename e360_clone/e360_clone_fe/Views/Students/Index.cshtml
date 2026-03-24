@@ -17,11 +17,18 @@
                     </ul>
                 </nav>
             </div>
-            <div>
-                <a asp-action="Create" class="btn btn-primary-600">
-                    <i class="ri-add-line"></i> Thêm sinh viên
-                </a>
-            </div>
+            @{
+                var role = Context.Session.GetString("Role") ?? string.Empty;
+                var isAdmin = role.Contains("admin", StringComparison.OrdinalIgnoreCase);
+            }
+            @if (isAdmin)
+            {
+                <div>
+                    <a asp-action="Create" class="btn btn-primary-600">
+                        <i class="ri-add-line"></i> Thêm sinh viên
+                    </a>
+                </div>
+            }
         </div>
     </div>
 

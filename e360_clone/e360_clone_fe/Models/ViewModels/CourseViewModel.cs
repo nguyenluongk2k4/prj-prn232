@@ -14,6 +14,9 @@ namespace e360_clone_fe.Models.ViewModels
     public class MyCoursesPageViewModel
     {
         public string LecturerName { get; set; } = string.Empty;
+        public string StudentName { get; set; } = string.Empty;
+        public string StudentClassCode { get; set; } = string.Empty;
+        public int StudentClassId { get; set; }
         public List<MyCourseItemViewModel> Courses { get; set; } = new();
     }
 }

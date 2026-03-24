@@ -1,0 +1,136 @@
+﻿@model e360_clone_fe.Models.ViewModels.MyGradesPageViewModel
+@{
+    ViewData["Title"] = "My Grades";
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">My Grades</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item">Grades</li>
+                        <li class="breadcrumb-item active" aria-current="page">My Grades</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="content-area p-24">
+        <div class="row g-3">
+            <div class="col-lg-4">
+                <div class="card radius-12 h-100">
+                    <div class="card-body">
+                        <h6 class="mb-3 text-dark fw-semibold">Môn học</h6>
+                        @if (Model.Subjects.Any())
+                        {
+                            <div class="list-group">
+                                @foreach (var subject in Model.Subjects)
+                                {
+                                    var active = Model.SelectedSubjectId == subject.SubjectId ? "active" : string.Empty;
+                                    <a class="list-group-item list-group-item-action @active"
+                                       asp-action="My"
+                                       asp-route-subjectId="@subject.SubjectId">
+                                        <div class="fw-semibold @(active == "active" ? "text-white" : "text-dark")">@subject.SubjectCode</div>
+                                        <div class="text-sm @(active == "active" ? "text-white-50" : "text-secondary-light")">@subject.SubjectName</div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Chưa có môn học</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card radius-12">
+                    <div class="card-body">
+                        @if (Model.SelectedSubject != null)
+                        {
+                            <div class="d-flex align-items-start justify-content-between flex-wrap gap-12 mb-3">
+                                <div>
+                                    <h6 class="mb-1 text-dark fw-semibold">@Model.SelectedSubject.SubjectCode - @Model.SelectedSubject.SubjectName</h6>
+                                    <div class="text-secondary-light">Chi tiết điểm thành phần</div>
+                                </div>
+                            </div>
+
+                            @foreach (var item in Model.SelectedSubject.Items)
+                            {
+                                <div class="border rounded-8 p-16 mb-3">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-2">
+                                        <div class="fw-semibold text-dark">
+                                            Kỳ thi:
+                                            @(item.ExamDate == default ? "-" : item.ExamDate.ToString("dd/MM/yyyy"))
+                                        </div>
+                                        <div class="text-secondary-light">
+                                            @(item.ExamDate == default ? "-" : $"{item.StartTime:hh\\:mm} - {item.EndTime:hh\\:mm}")
+                                        </div>
+                                    </div>
+                                    <div class="text-secondary-light mb-3">Lớp: <span class="text-dark fw-semibold">@(!string.IsNullOrWhiteSpace(item.ClassCode) ? item.ClassCode : "-")</span></div>
+                                    @if (item.Components.Any())
+                                    {
+                                        <div class="table-responsive">
+                                            <table class="table table-sm mb-0">
+                                                <thead>
+                                                    <tr class="text-secondary-light text-sm">
+                                                        <th class="fw-semibold">Đầu điểm</th>
+                                                        <th class="fw-semibold">Tỷ trọng</th>
+                                                        <th class="fw-semibold text-end">Điểm</th>
+                                                        <th class="fw-semibold text-end">Điểm chữ</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var component in item.Components)
+                                                    {
+                                                        <tr>
+                                                            <td class="fw-semibold text-dark">@component.ScoreTypeText</td>
+                                                            <td class="text-secondary-light">@((component.Weight * 100).ToString("0.#"))%</td>
+                                                            <td class="text-end fw-semibold text-dark">
+                                                                @(component.Score.HasValue ? component.Score.Value.ToString("0.##") : "-")
+                                                            </td>
+                                                            <td class="text-end">
+                                                                @if (!string.IsNullOrWhiteSpace(component.LetterGrade))
+                                                                {
+                                                                    <span class="badge bg-neutral-200 text-secondary-light">@component.LetterGrade</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="text-secondary-light">-</span>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">Chưa có điểm</div>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted">Chưa có điểm được công bố</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

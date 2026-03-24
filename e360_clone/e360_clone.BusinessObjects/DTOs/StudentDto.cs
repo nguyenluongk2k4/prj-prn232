@@ -16,4 +16,13 @@ namespace e360_clone.BusinessObjects.DTOs
         public DateTime? UpdatedAt { get; set; }
         public string? AvatarUrl { get; set; }
     }
+
+    public class GradeImportResultDto
+    {
+        public int TotalRows { get; set; }
+        public int Imported { get; set; }
+        public int Updated { get; set; }
+        public int Skipped { get; set; }
+        public List<string> Errors { get; set; } = new();
+    }
 }

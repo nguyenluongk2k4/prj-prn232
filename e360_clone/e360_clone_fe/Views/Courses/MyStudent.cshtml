@@ -11,11 +11,15 @@
                 <nav aria-label="breadcrumb">
                     <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                        <li class="breadcrumb-item">Teacher</li>
+                        <li class="breadcrumb-item">Student</li>
                         <li class="breadcrumb-item active" aria-current="page">My Courses</li>
                     </ul>
                 </nav>
-                <p class="text-secondary-light mt-2">Giảng viên: @Model.LecturerName</p>
+                <p class="text-secondary-light mt-2">Sinh viên: @Model.StudentName</p>
+                @if (!string.IsNullOrWhiteSpace(Model.StudentClassCode))
+                {
+                    <p class="text-secondary-light">Lớp đang học: <span class="fw-semibold">@Model.StudentClassCode</span></p>
+                }
             </div>
         </div>
     </div>
@@ -38,7 +42,7 @@
                                 <th>Môn học</th>
                                 <th>Năm học</th>
                                 <th>Học kỳ</th>
-                                <th>Lớp đang dạy</th>
+                                <th>Lớp học</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
@@ -54,15 +58,28 @@
                                         <td>@course.AcademicYear</td>
                                         <td>@course.Semester</td>
                                         <td>
-                                            <span class="badge bg-primary-100 text-primary-600">@course.ClassCode</span>
+                                            <span class="badge bg-primary-100 text-primary-600">
+                                                @(!string.IsNullOrWhiteSpace(course.ClassCode) ? course.ClassCode : Model.StudentClassCode)
+                                            </span>
                                         </td>
                                         <td>
-                                            <a class="btn btn-sm btn-primary-600"
-                                               asp-controller="Students"
-                                               asp-action="Index"
-                                               asp-route-classId="@course.ClassId">
-                                                Xem
-                                            </a>
+                                            @{
+                                                var targetClassId = course.ClassId > 0 ? course.ClassId : Model.StudentClassId;
+                                            }
+                                            @if (targetClassId > 0)
+                                            {
+                                                <a class="btn btn-sm btn-primary-600"
+                                                   asp-controller="Students"
+                                                   asp-action="Index"
+                                                   asp-route-subjectId="@course.SubjectId"
+                                                   asp-route-classId="@targetClassId">
+                                                    Xem lớp
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Chưa có lớp</span>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -72,7 +89,7 @@
                                 <tr>
                                     <td colspan="5" class="text-center py-4">
                                         <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
-                                        <p class="text-muted mt-2">Chưa có phân công giảng dạy</p>
+                                        <p class="text-muted mt-2">Chưa có môn học</p>
                                     </td>
                                 </tr>
                             }
