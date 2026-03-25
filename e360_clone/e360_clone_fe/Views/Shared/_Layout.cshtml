@@ -13,15 +13,30 @@
 
   <!-- Sidebar - Render based on role -->
   @{
-      var role = Context.Session.GetString("Role") ?? ViewData["Role"]?.ToString();
+      var role = (Context.Session.GetString("Role") ?? ViewData["Role"]?.ToString())?.Trim();
+      var studentId = Context.Session.GetInt32("StudentId");
+      var lecturerId = Context.Session.GetInt32("LecturerId");
+
+      if (string.IsNullOrWhiteSpace(role))
+      {
+          if (studentId.HasValue)
+          {
+              role = "Student";
+          }
+          else if (lecturerId.HasValue)
+          {
+              role = "Teacher";
+          }
+      }
+      var roleKey = role?.ToLowerInvariant();
   }
   @if (!string.IsNullOrEmpty(role))
   {
-      var sidebarName = role switch
+      var sidebarName = roleKey switch
       {
-          "Student" => "_Sidebar-Student",
-          "Teacher" => "_Sidebar-Teacher",
-          "Parent" => "_Sidebar-Parent",
+          "student" => "_Sidebar-Student",
+          "teacher" => "_Sidebar-Teacher",
+          "parent" => "_Sidebar-Parent",
           _ => "_Sidebar-Admin"
       };
       @await Html.PartialAsync(sidebarName)

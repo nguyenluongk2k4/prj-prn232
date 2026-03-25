@@ -40,6 +40,7 @@
 
     public class ExamScheduleCalendarItemViewModel
     {
+        public int ExamId { get; set; }
         public DateTime ExamDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }

@@ -1,51 +1,60 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
+using e360_clone.DataAccess;
+using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace e360_clone.Controllers
 {
     public class ExamsController : BaseApiController
     {
         private readonly IExamRepository _repository;
+        private readonly AppDbContext _context;
+        private readonly ILogger<ExamsController> _logger;
 
-        public ExamsController(IExamRepository repository)
+        public ExamsController(IExamRepository repository, AppDbContext context, ILogger<ExamsController> logger)
         {
             _repository = repository;
+            _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] PagedRequest request,
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate)
         {
             var term = request.SearchTerm?.Trim();
             Func<IQueryable<Exam>, IOrderedQueryable<Exam>> orderBy = q => q.OrderBy(x => x.ExamDate);
 
-            IEnumerable<Exam> data;
-            int totalRecords;
+            var hasFilter = !string.IsNullOrEmpty(term) || fromDate.HasValue || toDate.HasValue;
+            Expression<Func<Exam, bool>>? filter = null;
+            if (hasFilter)
+            {
+                var from = fromDate?.Date;
+                var to = toDate?.Date;
+                filter = x =>
+                    (string.IsNullOrEmpty(term) || x.ExamName.Contains(term) || x.ExamCode.Contains(term)) &&
+                    (!from.HasValue || x.ExamDate.Date >= from.Value) &&
+                    (!to.HasValue || x.ExamDate.Date <= to.Value);
+            }
 
-            if (!string.IsNullOrEmpty(term))
-            {
-                data = await _repository.GetPagedFilteredAsync(
-                    request.PageNumber,
-                    request.PageSize,
-                    x => x.ExamName.Contains(term) || x.ExamCode.Contains(term),
-                    orderBy);
-                totalRecords = await _repository.CountAsync(
-                    x => x.ExamName.Contains(term) || x.ExamCode.Contains(term));
-            }
-            else
-            {
-                data = await _repository.GetPagedFilteredAsync(
-                    request.PageNumber,
-                    request.PageSize,
-                    null,
-                    orderBy);
-                totalRecords = await _repository.CountAsync();
-            }
+            IEnumerable<Exam> data = await _repository.GetPagedFilteredAsync(
+                request.PageNumber,
+                request.PageSize,
+                filter,
+                orderBy);
+            var totalRecords = filter == null
+                ? await _repository.CountAsync()
+                : await _repository.CountAsync(filter);
 
             return Ok(new PagedResponse<Exam>
             {
                 Success = true,
-                Message = "Lấy danh sách kỳ thi thành công",
+                Message = "Láº¥y danh sÃ¡ch ká»³ thi thÃ nh cÃ´ng",
                 Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -58,16 +67,175 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
 
-            return HandleResult(item, "Lấy thông tin kỳ thi thành công");
+            return HandleResult(item, "Láº¥y thÃ´ng tin ká»³ thi thÃ nh cÃ´ng");
+        }
+
+        [HttpGet("student")]
+        public async Task<IActionResult> GetByStudent(
+            [FromQuery] int studentId,
+            [FromQuery] string? email,
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate)
+        {
+            try
+            {
+                if (studentId <= 0 && string.IsNullOrWhiteSpace(email))
+                {
+                    return BadRequest(new ApiResponse<List<StudentExamScheduleDto>>
+                    {
+                        Success = false,
+                        Message = "StudentId hoặc email không hợp lệ"
+                    });
+                }
+
+                var from = (fromDate ?? DateTime.UtcNow.Date.AddDays(-7)).Date;
+                var to = (toDate ?? DateTime.UtcNow.Date.AddDays(7)).Date;
+                var fromUtc = DateTime.SpecifyKind(from, DateTimeKind.Utc);
+                var toUtcExclusive = DateTime.SpecifyKind(to.AddDays(1), DateTimeKind.Utc);
+
+                if (studentId <= 0 && !string.IsNullOrWhiteSpace(email))
+                {
+                    studentId = await _context.Accounts
+                        .Where(a => a.Email == email)
+                        .Select(a => a.StudentId)
+                        .Where(id => id.HasValue)
+                        .Select(id => id!.Value)
+                        .FirstOrDefaultAsync();
+                }
+
+                if (studentId <= 0)
+                {
+                    return Ok(new ApiResponse<List<StudentExamScheduleDto>>
+                    {
+                        Success = true,
+                        Message = "Không tìm thấy sinh viên.",
+                        Data = new List<StudentExamScheduleDto>()
+                    });
+                }
+
+                var exams = await _context.ExamRoomAllocations
+                    .Where(alloc => alloc.StudentId == studentId)
+                    .Join(
+                        _context.Exams,
+                        alloc => alloc.ExamId,
+                        e => e.Id,
+                        (alloc, e) => new StudentExamScheduleDto
+                        {
+                            Id = e.Id,
+                            ExamCode = e.ExamCode,
+                            ExamName = e.ExamName,
+                            ExamType = e.ExamType,
+                            SubjectId = e.SubjectId,
+                            ClassId = e.ClassId,
+                            RoomId = alloc.RoomId,
+                            ExamDate = e.ExamDate,
+                            StartTime = e.StartTime,
+                            EndTime = e.EndTime,
+                            Duration = e.Duration,
+                            AcademicYear = e.AcademicYear,
+                            Semester = e.Semester,
+                            Status = e.Status,
+                            Notes = e.Notes,
+                            SeatNumber = alloc.SeatNumber
+                        })
+                    .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
+                    .Distinct()
+                    .OrderBy(e => e.ExamDate)
+                    .ThenBy(e => e.StartTime)
+                    .ToListAsync();
+
+                if (exams.Count == 0)
+                {
+                    exams = await _context.StudentExams
+                        .Where(se => se.StudentId == studentId)
+                        .Join(
+                            _context.Exams,
+                            se => se.ExamId,
+                            e => e.Id,
+                            (se, e) => new StudentExamScheduleDto
+                            {
+                                Id = e.Id,
+                                ExamCode = e.ExamCode,
+                                ExamName = e.ExamName,
+                                ExamType = e.ExamType,
+                                SubjectId = e.SubjectId,
+                                ClassId = e.ClassId,
+                                RoomId = e.RoomId,
+                                ExamDate = e.ExamDate,
+                                StartTime = e.StartTime,
+                                EndTime = e.EndTime,
+                                Duration = e.Duration,
+                                AcademicYear = e.AcademicYear,
+                                Semester = e.Semester,
+                                Status = e.Status,
+                                Notes = e.Notes,
+                                SeatNumber = 0
+                            })
+                        .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
+                        .Distinct()
+                        .OrderBy(e => e.ExamDate)
+                        .ThenBy(e => e.StartTime)
+                        .ToListAsync();
+                }
+
+                if (exams.Count == 0)
+                {
+                    var classId = await _context.Students
+                        .Where(s => s.Id == studentId)
+                        .Select(s => s.ClassId)
+                        .FirstOrDefaultAsync();
+
+                    if (classId > 0)
+                    {
+                        exams = await _context.Exams
+                            .Where(e => e.ClassId == classId)
+                            .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
+                            .Select(e => new StudentExamScheduleDto
+                            {
+                                Id = e.Id,
+                                ExamCode = e.ExamCode,
+                                ExamName = e.ExamName,
+                                ExamType = e.ExamType,
+                                SubjectId = e.SubjectId,
+                                ClassId = e.ClassId,
+                                RoomId = e.RoomId,
+                                ExamDate = e.ExamDate,
+                                StartTime = e.StartTime,
+                                EndTime = e.EndTime,
+                                Duration = e.Duration,
+                                AcademicYear = e.AcademicYear,
+                                Semester = e.Semester,
+                                Status = e.Status,
+                                Notes = e.Notes,
+                                SeatNumber = 0
+                            })
+                            .OrderBy(e => e.ExamDate)
+                            .ThenBy(e => e.StartTime)
+                            .ToListAsync();
+                    }
+                }
+
+                return Ok(new ApiResponse<List<StudentExamScheduleDto>>
+                {
+                    Success = true,
+                    Message = "Lấy lịch thi sinh viên thành công",
+                    Data = exams
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetByStudent failed. studentId={StudentId} email={Email} from={From} to={To}", studentId, email, fromDate, toDate);
+                return HandleError($"GetByStudent failed: {ex.Message}");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Exam exam)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Exam> { Success = false, Message = "Dữ liệu không hợp lệ" });
+                return BadRequest(new ApiResponse<Exam> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
 
             exam.CreatedAt = DateTime.UtcNow;
             await _repository.AddAsync(exam);
@@ -75,7 +243,7 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = exam.Id }, new ApiResponse<Exam>
             {
                 Success = true,
-                Message = "Thêm kỳ thi thành công",
+                Message = "ThÃªm ká»³ thi thÃ nh cÃ´ng",
                 Data = exam
             });
         }
@@ -85,7 +253,7 @@ namespace e360_clone.Controllers
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
 
             existing.ExamCode = exam.ExamCode;
             existing.ExamName = exam.ExamName;
@@ -104,7 +272,7 @@ namespace e360_clone.Controllers
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cập nhật kỳ thi thành công");
+            return HandleResult(existing, "Cáº­p nháº­t ká»³ thi thÃ nh cÃ´ng");
         }
 
         [HttpDelete("{id}")]
@@ -112,10 +280,10 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "Xóa kỳ thi thành công");
+            return HandleResult(true, "XÃ³a ká»³ thi thÃ nh cÃ´ng");
         }
     }
 }

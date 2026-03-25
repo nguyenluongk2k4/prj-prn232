@@ -25,13 +25,9 @@
             end = $"{item.ExamDate:yyyy-MM-dd}T{fmtTime(item.EndTime)}",
             allDay = false,
             className = "info",
-            url = Url.Action(listAction, new
-            {
-                date = item.ExamDate.ToString("yyyy-MM-dd"),
-                subjectId = item.SubjectId,
-                startTime = fmtTime(item.StartTime),
-                endTime = fmtTime(item.EndTime)
-            })
+            url = (ViewData["CalendarTarget"]?.ToString() ?? "Attendance") == "Student"
+                ? Url.Action("MyStudent", "ExamSchedules", new { view = "agendaDay", date = item.ExamDate.ToString("yyyy-MM-dd") })
+                : Url.Action("Index", "Attendance", new { examId = item.ExamId })
         })
         : Enumerable.Empty<object>();
     var calendarColClass = useCalendar ? "col-12" : "col-xxl-9 col-lg-8";
@@ -370,6 +366,8 @@
                 if (!calendarEl.length) return;
                 const defaultView = '@(ViewData["CalendarView"]?.ToString() ?? "agendaWeek")';
                 const baseUrl = '@Url.Action(listAction)';
+                const eventsUrl = '@(ViewData["EventsUrl"]?.ToString() ?? Url.Action("MyEvents", "ExamSchedules"))';
+                const calendarTarget = '@(ViewData["CalendarTarget"]?.ToString() ?? "Attendance")';
                 const serverDate = '@Model.SelectedDate:yyyy-MM-dd';
                 const params = new URLSearchParams(window.location.search);
                 const qsView = params.get('view') || defaultView;
@@ -384,7 +382,7 @@
                     initMonth = now.getMonth();
                     initDay = now.getDate();
                 }
-                window.__examCalState = window.__examCalState || { view: qsView, date: qsDate };
+                let isFetching = false;
 
                 setTimeout(function () {
                     try {
@@ -437,35 +435,43 @@
                                     var d = date.getDate().toString().padStart(2, '0');
                                     var dateStr = y + '-' + m + '-' + d;
 
-                                    var state = window.__examCalState || {};
-                                    if (state.view === viewName && state.date === dateStr) {
-                                        return;
-                                    }
-
-                                    window.__examCalState = { view: viewName, date: dateStr };
-
-                                    var currentParams = new URLSearchParams(window.location.search);
-                                    var currentView = currentParams.get('view');
-                                    var currentDate = currentParams.get('date');
-
-                                    if (viewName === 'agendaWeek') {
-                                        // If week data is not loaded for this date, reload once with date
-                                        if (currentView !== 'agendaWeek' || currentDate !== dateStr) {
-                                            var weekLoadUrl = baseUrl + '?view=agendaWeek&date=' + dateStr;
-                                            window.location = weekLoadUrl;
-                                            return;
-                                        }
-
-                                        // Week data already loaded: keep URL clean (no date)
-                                        var weekUrl = baseUrl + '?view=agendaWeek';
-                                        window.history.replaceState({}, '', weekUrl);
-                                        return;
-                                    }
-
-                                    var url = baseUrl + '?view=' + encodeURIComponent(viewName) + '&date=' + dateStr;
-                                    if (url !== window.location.pathname + window.location.search) {
-                                        window.location = url;
-                                    }
+                                    if (isFetching) return;
+                                    isFetching = true;
+                                    var fetchUrl = eventsUrl + '?view=' + encodeURIComponent(viewName) + '&date=' + dateStr;
+                                    fetch(fetchUrl)
+                                        .then(r => r.json())
+                                        .then(payload => {
+                                            if (!payload || !payload.data) return;
+                                            if (!Array.isArray(payload.data) || payload.data.length === 0) {
+                                                console.warn('Calendar fetch empty, keep existing events');
+                                                return;
+                                            }
+                                            const fmt = (t) => {
+                                                if (!t) return '00:00';
+                                                if (typeof t === 'string') {
+                                                    return t.length >= 5 ? t.slice(0, 5) : t;
+                                                }
+                                                const h = String(t.hours ?? t.Hours ?? 0).padStart(2, '0');
+                                                const mm = String(t.minutes ?? t.Minutes ?? 0).padStart(2, '0');
+                                                return `${h}:${mm}`;
+                                            };
+                                            const evts = payload.data.map(item => ({
+                                                title: `${item.subjectCode} - ${item.classCode}`,
+                                                start: `${item.examDate.split('T')[0]}T${fmt(item.startTime)}`,
+                                                end: `${item.examDate.split('T')[0]}T${fmt(item.endTime)}`,
+                                                allDay: false,
+                                                className: 'info',
+                                                url: calendarTarget === 'Student'
+                                                    ? `/ExamSchedules/MyStudent?view=agendaDay&date=${item.examDate.split('T')[0]}`
+                                                    : `/Attendance?examId=${item.examId}`
+                                            }));
+                                            calendarEl.fullCalendar('removeEvents');
+                                            calendarEl.fullCalendar('addEventSource', evts);
+                                            calendarEl.fullCalendar('refetchEvents');
+                                            calendarEl.fullCalendar('rerenderEvents');
+                                        })
+                                        .catch(err => console.warn('load events failed', err))
+                                        .finally(() => { isFetching = false; });
                                 } catch (e) {
                                     console.warn('Calendar view sync failed', e);
                                 }
@@ -475,6 +481,7 @@
                         calendarEl.fullCalendar('removeEvents');
                         calendarEl.fullCalendar('addEventSource', events);
                         calendarEl.fullCalendar('refetchEvents');
+                        calendarEl.fullCalendar('rerenderEvents');
                         calendarEl.fullCalendar('gotoDate', initYear, initMonth, initDay);
                         console.log('ExamSchedules/My events', events);
                     } catch (e) {

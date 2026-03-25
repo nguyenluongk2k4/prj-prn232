@@ -9,6 +9,7 @@ namespace e360_clone_fe.Models.ViewModels
         public int StudentId { get; set; }
         public string StudentCode { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
         public string ClassCode { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public DateTime? CheckInTime { get; set; }

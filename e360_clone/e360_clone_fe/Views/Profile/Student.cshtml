@@ -1,0 +1,81 @@
+@model e360_clone_fe.Models.ViewModels.StudentProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ sinh viên";
+    var avatarUrl = Context.Session.GetString("AvatarUrl");
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Hồ sơ sinh viên</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Hồ sơ</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        <div class="card h-100">
+            <div class="card-body p-24">
+                <div class="d-flex gap-32 flex-md-row flex-column">
+                    <div class="max-w-300-px w-100 text-center">
+                        <figure class="mb-24 w-120-px h-120-px mx-auto rounded-circle overflow-hidden">
+                            <img src="@(string.IsNullOrWhiteSpace(avatarUrl) ? "/assets/images/thumbs/avatar-img1.png" : avatarUrl)"
+                                 alt="student"
+                                 class="w-100 h-100 object-fit-cover">
+                        </figure>
+                        <h2 class="h6 text-primary-light mb-16 fw-semibold">@Model.Student.FullName</h2>
+                        <p class="mb-0">Mã SV: <span class="text-primary-600 fw-semibold">@Model.Student.StudentCode</span></p>
+                        <p class="mb-0">Lớp: <span class="text-primary-light fw-semibold">@Model.Class?.ClassCode</span></p>
+                        <div class="mt-24 d-flex flex-column gap-8">
+                            <span class="text-sm text-secondary-light">Email</span>
+                            <span class="text-primary-600 fw-semibold">@Model.Student.Email</span>
+                        </div>
+                    </div>
+                    <div class="">
+                        <span class="h-100 w-1-px bg-neutral-200"></span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="pb-16 border-bottom d-flex align-items-center justify-content-between gap-20">
+                            <h3 class="h6 text-primary-light text-lg mb-0 fw-semibold">Thông tin cá nhân</h3>
+                            <span class="@Model.Student.StatusBadgeClass px-16 py-4 radius-4 fw-medium text-sm">
+                                @Model.Student.StatusText
+                            </span>
+                        </div>
+                        <div class="mt-16 d-flex flex-column gap-8">
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Ngày sinh</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Student.DateOfBirth.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Giới tính</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Student.GenderText</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Điện thoại</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.Student.PhoneNumber</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Email</span>
+                                <span class="fw-normal text-sm text-primary-600">: @Model.Student.Email</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Địa chỉ</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Student.Address</span>
+                            </div>
+                            <div class="d-flex gap-4">
+                                <span class="fw-semibold text-sm text-primary-light w-110-px">Lớp</span>
+                                <span class="fw-normal text-sm text-secondary-light">: @Model.Class?.ClassCode - @Model.Class?.ClassName</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,6 +2,8 @@ using e360_clone_fe.Models.ViewModels;
 using e360_clone_fe.Services;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using e360_clone_fe.Hubs;
 
 namespace e360_clone_fe.Controllers
 {
@@ -9,9 +11,15 @@ namespace e360_clone_fe.Controllers
     {
         private const string AttendanceEndpoint = "attendances";
 
-        public AttendanceController(IApiService apiService, ILogger<AttendanceController> logger)
+        private readonly IHubContext<AttendanceHub> _hubContext;
+
+        public AttendanceController(
+            IApiService apiService,
+            ILogger<AttendanceController> logger,
+            IHubContext<AttendanceHub> hubContext)
             : base(apiService, logger)
         {
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index(
@@ -78,6 +86,100 @@ namespace e360_clone_fe.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> My(DateTime? date)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            if (!studentId.HasValue)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy sinh viên cho tài khoản này.";
+                return View("Student", new StudentAttendancePageViewModel());
+            }
+
+            var selectedDate = (date ?? DateTime.Today).Date;
+            var response = await _apiService.GetAsync<List<StudentAttendanceItemViewModel>>(
+                $"{AttendanceEndpoint}/student",
+                new Dictionary<string, string>
+                {
+                    { "studentId", studentId.Value.ToString() },
+                    { "date", selectedDate.ToString("yyyy-MM-dd") }
+                });
+
+            var model = new StudentAttendancePageViewModel
+            {
+                SelectedDate = selectedDate,
+                Items = response.Success && response.Data != null ? response.Data : new List<StudentAttendanceItemViewModel>()
+            };
+
+            return View("Student", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> StudentConfirm(
+            int attendanceId,
+            int examId,
+            bool confirmed,
+            string? returnUrl)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var studentId = HttpContext.Session.GetInt32("StudentId") ?? 0;
+            var status = confirmed ? "Present" : "Pending";
+            var payload = new
+            {
+                Id = attendanceId,
+                ExamId = examId,
+                StudentId = studentId,
+                Status = status,
+                CheckInTime = (DateTime?)null,
+                CheckOutTime = confirmed ? DateTime.UtcNow : (DateTime?)null,
+                Notes = string.Empty,
+                Violation = string.Empty,
+                StudentConfirmed = confirmed,
+                StudentConfirmedAt = confirmed ? DateTime.UtcNow : (DateTime?)null
+            };
+
+            var response = await _apiService.PutAsync<object>($"{AttendanceEndpoint}/{attendanceId}", payload);
+            TempData[response.Success ? "SuccessMessage" : "ErrorMessage"] = response.Success
+                ? "Đã cập nhật trạng thái ký giấy ra phòng."
+                : response.Message;
+
+            if (response.Success)
+            {
+                await _hubContext.Clients.All.SendAsync("AttendanceUpdated", new
+                {
+                    AttendanceId = attendanceId,
+                    ExamId = examId,
+                    StudentId = studentId,
+                    Status = status,
+                    StudentConfirmed = confirmed
+                });
+            }
+
+            var wantsJson = string.Equals(Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase)
+                || (Request.Headers["Accept"].ToString()?.Contains("application/json", StringComparison.OrdinalIgnoreCase) ?? false);
+            if (wantsJson)
+            {
+                return Json(new
+                {
+                    success = response.Success,
+                    confirmed,
+                    message = response.Success ? "Đã cập nhật trạng thái ký giấy ra phòng." : response.Message
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(My));
+        }
+
         [HttpGet]
         public async Task<IActionResult> ExamOptions(
             DateTime? date,
@@ -135,6 +237,18 @@ namespace e360_clone_fe.Controllers
             TempData[response.Success ? "SuccessMessage" : "ErrorMessage"] = response.Success
                 ? "Cập nhật điểm danh thành công"
                 : response.Message;
+
+            if (response.Success)
+            {
+                await _hubContext.Clients.All.SendAsync("AttendanceUpdated", new
+                {
+                    AttendanceId = attendanceId,
+                    ExamId = examId,
+                    StudentId = studentId,
+                    Status = status,
+                    StudentConfirmed = studentConfirmed
+                });
+            }
 
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {

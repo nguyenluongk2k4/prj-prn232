@@ -126,6 +126,12 @@
                 <div class="card-body p-0">
                     @if (Model.Filter.ExamId.HasValue && Model.Roster.Any())
                     {
+                        var unsignedList = Model.Roster.Where(r => !r.StudentConfirmed).ToList();
+                        var signedList = Model.Roster.Where(r => r.StudentConfirmed).ToList();
+
+                        <div class="p-24 border-bottom">
+                            <h6 class="text-md fw-semibold mb-12">Chưa ký (@unsignedList.Count)</h6>
+                        </div>
                         <div class="table-responsive">
                             <table class="table bordered-table mb-0">
                                 <thead class="bg-neutral-100">
@@ -140,23 +146,31 @@
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="unsigned-list">
                                     @{
                                         var index = 1;
                                     }
-                                    @foreach (var student in Model.Roster)
+                                    @foreach (var student in unsignedList)
                                     {
                                         var initials = string.Join("", student.FullName
                                             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                                             .TakeLast(2)
                                             .Select(s => s[0])).ToUpperInvariant();
-                                        <tr>
+                                        <tr data-attendance-id="@student.AttendanceId" data-exam-id="@student.ExamId" data-confirmed="false">
                                             <td>@index</td>
                                             <td>
-                                                <div class="d-flex align-items-center justify-content-center bg-neutral-200 rounded-circle"
-                                                     style="width:36px;height:36px;font-weight:600;">
-                                                    @initials
-                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(student.AvatarUrl))
+                                                {
+                                                    <img src="@student.AvatarUrl" alt="avatar"
+                                                         class="rounded-circle object-fit-cover" style="width:36px;height:36px;">
+                                                }
+                                                else
+                                                {
+                                                    <div class="d-flex align-items-center justify-content-center bg-neutral-200 rounded-circle"
+                                                         style="width:36px;height:36px;font-weight:600;">
+                                                        @initials
+                                                    </div>
+                                                }
                                             </td>
                                             <td>@student.StudentCode</td>
                                             <td>
@@ -198,6 +212,90 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="p-24 border-top border-bottom">
+                            <h6 class="text-md fw-semibold mb-12">Đã ký (@signedList.Count)</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table bordered-table mb-0">
+                                <thead class="bg-neutral-100">
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Ảnh</th>
+                                        <th>Mã SV</th>
+                                        <th>Họ tên</th>
+                                        <th>Lớp</th>
+                                        <th>Trạng thái</th>
+                                        <th>Đã ký</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="signed-list">
+                                    @{
+                                        var signedIndex = 1;
+                                    }
+                                    @foreach (var student in signedList)
+                                    {
+                                        var initials = string.Join("", student.FullName
+                                            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                            .TakeLast(2)
+                                            .Select(s => s[0])).ToUpperInvariant();
+                                        <tr data-attendance-id="@student.AttendanceId" data-exam-id="@student.ExamId" data-confirmed="true">
+                                            <td>@signedIndex</td>
+                                            <td>
+                                                @if (!string.IsNullOrWhiteSpace(student.AvatarUrl))
+                                                {
+                                                    <img src="@student.AvatarUrl" alt="avatar"
+                                                         class="rounded-circle object-fit-cover" style="width:36px;height:36px;">
+                                                }
+                                                else
+                                                {
+                                                    <div class="d-flex align-items-center justify-content-center bg-neutral-200 rounded-circle"
+                                                         style="width:36px;height:36px;font-weight:600;">
+                                                        @initials
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>@student.StudentCode</td>
+                                            <td>
+                                                <a class="text-primary-600 fw-semibold" href="/Students/Details/@student.StudentId">
+                                                    @student.FullName
+                                                </a>
+                                            </td>
+                                            <td>@student.ClassCode</td>
+                                            <td>
+                                                <select class="form-select form-select-sm" name="status" form="att-form-@student.AttendanceId">
+                                                    <option value="Pending" selected="@(student.Status == "Pending")">Pending</option>
+                                                    <option value="Present" selected="@(student.Status == "Present")">Present</option>
+                                                    <option value="Absent" selected="@(student.Status == "Absent")">Absent</option>
+                                                    <option value="Late" selected="@(student.Status == "Late")">Late</option>
+                                                    <option value="Excused" selected="@(student.Status == "Excused")">Excused</option>
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="studentConfirmed" form="att-form-@student.AttendanceId"
+                                                       value="true" @(student.StudentConfirmed ? "checked" : "") />
+                                            </td>
+                                            <td>
+                                                <form id="att-form-@student.AttendanceId" asp-action="Update" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="attendanceId" value="@student.AttendanceId" />
+                                                    <input type="hidden" name="examId" value="@student.ExamId" />
+                                                    <input type="hidden" name="studentId" value="@student.StudentId" />
+                                                    <input type="hidden" name="checkInTime" value="@(student.CheckInTime?.ToString("o") ?? string.Empty)" />
+                                                    <input type="hidden" name="checkOutTime" value="@(student.CheckOutTime?.ToString("o") ?? string.Empty)" />
+                                                    <input type="hidden" name="violation" value="@student.Violation" />
+                                                    <input type="hidden" name="notes" value="" />
+                                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">Lưu</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        signedIndex++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     }
                     else
                     {
@@ -213,6 +311,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const slotSelect = document.getElementById('slotSelect');
@@ -266,6 +365,41 @@
                 const params = new URLSearchParams(new FormData(filterForm));
                 window.location.href = `/Attendance/Export?${params.toString()}`;
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentExamId = @((Model.Filter.ExamId ?? 0));
+            if (!currentExamId || !window.signalR) return;
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl('/hubs/attendance')
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('AttendanceUpdated', function (payload) {
+                if (!payload || payload.examId !== currentExamId) return;
+                const row = document.querySelector(`tr[data-attendance-id="${payload.attendanceId}"]`);
+                if (!row) return;
+
+                const isConfirmed = payload.studentConfirmed === true;
+                row.dataset.confirmed = isConfirmed ? 'true' : 'false';
+
+                const checkbox = row.querySelector('input[type="checkbox"][name="studentConfirmed"]');
+                if (checkbox) checkbox.checked = isConfirmed;
+
+                const statusSelect = row.querySelector('select[name="status"]');
+                if (statusSelect && payload.status) {
+                    statusSelect.value = payload.status;
+                }
+
+                const targetBody = document.getElementById(isConfirmed ? 'signed-list' : 'unsigned-list');
+                if (targetBody && row.parentElement !== targetBody) {
+                    targetBody.appendChild(row);
+                }
+            });
+
+            connection.start().catch(err => console.warn('SignalR connect failed', err));
         });
     </script>
 }

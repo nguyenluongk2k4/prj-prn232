@@ -340,6 +340,7 @@ namespace e360_clone_fe.Controllers
 
                     calendarItems.Add(new ExamScheduleCalendarItemViewModel
                     {
+                        ExamId = exam.Id,
                         ExamDate = examDate,
                         StartTime = exam.StartTime,
                         EndTime = exam.EndTime,
@@ -425,7 +426,370 @@ namespace e360_clone_fe.Controllers
             ViewData["UseCalendar"] = true;
             ViewData["ListAction"] = "My";
             ViewData["CalendarView"] = calendarView;
+            ViewData["CalendarTarget"] = "Attendance";
+            ViewData["EventsUrl"] = Url.Action("MyEvents", "ExamSchedules");
             return View("Index", model);
+        }
+
+        public async Task<IActionResult> MyStudent(DateTime? date, string? view)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            var email = HttpContext.Session.GetString("Email");
+
+            if (!studentId.HasValue && !string.IsNullOrWhiteSpace(email))
+            {
+                var studentsResponse = await _apiService.GetAsync<List<StudentViewModel>>(
+                    "students",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (studentsResponse.Success && studentsResponse.Data != null)
+                {
+                    var match = studentsResponse.Data.FirstOrDefault(s =>
+                        string.Equals(s.Email, email, StringComparison.OrdinalIgnoreCase));
+                    if (match != null)
+                    {
+                        studentId = match.Id;
+                        HttpContext.Session.SetInt32("StudentId", match.Id);
+                    }
+                }
+            }
+
+            _logger.LogInformation("MyStudent resolved studentId={StudentId} email={Email}", studentId, email);
+
+            if (!studentId.HasValue)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy sinh viên cho tài khoản này.";
+                ViewData["UseCalendar"] = true;
+                ViewData["ListAction"] = "MyStudent";
+                ViewData["CalendarView"] = view ?? "agendaWeek";
+                ViewData["CalendarTarget"] = "Student";
+                ViewData["EventsUrl"] = Url.Action("MyStudentEvents", "ExamSchedules");
+                return View("Index", new ExamSchedulePageViewModel
+                {
+                    SelectedDate = (date ?? DateTime.Today).Date,
+                    Slots = new List<ExamScheduleSlotViewModel>(),
+                    CalendarItems = new List<ExamScheduleCalendarItemViewModel>()
+                });
+            }
+
+            var selectedDate = (date ?? DateTime.Today).Date;
+            var calendarView = string.IsNullOrWhiteSpace(view) ? "agendaWeek" : view;
+            var weekStart = GetWeekStart(selectedDate);
+            var weekEnd = weekStart.AddDays(6);
+            var monthStart = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            var dateRange = calendarView switch
+            {
+                "agendaDay" => (From: selectedDate, To: selectedDate),
+                "month" => (From: monthStart, To: monthEnd),
+                _ => (From: weekStart, To: weekEnd)
+            };
+
+            var examQuery = new Dictionary<string, string>
+            {
+                { "studentId", studentId.Value.ToString() },
+                { "fromDate", dateRange.From.ToString("yyyy-MM-dd") },
+                { "toDate", dateRange.To.ToString("yyyy-MM-dd") }
+            };
+
+            var examsResponse = await _apiService.GetAsync<List<ExamViewModel>>("exams/student", examQuery);
+            _logger.LogInformation("MyStudent exams/student query={Query} success={Success} count={Count} message={Message}",
+                string.Join("&", examQuery.Select(kv => $"{kv.Key}={kv.Value}")),
+                examsResponse.Success,
+                examsResponse.Data?.Count ?? 0,
+                examsResponse.Message);
+            var classResponse = await _apiService.GetAsync<List<ClassFormViewModel>>(
+                "classes", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var subjectResponse = await _apiService.GetAsync<List<SubjectFormViewModel>>(
+                "subjects", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var roomResponse = await _apiService.GetAsync<List<ExamRoomViewModel>>(
+                "rooms", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+            var classMap = classResponse.Success && classResponse.Data != null
+                ? classResponse.Data.ToDictionary(c => c.Id, c => c)
+                : new Dictionary<int, ClassFormViewModel>();
+            var subjectMap = subjectResponse.Success && subjectResponse.Data != null
+                ? subjectResponse.Data.ToDictionary(s => s.Id, s => s)
+                : new Dictionary<int, SubjectFormViewModel>();
+            var roomMap = roomResponse.Success && roomResponse.Data != null
+                ? roomResponse.Data.ToDictionary(r => r.Id, r => r)
+                : new Dictionary<int, ExamRoomViewModel>();
+
+            var calendarItems = new List<ExamScheduleCalendarItemViewModel>();
+            if (examsResponse.Success && examsResponse.Data != null)
+            {
+                foreach (var exam in examsResponse.Data)
+                {
+                    classMap.TryGetValue(exam.ClassId, out var cls);
+                    subjectMap.TryGetValue(exam.SubjectId, out var subject);
+                    roomMap.TryGetValue(exam.RoomId, out var room);
+
+                    var examDate = exam.ExamDate.Kind == DateTimeKind.Utc
+                        ? exam.ExamDate.ToLocalTime().Date
+                        : exam.ExamDate.Date;
+
+                    calendarItems.Add(new ExamScheduleCalendarItemViewModel
+                    {
+                        ExamId = exam.Id,
+                        ExamDate = examDate,
+                        StartTime = exam.StartTime,
+                        EndTime = exam.EndTime,
+                        SubjectId = exam.SubjectId,
+                        SubjectCode = subject?.SubjectCode ?? string.Empty,
+                        SubjectName = subject?.SubjectName ?? string.Empty,
+                        ClassCode = cls?.ClassCode ?? string.Empty,
+                        RoomCode = room?.RoomCode ?? string.Empty
+                    });
+                }
+            }
+
+            var model = new ExamSchedulePageViewModel
+            {
+                SelectedDate = selectedDate,
+                CalendarItems = calendarItems
+            };
+
+            if (calendarItems.Count > 0)
+            {
+                var sample = calendarItems.Take(3).Select(i => $"{i.SubjectCode}-{i.ClassCode}@{i.ExamDate:yyyy-MM-dd}");
+                _logger.LogInformation("MyStudent calendar items count={Count} sample={Sample}",
+                    calendarItems.Count, string.Join(", ", sample));
+            }
+            else
+            {
+                _logger.LogWarning("MyStudent calendar items empty");
+            }
+
+            ViewData["Title"] = "Lịch thi của tôi";
+            ViewData["UseCalendar"] = true;
+            ViewData["ListAction"] = "MyStudent";
+            ViewData["CalendarView"] = calendarView;
+            ViewData["CalendarTarget"] = "Student";
+            ViewData["EventsUrl"] = Url.Action("MyStudentEvents", "ExamSchedules");
+            return View("Index", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyStudentEvents(DateTime? date, string? view)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var studentId = HttpContext.Session.GetInt32("StudentId");
+            var email = HttpContext.Session.GetString("Email");
+            var selectedDate = (date ?? DateTime.Today).Date;
+            var calendarView = string.IsNullOrWhiteSpace(view) ? "agendaWeek" : view;
+
+            if (!studentId.HasValue && !string.IsNullOrWhiteSpace(email))
+            {
+                var studentsResponse = await _apiService.GetAsync<List<StudentViewModel>>(
+                    "students",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (studentsResponse.Success && studentsResponse.Data != null)
+                {
+                    var match = studentsResponse.Data.FirstOrDefault(s =>
+                        string.Equals(s.Email, email, StringComparison.OrdinalIgnoreCase));
+                    if (match != null)
+                    {
+                        studentId = match.Id;
+                        HttpContext.Session.SetInt32("StudentId", match.Id);
+                    }
+                }
+            }
+
+            if (!studentId.HasValue)
+            {
+                return Json(new { success = false, data = Array.Empty<object>() });
+            }
+
+            var weekStart = GetWeekStart(selectedDate);
+            var weekEnd = weekStart.AddDays(6);
+            var monthStart = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            var dateRange = calendarView switch
+            {
+                "agendaDay" => (From: selectedDate, To: selectedDate),
+                "month" => (From: monthStart, To: monthEnd),
+                _ => (From: weekStart, To: weekEnd)
+            };
+
+            var examQuery = new Dictionary<string, string>
+            {
+                { "studentId", studentId.Value.ToString() },
+                { "fromDate", dateRange.From.ToString("yyyy-MM-dd") },
+                { "toDate", dateRange.To.ToString("yyyy-MM-dd") }
+            };
+
+            var examsResponse = await _apiService.GetAsync<List<ExamViewModel>>("exams/student", examQuery);
+            _logger.LogInformation("MyStudentEvents exams/student query={Query} success={Success} count={Count} message={Message}",
+                string.Join("&", examQuery.Select(kv => $"{kv.Key}={kv.Value}")),
+                examsResponse.Success,
+                examsResponse.Data?.Count ?? 0,
+                examsResponse.Message);
+            var classResponse = await _apiService.GetAsync<List<ClassFormViewModel>>(
+                "classes", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var subjectResponse = await _apiService.GetAsync<List<SubjectFormViewModel>>(
+                "subjects", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var roomResponse = await _apiService.GetAsync<List<ExamRoomViewModel>>(
+                "rooms", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+            var classMap = classResponse.Success && classResponse.Data != null
+                ? classResponse.Data.ToDictionary(c => c.Id, c => c)
+                : new Dictionary<int, ClassFormViewModel>();
+            var subjectMap = subjectResponse.Success && subjectResponse.Data != null
+                ? subjectResponse.Data.ToDictionary(s => s.Id, s => s)
+                : new Dictionary<int, SubjectFormViewModel>();
+            var roomMap = roomResponse.Success && roomResponse.Data != null
+                ? roomResponse.Data.ToDictionary(r => r.Id, r => r)
+                : new Dictionary<int, ExamRoomViewModel>();
+
+            var items = new List<ExamScheduleCalendarItemViewModel>();
+            if (examsResponse.Success && examsResponse.Data != null)
+            {
+                foreach (var exam in examsResponse.Data)
+                {
+                    classMap.TryGetValue(exam.ClassId, out var cls);
+                    subjectMap.TryGetValue(exam.SubjectId, out var subject);
+                    roomMap.TryGetValue(exam.RoomId, out var room);
+
+                    var examDate = exam.ExamDate.Kind == DateTimeKind.Utc
+                        ? exam.ExamDate.ToLocalTime().Date
+                        : exam.ExamDate.Date;
+
+                    items.Add(new ExamScheduleCalendarItemViewModel
+                    {
+                        ExamId = exam.Id,
+                        ExamDate = examDate,
+                        StartTime = exam.StartTime,
+                        EndTime = exam.EndTime,
+                        SubjectId = exam.SubjectId,
+                        SubjectCode = subject?.SubjectCode ?? string.Empty,
+                        SubjectName = subject?.SubjectName ?? string.Empty,
+                        ClassCode = cls?.ClassCode ?? string.Empty,
+                        RoomCode = room?.RoomCode ?? string.Empty
+                    });
+                }
+            }
+
+            return Json(new { success = true, data = items });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyEvents(DateTime? date, string? view)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            var email = HttpContext.Session.GetString("Email");
+            var calendarView = string.IsNullOrWhiteSpace(view) ? "agendaWeek" : view;
+            var selectedDate = (date ?? DateTime.Today).Date;
+
+            if (!lecturerId.HasValue && !string.IsNullOrWhiteSpace(email))
+            {
+                var lecturersResponse = await _apiService.GetAsync<List<LecturerViewModel>>(
+                    "lecturers",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (lecturersResponse.Success && lecturersResponse.Data != null)
+                {
+                    var match = lecturersResponse.Data.FirstOrDefault(l =>
+                        string.Equals(l.Email, email, StringComparison.OrdinalIgnoreCase));
+                    if (match != null)
+                    {
+                        lecturerId = match.Id;
+                        HttpContext.Session.SetInt32("LecturerId", match.Id);
+                    }
+                }
+            }
+
+            if (!lecturerId.HasValue)
+            {
+                return Json(new { success = false, data = Array.Empty<object>() });
+            }
+
+            var weekStart = GetWeekStart(selectedDate);
+            var weekEnd = weekStart.AddDays(6);
+            var monthStart = new DateTime(selectedDate.Year, selectedDate.Month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            var proctorQuery = new Dictionary<string, string>
+            {
+                { "pageNumber", "1" },
+                { "pageSize", "2000" },
+                { "lecturerId", lecturerId.Value.ToString() }
+            };
+
+            var dateRange = calendarView switch
+            {
+                "agendaDay" => (From: selectedDate, To: selectedDate),
+                "month" => (From: monthStart, To: monthEnd),
+                _ => (From: weekStart, To: weekEnd)
+            };
+
+            var examQuery = new Dictionary<string, string>
+            {
+                { "pageNumber", "1" },
+                { "pageSize", "2000" },
+                { "fromDate", dateRange.From.ToString("yyyy-MM-dd") },
+                { "toDate", dateRange.To.ToString("yyyy-MM-dd") }
+            };
+
+            var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentViewModel>>("proctors", proctorQuery);
+            var examsResponse = await _apiService.GetAsync<List<ExamViewModel>>(ExamsEndpoint, examQuery);
+            var classResponse = await _apiService.GetAsync<List<ClassFormViewModel>>("classes", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var subjectResponse = await _apiService.GetAsync<List<SubjectFormViewModel>>("subjects", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+            var roomResponse = await _apiService.GetAsync<List<ExamRoomViewModel>>("rooms", new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+            var classMap = classResponse.Success && classResponse.Data != null
+                ? classResponse.Data.ToDictionary(c => c.Id, c => c)
+                : new Dictionary<int, ClassFormViewModel>();
+            var subjectMap = subjectResponse.Success && subjectResponse.Data != null
+                ? subjectResponse.Data.ToDictionary(s => s.Id, s => s)
+                : new Dictionary<int, SubjectFormViewModel>();
+            var roomMap = roomResponse.Success && roomResponse.Data != null
+                ? roomResponse.Data.ToDictionary(r => r.Id, r => r)
+                : new Dictionary<int, ExamRoomViewModel>();
+
+            var assignedExamIds = proctorResponse.Success && proctorResponse.Data != null
+                ? proctorResponse.Data.Select(p => p.ExamId).Distinct().ToHashSet()
+                : new HashSet<int>();
+
+            var items = new List<ExamScheduleCalendarItemViewModel>();
+            if (examsResponse.Success && examsResponse.Data != null && assignedExamIds.Count > 0)
+            {
+                foreach (var exam in examsResponse.Data.Where(e => assignedExamIds.Contains(e.Id)))
+                {
+                    classMap.TryGetValue(exam.ClassId, out var cls);
+                    subjectMap.TryGetValue(exam.SubjectId, out var subject);
+                    roomMap.TryGetValue(exam.RoomId, out var room);
+
+                    var examDate = exam.ExamDate.Kind == DateTimeKind.Utc
+                        ? exam.ExamDate.ToLocalTime().Date
+                        : exam.ExamDate.Date;
+
+                    items.Add(new ExamScheduleCalendarItemViewModel
+                    {
+                        ExamId = exam.Id,
+                        ExamDate = examDate,
+                        StartTime = exam.StartTime,
+                        EndTime = exam.EndTime,
+                        SubjectId = exam.SubjectId,
+                        SubjectCode = subject?.SubjectCode ?? string.Empty,
+                        SubjectName = subject?.SubjectName ?? string.Empty,
+                        ClassCode = cls?.ClassCode ?? string.Empty,
+                        RoomCode = room?.RoomCode ?? string.Empty
+                    });
+                }
+            }
+
+            return Json(new { success = true, data = items });
         }
 
         public IActionResult Create()

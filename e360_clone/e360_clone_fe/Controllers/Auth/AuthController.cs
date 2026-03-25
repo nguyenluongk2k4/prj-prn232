@@ -131,6 +131,11 @@ namespace e360_clone_fe.Controllers
                     return RedirectToAction("LMS", "Dashboard");
                 }
 
+                if (response.Data.Role == "Student")
+                {
+                    return RedirectToAction("MyStudent", "ExamSchedules");
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
