@@ -1,6 +1,7 @@
-﻿using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects;
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -17,6 +18,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetAll(
             [FromQuery] PagedRequest request,
             [FromQuery] DateTime? fromDate,
@@ -32,7 +34,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Exam>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch ká»³ thi thÃ nh cÃ´ng",
+                Message = "Lấy danh sách kỳ thi thành công",
                 Data = result.Items,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -41,16 +43,18 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
 
-            return HandleResult(item, "Láº¥y thÃ´ng tin ká»³ thi thÃ nh cÃ´ng");
+            return HandleResult(item, "Lấy thông tin kỳ thi thành công");
         }
 
         [HttpGet("student")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetByStudent(
             [FromQuery] int studentId,
             [FromQuery] string? email,
@@ -85,10 +89,11 @@ namespace e360_clone.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         public async Task<IActionResult> Create([FromBody] Exam exam)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Exam> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<Exam> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
             exam.CreatedAt = DateTime.UtcNow;
             await _repository.AddAsync(exam);
@@ -96,17 +101,18 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = exam.Id }, new ApiResponse<Exam>
             {
                 Success = true,
-                Message = "ThÃªm ká»³ thi thÃ nh cÃ´ng",
+                Message = "Thêm kỳ thi thành công",
                 Data = exam
             });
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         public async Task<IActionResult> Update(int id, [FromBody] Exam exam)
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
 
             existing.ExamCode = exam.ExamCode;
             existing.ExamName = exam.ExamName;
@@ -125,18 +131,19 @@ namespace e360_clone.Controllers
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cáº­p nháº­t ká»³ thi thÃ nh cÃ´ng");
+            return HandleResult(existing, "Cập nhật kỳ thi thành công");
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "XÃ³a ká»³ thi thÃ nh cÃ´ng");
+            return HandleResult(true, "Xóa kỳ thi thành công");
         }
     }
 }

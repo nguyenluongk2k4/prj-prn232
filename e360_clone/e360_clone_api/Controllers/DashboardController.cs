@@ -1,5 +1,6 @@
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -14,6 +15,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("summary")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> GetSummary([FromQuery] int days = 14)
         {
             if (days <= 0)

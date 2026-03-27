@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BaseApiController : ControllerBase
     {
         protected IActionResult HandleResult<T>(T? data, string? message = null, bool success = true)

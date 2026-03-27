@@ -1,6 +1,7 @@
 ﻿using e360_clone.BusinessObjects;
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -22,6 +23,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher")]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request, [FromQuery] int? classId)
         {
             var term = request.SearchTerm?.Trim();
@@ -106,6 +108,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetById(int id)
         {
             var student = await _studentRepository.GetByIdAsync(id);
@@ -136,6 +139,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("by-subject")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher")]
         public async Task<IActionResult> GetBySubject([FromQuery] PagedRequest request, [FromQuery] int subjectId, [FromQuery] int? classId)
         {
             if (subjectId <= 0)
@@ -219,6 +223,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Create([FromBody] Student student)
         {
             if (!ModelState.IsValid)
@@ -243,6 +248,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] Student student)
         {
             var existing = await _studentRepository.GetByIdAsync(id);
@@ -267,6 +273,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var student = await _studentRepository.GetByIdAsync(id);

@@ -1,5 +1,6 @@
 using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -14,6 +15,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
             var data = await _repository.GetPagedFilteredAsync(
@@ -35,6 +37,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);

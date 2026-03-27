@@ -1,5 +1,6 @@
-﻿using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -15,6 +16,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetByStudent([FromQuery] int studentId)
         {
             if (studentId <= 0)

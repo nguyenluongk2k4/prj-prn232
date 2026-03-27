@@ -1,6 +1,7 @@
-﻿using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using e360_clone.BusinessObjects.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -14,6 +15,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher")]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
             var data = await _repository.GetPagedFilteredAsync(
@@ -35,6 +37,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -45,6 +48,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("roster")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher")]
         public async Task<IActionResult> GetRoster([FromQuery] int examId)
         {
             if (examId <= 0)
@@ -68,6 +72,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("student")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student,Parent")]
         public async Task<IActionResult> GetStudentAttendance([FromQuery] int studentId, [FromQuery] DateTime? date)
         {
             if (studentId <= 0)
@@ -96,6 +101,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("report")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         public async Task<IActionResult> GetReport(
             [FromQuery] DateTime? fromDate,
             [FromQuery] DateTime? toDate,
@@ -119,6 +125,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher")]
         public async Task<IActionResult> Create([FromBody] Attendance attendance)
         {
             if (!ModelState.IsValid)
@@ -136,6 +143,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff,Teacher,Student")]
         public async Task<IActionResult> Update(int id, [FromBody] Attendance attendance)
         {
             var existing = await _repository.GetByIdAsync(id);
@@ -178,6 +186,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Staff")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _repository.GetByIdAsync(id);
@@ -187,8 +196,5 @@ namespace e360_clone.Controllers
             await _repository.DeleteAsync(item);
             return HandleResult(true, "Xóa điểm danh thành công");
         }
-
     }
 }
-
-

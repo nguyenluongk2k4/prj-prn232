@@ -24,6 +24,7 @@ namespace e360_clone.Controllers
             _config = config;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
@@ -93,6 +94,7 @@ namespace e360_clone.Controllers
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
@@ -125,6 +127,7 @@ namespace e360_clone.Controllers
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("quick-login")]
         public async Task<IActionResult> QuickLogin([FromBody] QuickLoginRequest model)
         {

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/desktop_data/Tai_Lieu_FPT/SP26/PRN232/projects/real_project/e360_clone -name *Test* -o -name *test*)",
+      "Bash(grep -E \"\\\\.\\(cs|js|tsx\\)$\")",
+      "Bash(xargs ls:*)",
+      "Bash(grep -E \"\\\\.\\(cs|ts|tsx\\)$\")",
+      "Bash(dotnet build:*)",
+      "Skill(view)"
+    ]
+  }
+}

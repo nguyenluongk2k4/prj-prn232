@@ -1,211 +1,299 @@
-﻿# API Specification (E360 Clone)
+# API Specification (E360 Clone)
 
 ## Overview
-- Base URL: `/api`
-- Response wrapper: `ApiResponse<T>` (fields: `success`, `message`, `data`).
-- Paged response: `PagedResponse<T>` adds `pageNumber`, `pageSize`, `totalRecords`, `totalPages`.
-- Common query for list endpoints: `pageNumber`, `pageSize`, `searchTerm`, `sortBy`, `sortDescending`.
-- Auth: JWT Bearer for protected endpoints. `POST /api/auth/login` returns token.
 
-## Existing APIs (Implemented)
-1. `POST /api/auth/login`
-- Đăng nhập bằng email hoặc username + password, trả JWT và thông tin tài khoản.
-- Body: `email`, `password`, `rememberMe`.
+- **Base URL**: `/api`
+- **Response wrapper**: `ApiResponse<T>` — fields: `success`, `message`, `data`
+- **Paged response**: `PagedResponse<T>` — thêm `pageNumber`, `pageSize`, `totalRecords`, `totalPages`
+- **Common query params cho list endpoints**: `pageNumber`, `pageSize`, `searchTerm`, `sortBy`, `sortDescending`
+- **Auth**: JWT Bearer. Token lấy từ `POST /api/auth/login`. Chỉ `GET /api/auth/me` có `[Authorize]` — các endpoint còn lại chưa enforce authorization ở controller level.
 
-2. `POST /api/auth/quick-login`
-- Login demo theo role, không kiểm DB (dùng cho demo/seed).
-- Body: `role`.
+---
 
-3. `GET /api/students`
-- Lấy danh sách sinh viên có phân trang + tìm kiếm theo `fullName` hoặc `studentCode`.
+## Auth (`/api/auth`)
 
-4. `GET /api/students/{id}`
-- Lấy chi tiết 1 sinh viên theo ID.
+### `POST /api/auth/login`
+Đăng nhập bằng email/username + password. Trả JWT token và thông tin tài khoản.
+- **Body**: `email` (string), `password` (string)
 
-5. `POST /api/students`
-- Tạo sinh viên mới.
+### `POST /api/auth/register`
+Đăng ký tài khoản sinh viên mới.
+- **Body**: `email`, `password`, `fullName`, `studentId` (int)
 
-6. `PUT /api/students/{id}`
-- Cập nhật thông tin sinh viên.
+### `POST /api/auth/quick-login`
+Login demo theo role, không kiểm tra DB (chỉ dùng khi demo/seed).
+- **Body**: `role` (string — "Admin", "Student", "Teacher", ...)
 
-7. `DELETE /api/students/{id}`
-- Xóa sinh viên.
+### `GET /api/auth/me` *(Authorize)*
+Lấy thông tin tài khoản đang đăng nhập từ JWT claims.
 
-8. `GET /WeatherForecast`
-- Endpoint mẫu của template .NET, không dùng trong nghiệp vụ.
+---
 
-## Required APIs (To Build)
+## Students (`/api/students`)
 
-### Accounts & Auth
-1. `POST /api/accounts`
-- Tạo tài khoản hệ thống (Admin/SuperAdmin/AcademicStaff/Teacher/Student).
+### `GET /api/students`
+Danh sách sinh viên có phân trang + tìm kiếm.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm` (theo `fullName` hoặc `studentCode`), `classId?` (int)
 
-2. `GET /api/accounts`
-- Danh sách tài khoản, lọc theo role/status, hỗ trợ paging.
+### `GET /api/students/{id}`
+Chi tiết 1 sinh viên theo ID.
 
-3. `GET /api/accounts/{id}`
-- Lấy thông tin tài khoản.
+### `GET /api/students/by-subject`
+Danh sách sinh viên theo môn học và lớp.
+- **Query**: `pageNumber`, `pageSize`, `subjectId` (int, bắt buộc), `classId?` (int)
 
-4. `PUT /api/accounts/{id}`
-- Cập nhật thông tin account (profile, role, trạng thái).
+### `POST /api/students`
+Tạo sinh viên mới.
+- **Body**: `Student` object
 
-5. `POST /api/accounts/{id}/lock`
-- Khóa tài khoản (status = Locked).
+### `PUT /api/students/{id}`
+Cập nhật thông tin sinh viên.
+- **Body**: `Student` object
 
-6. `POST /api/accounts/{id}/unlock`
-- Mở khóa tài khoản.
+### `DELETE /api/students/{id}`
+Xóa sinh viên.
 
-7. `POST /api/accounts/{id}/reset-password`
-- Reset mật khẩu về mặc định hoặc random.
+---
 
-### Lecturers
-1. `GET /api/lecturers`
-- Danh sách giảng viên, paging + search.
+## Lecturers (`/api/lecturers`)
 
-2. `GET /api/lecturers/{id}`
-- Chi tiết giảng viên.
+### `GET /api/lecturers`
+Danh sách giảng viên có phân trang + tìm kiếm.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm`
 
-3. `POST /api/lecturers`
-- Thêm giảng viên.
+### `GET /api/lecturers/{id}`
+Chi tiết giảng viên theo ID.
 
-4. `PUT /api/lecturers/{id}`
-- Cập nhật giảng viên.
+### `POST /api/lecturers`
+Thêm giảng viên mới.
+- **Body**: `Lecturer` object
 
-5. `DELETE /api/lecturers/{id}`
-- Xóa giảng viên.
+### `PUT /api/lecturers/{id}`
+Cập nhật thông tin giảng viên.
+- **Body**: `Lecturer` object
 
-### Subjects
-1. `GET /api/subjects`
-- Danh sách môn học, paging + search.
+### `DELETE /api/lecturers/{id}`
+Xóa giảng viên.
 
-2. `GET /api/subjects/{id}`
-- Chi tiết môn học.
+---
 
-3. `POST /api/subjects`
-- Thêm môn học.
+## Subjects (`/api/subjects`)
 
-4. `PUT /api/subjects/{id}`
-- Cập nhật môn học.
+### `GET /api/subjects`
+Danh sách môn học có phân trang + filter.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm`, `status?`, `subjectType?`, `department?`
 
-5. `DELETE /api/subjects/{id}`
-- Xóa môn học.
+### `GET /api/subjects/{id}`
+Chi tiết môn học theo ID.
 
-### Classes
-1. `GET /api/classes`
-- Danh sách lớp, paging + search.
+### `POST /api/subjects`
+Thêm môn học mới.
+- **Body**: `Subject` object
 
-2. `GET /api/classes/{id}`
-- Chi tiết lớp.
+### `PUT /api/subjects/{id}`
+Cập nhật môn học.
+- **Body**: `Subject` object
 
-3. `POST /api/classes`
-- Tạo lớp mới.
+### `DELETE /api/subjects/{id}`
+Xóa môn học.
 
-4. `PUT /api/classes/{id}`
-- Cập nhật lớp.
+---
 
-5. `DELETE /api/classes/{id}`
-- Xóa lớp.
+## Majors (`/api/majors`)
 
-### Exam Rooms
-1. `GET /api/exam-rooms`
-- Danh sách phòng thi, filter theo `building`, `hasComputer`, `status`.
+### `GET /api/majors`
+Danh sách ngành học có phân trang.
+- **Query**: `pageNumber`, `pageSize`
 
-2. `GET /api/exam-rooms/{id}`
-- Chi tiết phòng thi.
+### `GET /api/majors/{id}`
+Chi tiết ngành học theo ID.
 
-3. `POST /api/exam-rooms`
-- Thêm phòng thi.
+---
 
-4. `PUT /api/exam-rooms/{id}`
-- Cập nhật phòng thi.
+## Classes (`/api/classes`)
 
-5. `DELETE /api/exam-rooms/{id}`
-- Xóa phòng thi.
+### `GET /api/classes`
+Danh sách lớp học có phân trang + filter.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm`, `majorCode?`, `cohort?`, `subjectId?`, `status?`
 
-### Exams
-1. `GET /api/exams`
-- Danh sách kỳ thi theo lớp/môn/năm học/kỳ.
+### `GET /api/classes/{id}`
+Chi tiết lớp học theo ID.
 
-2. `GET /api/exams/{id}`
-- Chi tiết kỳ thi.
+### `POST /api/classes`
+Tạo lớp học mới.
+- **Body**: `Class` object
 
-3. `POST /api/exams`
-- Tạo kỳ thi (môn, lớp, ngày, phòng, thời gian, trạng thái).
+### `PUT /api/classes/{id}`
+Cập nhật thông tin lớp học.
+- **Body**: `Class` object
 
-4. `PUT /api/exams/{id}`
-- Cập nhật thông tin kỳ thi.
+### `DELETE /api/classes/{id}`
+Xóa lớp học.
 
-5. `DELETE /api/exams/{id}`
-- Xóa kỳ thi.
+---
 
-### Exam Schedules
-1. `GET /api/exam-schedules`
-- Danh sách lịch thi, filter theo ngày/phòng/kỳ thi.
+## Rooms (`/api/rooms`)
 
-2. `GET /api/exam-schedules/{id}`
-- Chi tiết lịch thi.
+### `GET /api/rooms`
+Danh sách phòng thi có phân trang + tìm kiếm.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm`
 
-3. `POST /api/exam-schedules`
-- Tạo lịch thi cụ thể (ca thi, phòng, thời gian).
+### `GET /api/rooms/available`
+Lấy danh sách phòng thi còn trống trong khung giờ chỉ định.
+- **Query**: `examDate` (DateTime), `startTime` (TimeSpan), `endTime` (TimeSpan), `excludeExamId?` (int)
 
-4. `PUT /api/exam-schedules/{id}`
-- Cập nhật lịch thi.
+### `GET /api/rooms/{id}`
+Chi tiết phòng thi theo ID.
 
-5. `POST /api/exam-schedules/{id}/check-conflicts`
-- Kiểm tra xung đột lịch/phòng/giờ.
+### `POST /api/rooms`
+Thêm phòng thi mới.
+- **Body**: `ExamRoom` object
 
-6. `DELETE /api/exam-schedules/{id}`
-- Hủy lịch thi.
+### `PUT /api/rooms/{id}`
+Cập nhật thông tin phòng thi.
+- **Body**: `ExamRoom` object
 
-### Proctor Assignments
-1. `GET /api/proctor-assignments`
-- Danh sách phân công coi thi theo ca thi/giảng viên.
+### `DELETE /api/rooms/{id}`
+Xóa phòng thi.
 
-2. `POST /api/proctor-assignments`
-- Phân công giám thị cho ca thi.
+---
 
-3. `PUT /api/proctor-assignments/{id}`
-- Cập nhật phân công.
+## Exams (`/api/exams`)
 
-4. `DELETE /api/proctor-assignments/{id}`
-- Hủy phân công.
+### `GET /api/exams`
+Danh sách kỳ thi có phân trang + lọc theo ngày.
+- **Query**: `pageNumber`, `pageSize`, `searchTerm`, `fromDate?` (DateTime), `toDate?` (DateTime)
 
-### Attendances
-1. `GET /api/attendances`
-- Danh sách điểm danh theo ca thi/lớp.
+### `GET /api/exams/{id}`
+Chi tiết kỳ thi theo ID.
 
-2. `POST /api/attendances`
-- Ghi nhận điểm danh cho sinh viên.
+### `GET /api/exams/student`
+Lịch thi của sinh viên.
+- **Query**: `studentId` (int), `email?` (string), `fromDate?` (DateTime), `toDate?` (DateTime)
 
-3. `PUT /api/attendances/{id}`
-- Cập nhật trạng thái điểm danh/ghi chú/vi phạm.
+### `POST /api/exams`
+Tạo kỳ thi mới (môn, lớp, phòng, ngày, giờ, hình thức thi...).
+- **Body**: `Exam` object
 
-### Grades
-1. `GET /api/grades`
-- Danh sách điểm theo sinh viên/kỳ thi/môn.
+### `PUT /api/exams/{id}`
+Cập nhật thông tin kỳ thi.
+- **Body**: `Exam` object
 
-2. `POST /api/grades`
-- Nhập điểm cho sinh viên.
+### `DELETE /api/exams/{id}`
+Xóa kỳ thi.
 
-3. `PUT /api/grades/{id}`
-- Cập nhật điểm (trước khi duyệt).
+---
 
-4. `POST /api/grades/{id}/approve`
-- Duyệt điểm.
+## Proctor Assignments (`/api/proctors`)
 
-### Reports & Statistics
-1. `GET /api/reports/exam-results`
-- Thống kê kết quả thi theo môn/lớp/kỳ.
+### `GET /api/proctors`
+Danh sách phân công giám thị có phân trang.
+- **Query**: `pageNumber`, `pageSize`
 
-2. `GET /api/reports/attendance`
-- Báo cáo điểm danh theo ca thi/môn.
+### `GET /api/proctors/{id}`
+Chi tiết phân công giám thị theo ID.
 
-3. `GET /api/reports/proctoring`
-- Báo cáo phân công coi thi.
+### `POST /api/proctors`
+Phân công giảng viên làm giám thị cho kỳ thi. Có kiểm tra xung đột lịch.
+- **Body**: `ProctorAssignment` object (gồm `examId`, `lecturerId`, `proctorRole` — "ChiefProctor" hoặc "Proctor")
 
-4. `GET /api/reports/export`
-- Xuất báo cáo (Excel/PDF) theo tham số.
+### `PUT /api/proctors/{id}`
+Cập nhật phân công giám thị.
+- **Body**: `ProctorAssignment` object
+
+### `DELETE /api/proctors/{id}`
+Hủy phân công giám thị.
+
+---
+
+## Teaching Assignments (`/api/teaching-assignments`)
+
+### `GET /api/teaching-assignments`
+Danh sách phân công giảng dạy có phân trang + lọc theo giảng viên.
+- **Query**: `pageNumber`, `pageSize`, `lecturerId?` (int)
+
+### `GET /api/teaching-assignments/{id}`
+Chi tiết phân công giảng dạy theo ID.
+
+### `POST /api/teaching-assignments`
+Tạo phân công giảng dạy mới.
+- **Body**: `TeachingAssignment` object
+
+### `PUT /api/teaching-assignments/{id}`
+Cập nhật phân công giảng dạy.
+- **Body**: `TeachingAssignment` object
+
+### `DELETE /api/teaching-assignments/{id}`
+Xóa phân công giảng dạy.
+
+---
+
+## Student Subjects (`/api/student-subjects`)
+
+### `GET /api/student-subjects`
+Danh sách môn học của sinh viên.
+- **Query**: `studentId` (int, bắt buộc)
+
+---
+
+## Attendances (`/api/attendances`)
+
+### `GET /api/attendances`
+Danh sách điểm danh có phân trang.
+- **Query**: `pageNumber`, `pageSize`
+
+### `GET /api/attendances/{id}`
+Chi tiết bản ghi điểm danh theo ID.
+
+### `GET /api/attendances/roster`
+Danh sách điểm danh đầy đủ của 1 kỳ thi (attendance roster).
+- **Query**: `examId` (int, bắt buộc)
+
+### `GET /api/attendances/student`
+Lịch sử điểm danh của sinh viên, có thể lọc theo ngày.
+- **Query**: `studentId` (int, bắt buộc), `date?` (DateTime)
+
+### `GET /api/attendances/report`
+Báo cáo điểm danh theo khoảng thời gian/môn/lớp.
+- **Query**: `fromDate?` (DateTime), `toDate?` (DateTime), `subjectId?` (int), `classId?` (int)
+
+### `POST /api/attendances`
+Ghi nhận điểm danh sinh viên tại kỳ thi.
+- **Body**: `Attendance` object
+
+### `PUT /api/attendances/{id}`
+Cập nhật trạng thái điểm danh (status, ghi chú, vi phạm, xác nhận sinh viên).
+- **Body**: `Attendance` object
+
+### `DELETE /api/attendances/{id}`
+Xóa bản ghi điểm danh.
+
+---
+
+## Dashboard (`/api/dashboard`)
+
+### `GET /api/dashboard/summary`
+Tổng quan thống kê cho dashboard admin.
+- **Query**: `days?` (int, mặc định 14) — số ngày nhìn lại
+
+---
+
+## Enums tham chiếu
+
+| Enum | Giá trị |
+|------|---------|
+| **Gender** | `Nam`, `Nữ`, `Khác` |
+| **StudentStatus** | `Active` (Đang học), `Inactive` (Tạm ngưng), `Graduated` (Tốt nghiệp), `Suspended` (Đình chỉ), `Dismissed` (Buộc thôi học) |
+| **AccountStatus** | `Active`, `Inactive`, `Locked`, `Suspended` |
+| **Role** | `SuperAdmin`, `Admin`, `Student`, `Teacher`, `Parent`, `Librarian`, `Staff` |
+| **GradeType** | `KiemTra15Phut`, `KiemTra1Tiet`, `GiuaKy`, `CuoiKy`, `BaiTap`, `DoAn`, `ChuyenCan`, `Khac` |
+| **ProctorRole** | `ChiefProctor` (Giám thị quản lý), `Proctor` (Giám thị coi thi) |
+
+---
 
 ## Notes
-- Tất cả endpoints quản trị dữ liệu yêu cầu JWT và phân quyền theo role.
-- Các thao tác thay đổi dữ liệu cần audit fields (`createdAt`, `updatedAt`, `status`).
+
+- `Account.Role` lưu dạng **string** (không phải int) — ví dụ `"Admin"`, `"Student"`, `"Teacher"`.
+- JWT claims bao gồm: `ClaimTypes.Name` (username), `ClaimTypes.Email`, `ClaimTypes.Role`, `"FullName"`, `"UserId"`.
+- Tất cả entity kế thừa `BaseEntity`: `Id` (int PK), `CreatedAt`, `UpdatedAt`.
+- Password hash: SHA256 (demo). Tài khoản mặc định seed (password `123456`): `superadmin`, `admin`, `student`, `teacher`, `parent`, `librarian`.

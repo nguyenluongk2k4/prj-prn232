@@ -1,5 +1,6 @@
-﻿using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone.Controllers
@@ -14,6 +15,7 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin,Teacher,Student")]
         public async Task<IActionResult> GetAll(
             [FromQuery] PagedRequest request,
             [FromQuery] string? majorCode,
@@ -33,7 +35,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Class>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch lá»›p há»c thÃ nh cÃ´ng",
+                Message = "Lấy danh sách lớp học thành công",
                 Data = result.Items,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -42,20 +44,22 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Teacher,Student")]
         public async Task<IActionResult> GetById(int id)
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y lá»›p há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy lớp học có ID = {id}");
 
-            return HandleResult(item, "Láº¥y thÃ´ng tin lá»›p há»c thÃ nh cÃ´ng");
+            return HandleResult(item, "Lấy thông tin lớp học thành công");
         }
 
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Create([FromBody] Class cls)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Class> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<Class> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
             cls.CreatedAt = DateTime.UtcNow;
             NormalizeCohort(cls);
@@ -64,17 +68,18 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = cls.Id }, new ApiResponse<Class>
             {
                 Success = true,
-                Message = "ThÃªm lá»›p há»c thÃ nh cÃ´ng",
+                Message = "Thêm lớp học thành công",
                 Data = cls
             });
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] Class cls)
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y lá»›p há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy lớp học có ID = {id}");
 
             existing.ClassCode = cls.ClassCode;
             existing.ClassName = cls.ClassName;
@@ -90,7 +95,7 @@ namespace e360_clone.Controllers
 
             NormalizeCohort(existing);
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cáº­p nháº­t lá»›p há»c thÃ nh cÃ´ng");
+            return HandleResult(existing, "Cập nhật lớp học thành công");
         }
 
         private static void NormalizeCohort(Class cls)
@@ -113,15 +118,15 @@ namespace e360_clone.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y lá»›p há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy lớp học có ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "XÃ³a lá»›p há»c thÃ nh cÃ´ng");
+            return HandleResult(true, "Xóa lớp học thành công");
         }
     }
 }
-
