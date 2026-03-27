@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using e360_clone.BusinessObjects;
 using e360_clone.DataAccess;
 using e360_clone.DataAccess.DAOs;
+using e360_clone.BusinessObjects.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace e360_clone.Repositories
@@ -76,6 +77,21 @@ namespace e360_clone.Repositories
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public Task<List<AttendanceRosterItemDto>?> GetRosterAsync(int examId)
+        {
+            return _dao.GetRosterAsync(examId);
+        }
+
+        public Task<List<StudentAttendanceItemDto>> GetStudentAttendanceAsync(int studentId, DateTime? date)
+        {
+            return _dao.GetStudentAttendanceAsync(studentId, date);
+        }
+
+        public Task<List<AttendanceReportItemDto>> GetReportAsync(DateTime? fromDate, DateTime? toDate, int? subjectId, int? classId)
+        {
+            return _dao.GetReportAsync(fromDate, toDate, subjectId, classId);
         }
     }
 }
