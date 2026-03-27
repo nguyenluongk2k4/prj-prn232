@@ -62,7 +62,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Subject>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch mÃ´n há»c thÃ nh cÃ´ng",
+                Message = "Lấy danh sách môn học thành công",
                 Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -75,16 +75,16 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
 
-            return HandleResult(item, "Láº¥y thÃ´ng tin mÃ´n há»c thÃ nh cÃ´ng");
+            return HandleResult(item, "Lấy thông tin môn học thành công");
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Subject subject)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Subject> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<Subject> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
             subject.CreatedAt = DateTime.UtcNow;
             await _repository.AddAsync(subject);
@@ -92,7 +92,7 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = subject.Id }, new ApiResponse<Subject>
             {
                 Success = true,
-                Message = "ThÃªm mÃ´n há»c thÃ nh cÃ´ng",
+                Message = "Thêm môn học thành công",
                 Data = subject
             });
         }
@@ -102,7 +102,7 @@ namespace e360_clone.Controllers
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
 
             existing.SubjectCode = subject.SubjectCode;
             existing.SubjectName = subject.SubjectName;
@@ -115,7 +115,7 @@ namespace e360_clone.Controllers
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cáº­p nháº­t mÃ´n há»c thÃ nh cÃ´ng");
+            return HandleResult(existing, "Cập nhật môn học thành công");
         }
 
         [HttpDelete("{id}")]
@@ -123,11 +123,10 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y mÃ´n há»c cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy môn học có ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "XÃ³a mÃ´n há»c thÃ nh cÃ´ng");
+            return HandleResult(true, "Xóa môn học thành công");
         }
     }
 }
-
