@@ -1,0 +1,77 @@
+@startuml
+' 2.2.1 UCs for Admin / SuperAdmin
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+}
+
+actor "Admin /\nSuperAdmin" as admin
+
+rectangle "e360 Exam Management System" {
+    usecase "Login System" as UC_LOGIN
+    usecase "Reset Password" as UC_RESET
+
+    usecase "View School Dashboard" as UC_DASHBOARD
+
+    usecase "Manage Students" as UC_STUDENTS
+    usecase "Create Student" as UC_CREATE_STU
+    usecase "Update Student" as UC_UPDATE_STU
+    usecase "Delete Student" as UC_DELETE_STU
+
+    usecase "Manage Lecturers" as UC_LECTURERS
+    usecase "Create Lecturer" as UC_CREATE_LEC
+    usecase "Update Lecturer" as UC_UPDATE_LEC
+    usecase "Delete Lecturer" as UC_DELETE_LEC
+
+    usecase "Manage Subjects" as UC_SUBJECTS
+    usecase "Manage Classes" as UC_CLASSES
+    usecase "Manage Exam Rooms" as UC_ROOMS
+
+    usecase "Manage Exams" as UC_EXAMS
+    usecase "Create Exam" as UC_CREATE_EXAM
+    usecase "Update Exam" as UC_UPDATE_EXAM
+    usecase "Delete Exam" as UC_DELETE_EXAM
+
+    usecase "Assign Proctors" as UC_PROCTOR
+    usecase "Remove Proctor Assignment" as UC_DEL_PROCTOR
+
+    usecase "Manage Grades" as UC_GRADES
+    usecase "Manage Attendances" as UC_ATTEND
+}
+
+admin --> UC_LOGIN
+admin --> UC_DASHBOARD
+admin --> UC_STUDENTS
+admin --> UC_LECTURERS
+admin --> UC_SUBJECTS
+admin --> UC_CLASSES
+admin --> UC_ROOMS
+admin --> UC_EXAMS
+admin --> UC_PROCTOR
+admin --> UC_GRADES
+admin --> UC_ATTEND
+
+UC_LOGIN <.. UC_RESET : <<extend>>
+
+UC_STUDENTS <.. UC_CREATE_STU : <<extend>>
+UC_STUDENTS <.. UC_UPDATE_STU : <<extend>>
+UC_STUDENTS <.. UC_DELETE_STU : <<extend>>
+
+UC_LECTURERS <.. UC_CREATE_LEC : <<extend>>
+UC_LECTURERS <.. UC_UPDATE_LEC : <<extend>>
+UC_LECTURERS <.. UC_DELETE_LEC : <<extend>>
+
+UC_EXAMS <.. UC_CREATE_EXAM : <<extend>>
+UC_EXAMS <.. UC_UPDATE_EXAM : <<extend>>
+UC_EXAMS <.. UC_DELETE_EXAM : <<extend>>
+
+UC_PROCTOR <.. UC_DEL_PROCTOR : <<extend>>
+UC_PROCTOR ..> UC_EXAMS : <<include>>
+
+@enduml

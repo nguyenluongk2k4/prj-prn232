@@ -1,0 +1,47 @@
+@startuml
+' 2.2.4 UCs for Student
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+}
+
+actor "Student" as student
+
+rectangle "e360 Exam Management System" {
+    usecase "Login System" as UC_LOGIN
+    usecase "Reset Password" as UC_RESET
+
+    usecase "View Student Dashboard" as UC_DASHBOARD
+
+    usecase "View Exam Schedule" as UC_VIEW_EXAM
+    usecase "View Exam Details" as UC_EXAM_DETAIL
+
+    usecase "Confirm Attendance" as UC_CONFIRM_ATTEND
+
+    usecase "View Grade Results" as UC_VIEW_GRADE
+    usecase "View Grade Details" as UC_GRADE_DETAIL
+
+    usecase "Log Out" as UC_LOGOUT
+}
+
+student --> UC_LOGIN
+student --> UC_DASHBOARD
+student --> UC_VIEW_EXAM
+student --> UC_CONFIRM_ATTEND
+student --> UC_VIEW_GRADE
+student --> UC_LOGOUT
+
+UC_LOGIN <.. UC_RESET : <<extend>>
+
+UC_VIEW_EXAM <.. UC_EXAM_DETAIL : <<extend>>
+UC_CONFIRM_ATTEND ..> UC_VIEW_EXAM : <<include>>
+
+UC_VIEW_GRADE <.. UC_GRADE_DETAIL : <<extend>>
+
+@enduml

@@ -1,0 +1,124 @@
+@startuml screens_flow
+title e360 Exam Management System — Screens Flow
+
+top to bottom direction
+
+skinparam state {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+    FontName Arial
+    FontSize 11
+}
+skinparam ranksep 40
+skinparam nodesep 30
+
+' ─────────────────────────────────────────
+'  ENTRY POINT
+' ─────────────────────────────────────────
+[*] --> LoginPage
+
+state "Login Page" as LoginPage
+
+' ─────────────────────────────────────────
+'  ROLE BRANCH
+' ─────────────────────────────────────────
+LoginPage --> LMSDashboard      : [Admin / SuperAdmin]
+LoginPage --> TeacherDashboard  : [Teacher]
+LoginPage --> StudentDashboard  : [Student]
+LoginPage --> LoginPage         : invalid credentials
+
+' ─────────────────────────────────────────
+'  ADMIN DASHBOARD
+' ─────────────────────────────────────────
+state "LMS Dashboard" as LMSDashboard
+
+LMSDashboard --> StudentList
+LMSDashboard --> LecturerList
+LMSDashboard --> SubjectList
+LMSDashboard --> ClassList
+LMSDashboard --> ExamList
+LMSDashboard --> LoginPage : logout
+
+' ─── STUDENTS ───
+state "Student List" as StudentList
+state "Create Student" as StudentCreate
+state "Student Details" as StudentDetails
+state "Edit Student" as StudentEdit
+
+StudentList --> StudentCreate
+StudentList --> StudentDetails
+StudentList --> StudentEdit
+StudentCreate --> StudentList : submit / cancel
+StudentEdit --> StudentList   : submit / cancel
+StudentDetails --> StudentEdit
+
+' ─── LECTURERS ───
+state "Lecturer List" as LecturerList
+state "Create Lecturer" as LecturerCreate
+state "Lecturer Details" as LecturerDetails
+state "Edit Lecturer" as LecturerEdit
+
+LecturerList --> LecturerCreate
+LecturerList --> LecturerDetails
+LecturerList --> LecturerEdit
+LecturerCreate --> LecturerList : submit / cancel
+LecturerEdit --> LecturerList   : submit / cancel
+LecturerDetails --> LecturerEdit
+
+' ─── SUBJECTS ───
+state "Subject List" as SubjectList
+state "Create Subject" as SubjectCreate
+state "Subject Details" as SubjectDetails
+state "Edit Subject" as SubjectEdit
+
+SubjectList --> SubjectCreate
+SubjectList --> SubjectDetails
+SubjectList --> SubjectEdit
+SubjectCreate --> SubjectList : submit / cancel
+SubjectEdit --> SubjectList   : submit / cancel
+
+' ─── CLASSES ───
+state "Class List" as ClassList
+state "Create Class" as ClassCreate
+state "Class Details" as ClassDetails
+state "Edit Class" as ClassEdit
+
+ClassList --> ClassCreate
+ClassList --> ClassDetails
+ClassList --> ClassEdit
+ClassCreate --> ClassList : submit / cancel
+ClassEdit --> ClassList   : submit / cancel
+
+' ─── EXAMS ───
+state "Exam List" as ExamList
+state "Create Exam" as ExamCreate
+state "Exam Details" as ExamDetails
+state "Edit Exam" as ExamEdit
+
+ExamList --> ExamCreate
+ExamList --> ExamDetails
+ExamList --> ExamEdit
+ExamCreate --> ExamList : submit / cancel
+ExamEdit --> ExamList   : submit / cancel
+ExamDetails --> ExamEdit
+
+' ─────────────────────────────────────────
+'  TEACHER FLOW
+' ─────────────────────────────────────────
+state "Teacher Dashboard" as TeacherDashboard
+TeacherDashboard --> LoginPage : logout
+
+' ─────────────────────────────────────────
+'  STUDENT FLOW
+' ─────────────────────────────────────────
+state "Student Dashboard" as StudentDashboard
+StudentDashboard --> LoginPage : logout
+
+' ─────────────────────────────────────────
+'  ACCESS DENIED
+' ─────────────────────────────────────────
+state "Access Denied" as AccessDenied
+LoginPage --> AccessDenied : forbidden route
+
+@enduml

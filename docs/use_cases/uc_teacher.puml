@@ -1,0 +1,49 @@
+@startuml
+' 2.2.3 UCs for Teacher (Lecturer)
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+}
+
+actor "Teacher" as teacher
+
+rectangle "e360 Exam Management System" {
+    usecase "Login System" as UC_LOGIN
+    usecase "Reset Password" as UC_RESET
+
+    usecase "View Teacher Dashboard" as UC_DASHBOARD
+
+    usecase "View Proctor Assignments" as UC_VIEW_PROCTOR
+    usecase "View Assigned Exam Details" as UC_EXAM_DETAIL
+    usecase "View Assigned Student List" as UC_STUDENT_LIST
+
+    usecase "Submit Student Grades" as UC_SUBMIT_GRADE
+    usecase "Update Student Grade" as UC_UPDATE_GRADE
+
+    usecase "View Exam Schedule" as UC_EXAM_SCHEDULE
+
+    usecase "Log Out" as UC_LOGOUT
+}
+
+teacher --> UC_LOGIN
+teacher --> UC_DASHBOARD
+teacher --> UC_VIEW_PROCTOR
+teacher --> UC_SUBMIT_GRADE
+teacher --> UC_EXAM_SCHEDULE
+teacher --> UC_LOGOUT
+
+UC_LOGIN <.. UC_RESET : <<extend>>
+
+UC_VIEW_PROCTOR <.. UC_EXAM_DETAIL : <<extend>>
+UC_VIEW_PROCTOR <.. UC_STUDENT_LIST : <<extend>>
+
+UC_SUBMIT_GRADE <.. UC_UPDATE_GRADE : <<extend>>
+UC_SUBMIT_GRADE ..> UC_STUDENT_LIST : <<include>>
+
+@enduml
