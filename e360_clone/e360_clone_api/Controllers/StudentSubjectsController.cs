@@ -27,7 +27,7 @@ namespace e360_clone.Controllers
                 });
             }
 
-            var data = (await _repository.FindAsync(x => x.StudentId == studentId)).ToList();
+            var data = await _repository.GetByStudentIdAsync(studentId);
 
             return Ok(new ApiResponse<List<StudentSubject>>
             {

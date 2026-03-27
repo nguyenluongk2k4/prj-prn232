@@ -35,6 +35,7 @@ namespace e360_clone
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<StudentDAO>();
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<StudentSubjectDAO>();
             builder.Services.AddScoped<IStudentSubjectRepository, StudentSubjectRepository>();
             builder.Services.AddScoped<SubjectDAO>();
             builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();

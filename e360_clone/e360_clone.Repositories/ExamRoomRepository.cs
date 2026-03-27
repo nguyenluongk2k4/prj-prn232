@@ -77,5 +77,10 @@ namespace e360_clone.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public Task<List<ExamRoom>> GetAvailableRoomsAsync(DateTime examDate, TimeSpan startTime, TimeSpan endTime, int? excludeExamId)
+        {
+            return _dao.GetAvailableRoomsAsync(examDate, startTime, endTime, excludeExamId);
+        }
     }
 }

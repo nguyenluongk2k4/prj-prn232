@@ -1,4 +1,4 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -210,7 +210,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<StudentDto>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch sinh viÃªn theo mÃ´n thÃ nh cÃ´ng",
+                Message = "Lấy danh sách sinh viên theo môn thành công",
                 Data = dtoList,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -281,4 +281,3 @@ namespace e360_clone.Controllers
         }
     }
 }
-

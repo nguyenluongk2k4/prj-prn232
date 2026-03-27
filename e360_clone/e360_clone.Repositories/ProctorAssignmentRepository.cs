@@ -77,5 +77,10 @@ namespace e360_clone.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public Task<bool> HasScheduleConflictAsync(int lecturerId, int examId, int? excludeId)
+        {
+            return _dao.HasScheduleConflictAsync(lecturerId, examId, excludeId);
+        }
     }
 }

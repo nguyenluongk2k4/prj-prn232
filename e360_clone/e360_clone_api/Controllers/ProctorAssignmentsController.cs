@@ -58,7 +58,7 @@ namespace e360_clone.Controllers
             if (exam == null)
                 return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
 
-            var hasConflict = await HasScheduleConflictAsync(assignment.LecturerId, exam, null);
+            var hasConflict = await _repository.HasScheduleConflictAsync(assignment.LecturerId, assignment.ExamId, null);
             if (hasConflict)
             {
                 return BadRequest(new ApiResponse<ProctorAssignment>
@@ -90,7 +90,7 @@ namespace e360_clone.Controllers
             if (exam == null)
                 return HandleNotFound($"Không tìm thấy kỳ thi có ID = {assignment.ExamId}");
 
-            var hasConflict = await HasScheduleConflictAsync(assignment.LecturerId, exam, id);
+            var hasConflict = await _repository.HasScheduleConflictAsync(assignment.LecturerId, assignment.ExamId, id);
             if (hasConflict)
             {
                 return BadRequest(new ApiResponse<ProctorAssignment>
@@ -121,33 +121,5 @@ namespace e360_clone.Controllers
             return HandleResult(true, "Xóa phân công coi thi thành công");
         }
 
-        private async Task<bool> HasScheduleConflictAsync(int lecturerId, Exam exam, int? excludeId)
-        {
-            var assignments = await _repository.GetPagedFilteredAsync(
-                1,
-                int.MaxValue,
-                x => x.LecturerId == lecturerId && (!excludeId.HasValue || x.Id != excludeId.Value),
-                q => q.OrderBy(x => x.Id));
-
-            foreach (var assignment in assignments)
-            {
-                var otherExam = await _examRepository.GetByIdAsync(assignment.ExamId);
-                if (otherExam == null)
-                    continue;
-
-                if (otherExam.ExamDate.Date != exam.ExamDate.Date)
-                    continue;
-
-                if (IsTimeOverlap(otherExam.StartTime, otherExam.EndTime, exam.StartTime, exam.EndTime))
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsTimeOverlap(TimeSpan start1, TimeSpan end1, TimeSpan start2, TimeSpan end2)
-        {
-            return start1 < end2 && start2 < end1;
-        }
     }
 }

@@ -1,4 +1,4 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,12 +7,10 @@ namespace e360_clone.Controllers
     public class RoomsController : BaseApiController
     {
         private readonly IExamRoomRepository _repository;
-        private readonly IExamRepository _examRepository;
 
-        public RoomsController(IExamRoomRepository repository, IExamRepository examRepository)
+        public RoomsController(IExamRoomRepository repository)
         {
             _repository = repository;
-            _examRepository = examRepository;
         }
 
         [HttpGet]
@@ -62,10 +60,7 @@ namespace e360_clone.Controllers
             [FromQuery] TimeSpan endTime,
             [FromQuery] int? excludeExamId)
         {
-            var rooms = await _repository.GetAllAsync();
-            var conflicts = await _examRepository.GetConflictingRoomIdsAsync(examDate, startTime, endTime, excludeExamId);
-
-            var available = rooms.Where(r => !conflicts.Contains(r.Id)).ToList();
+            var available = await _repository.GetAvailableRoomsAsync(examDate, startTime, endTime, excludeExamId);
             return HandleResult(available, "Lấy danh sách phòng trống thành công");
         }
 
