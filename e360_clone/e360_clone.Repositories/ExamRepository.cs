@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects.DTOs;
 using e360_clone.DataAccess;
 using e360_clone.DataAccess.DAOs;
 using Microsoft.EntityFrameworkCore;
@@ -97,6 +98,25 @@ namespace e360_clone.Repositories
                 .Select(x => x.RoomId)
                 .Distinct()
                 .ToListAsync();
+        }
+
+        public Task<(List<Exam> Items, int TotalRecords)> GetPagedFilteredWithMetaAsync(
+            int pageNumber,
+            int pageSize,
+            string? searchTerm,
+            DateTime? fromDate,
+            DateTime? toDate)
+        {
+            return _dao.GetPagedFilteredWithMetaAsync(pageNumber, pageSize, searchTerm, fromDate, toDate);
+        }
+
+        public Task<List<StudentExamScheduleDto>> GetStudentScheduleAsync(
+            int studentId,
+            string? email,
+            DateTime? fromDate,
+            DateTime? toDate)
+        {
+            return _dao.GetStudentScheduleAsync(studentId, email, fromDate, toDate);
         }
     }
 }

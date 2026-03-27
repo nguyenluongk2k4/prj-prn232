@@ -1,23 +1,18 @@
 ﻿using e360_clone.BusinessObjects;
-using e360_clone.DataAccess;
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace e360_clone.Controllers
 {
     public class ExamsController : BaseApiController
     {
         private readonly IExamRepository _repository;
-        private readonly AppDbContext _context;
         private readonly ILogger<ExamsController> _logger;
 
-        public ExamsController(IExamRepository repository, AppDbContext context, ILogger<ExamsController> logger)
+        public ExamsController(IExamRepository repository, ILogger<ExamsController> logger)
         {
             _repository = repository;
-            _context = context;
             _logger = logger;
         }
 
@@ -27,38 +22,21 @@ namespace e360_clone.Controllers
             [FromQuery] DateTime? fromDate,
             [FromQuery] DateTime? toDate)
         {
-            var term = request.SearchTerm?.Trim();
-            Func<IQueryable<Exam>, IOrderedQueryable<Exam>> orderBy = q => q.OrderBy(x => x.ExamDate);
-
-            var hasFilter = !string.IsNullOrEmpty(term) || fromDate.HasValue || toDate.HasValue;
-            Expression<Func<Exam, bool>>? filter = null;
-            if (hasFilter)
-            {
-                var from = fromDate?.Date;
-                var to = toDate?.Date;
-                filter = x =>
-                    (string.IsNullOrEmpty(term) || x.ExamName.Contains(term) || x.ExamCode.Contains(term)) &&
-                    (!from.HasValue || x.ExamDate.Date >= from.Value) &&
-                    (!to.HasValue || x.ExamDate.Date <= to.Value);
-            }
-
-            IEnumerable<Exam> data = await _repository.GetPagedFilteredAsync(
+            var result = await _repository.GetPagedFilteredWithMetaAsync(
                 request.PageNumber,
                 request.PageSize,
-                filter,
-                orderBy);
-            var totalRecords = filter == null
-                ? await _repository.CountAsync()
-                : await _repository.CountAsync(filter);
+                request.SearchTerm,
+                fromDate,
+                toDate);
 
             return Ok(new PagedResponse<Exam>
             {
                 Success = true,
                 Message = "Láº¥y danh sÃ¡ch ká»³ thi thÃ nh cÃ´ng",
-                Data = data.ToList(),
+                Data = result.Items,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-                TotalRecords = totalRecords
+                TotalRecords = result.TotalRecords
             });
         }
 
@@ -90,132 +68,7 @@ namespace e360_clone.Controllers
                     });
                 }
 
-                var from = (fromDate ?? DateTime.UtcNow.Date.AddDays(-7)).Date;
-                var to = (toDate ?? DateTime.UtcNow.Date.AddDays(7)).Date;
-                var fromUtc = DateTime.SpecifyKind(from, DateTimeKind.Utc);
-                var toUtcExclusive = DateTime.SpecifyKind(to.AddDays(1), DateTimeKind.Utc);
-
-                if (studentId <= 0 && !string.IsNullOrWhiteSpace(email))
-                {
-                    studentId = await _context.Accounts
-                        .Where(a => a.Email == email)
-                        .Select(a => a.StudentId)
-                        .Where(id => id.HasValue)
-                        .Select(id => id!.Value)
-                        .FirstOrDefaultAsync();
-                }
-
-                if (studentId <= 0)
-                {
-                    return Ok(new ApiResponse<List<StudentExamScheduleDto>>
-                    {
-                        Success = true,
-                        Message = "Không tìm thấy sinh viên.",
-                        Data = new List<StudentExamScheduleDto>()
-                    });
-                }
-
-                var exams = await _context.ExamRoomAllocations
-                    .Where(alloc => alloc.StudentId == studentId)
-                    .Join(
-                        _context.Exams,
-                        alloc => alloc.ExamId,
-                        e => e.Id,
-                        (alloc, e) => new StudentExamScheduleDto
-                        {
-                            Id = e.Id,
-                            ExamCode = e.ExamCode,
-                            ExamName = e.ExamName,
-                            ExamType = e.ExamType,
-                            SubjectId = e.SubjectId,
-                            ClassId = e.ClassId,
-                            RoomId = alloc.RoomId,
-                            ExamDate = e.ExamDate,
-                            StartTime = e.StartTime,
-                            EndTime = e.EndTime,
-                            Duration = e.Duration,
-                            AcademicYear = e.AcademicYear,
-                            Semester = e.Semester,
-                            Status = e.Status,
-                            Notes = e.Notes,
-                            SeatNumber = alloc.SeatNumber
-                        })
-                    .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
-                    .Distinct()
-                    .OrderBy(e => e.ExamDate)
-                    .ThenBy(e => e.StartTime)
-                    .ToListAsync();
-
-                if (exams.Count == 0)
-                {
-                    exams = await _context.StudentExams
-                        .Where(se => se.StudentId == studentId)
-                        .Join(
-                            _context.Exams,
-                            se => se.ExamId,
-                            e => e.Id,
-                            (se, e) => new StudentExamScheduleDto
-                            {
-                                Id = e.Id,
-                                ExamCode = e.ExamCode,
-                                ExamName = e.ExamName,
-                                ExamType = e.ExamType,
-                                SubjectId = e.SubjectId,
-                                ClassId = e.ClassId,
-                                RoomId = e.RoomId,
-                                ExamDate = e.ExamDate,
-                                StartTime = e.StartTime,
-                                EndTime = e.EndTime,
-                                Duration = e.Duration,
-                                AcademicYear = e.AcademicYear,
-                                Semester = e.Semester,
-                                Status = e.Status,
-                                Notes = e.Notes,
-                                SeatNumber = 0
-                            })
-                        .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
-                        .Distinct()
-                        .OrderBy(e => e.ExamDate)
-                        .ThenBy(e => e.StartTime)
-                        .ToListAsync();
-                }
-
-                if (exams.Count == 0)
-                {
-                    var classId = await _context.Students
-                        .Where(s => s.Id == studentId)
-                        .Select(s => s.ClassId)
-                        .FirstOrDefaultAsync();
-
-                    if (classId > 0)
-                    {
-                        exams = await _context.Exams
-                            .Where(e => e.ClassId == classId)
-                            .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
-                            .Select(e => new StudentExamScheduleDto
-                            {
-                                Id = e.Id,
-                                ExamCode = e.ExamCode,
-                                ExamName = e.ExamName,
-                                ExamType = e.ExamType,
-                                SubjectId = e.SubjectId,
-                                ClassId = e.ClassId,
-                                RoomId = e.RoomId,
-                                ExamDate = e.ExamDate,
-                                StartTime = e.StartTime,
-                                EndTime = e.EndTime,
-                                Duration = e.Duration,
-                                AcademicYear = e.AcademicYear,
-                                Semester = e.Semester,
-                                Status = e.Status,
-                                Notes = e.Notes,
-                                SeatNumber = 0
-                            })
-                            .OrderBy(e => e.ExamDate)
-                            .ThenBy(e => e.StartTime)
-                            .ToListAsync();
-                    }
-                }
+                var exams = await _repository.GetStudentScheduleAsync(studentId, email, fromDate, toDate);
 
                 return Ok(new ApiResponse<List<StudentExamScheduleDto>>
                 {
