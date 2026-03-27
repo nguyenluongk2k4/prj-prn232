@@ -237,19 +237,20 @@ namespace e360_clone_fe.Controllers
             int attendanceId,
             int examId,
             bool confirmed,
+            string? status,
             string? returnUrl)
         {
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
 
             var studentId = HttpContext.Session.GetInt32("StudentId") ?? 0;
-            var status = confirmed ? "Present" : "Pending";
+            var currentStatus = string.IsNullOrWhiteSpace(status) ? "Pending" : status;
             var payload = new
             {
                 Id = attendanceId,
                 ExamId = examId,
                 StudentId = studentId,
-                Status = status,
+                Status = currentStatus,
                 CheckInTime = (DateTime?)null,
                 CheckOutTime = confirmed ? DateTime.UtcNow : (DateTime?)null,
                 Notes = string.Empty,

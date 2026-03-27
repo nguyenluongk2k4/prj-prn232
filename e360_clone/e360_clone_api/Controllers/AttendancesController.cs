@@ -26,7 +26,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Attendance>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch Ä‘iá»ƒm danh thÃ nh cÃ´ng",
+                Message = "Lấy danh sách điểm danh thành công",
                 Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -39,9 +39,9 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
 
-            return HandleResult(item, "Láº¥y thÃ´ng tin Ä‘iá»ƒm danh thÃ nh cÃ´ng");
+            return HandleResult(item, "Lấy thông tin điểm danh thành công");
         }
 
         [HttpGet("roster")]
@@ -49,20 +49,20 @@ namespace e360_clone.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "ExamId khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "ExamId không hợp lệ" });
             }
 
             var roster = await _repository.GetRosterAsync(examId);
 
             if (roster == null)
             {
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {examId}");
+                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {examId}");
             }
 
             return Ok(new ApiResponse<List<AttendanceRosterItemDto>>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch Ä‘iá»ƒm danh theo ca thi thÃ nh cÃ´ng",
+                Message = "Lấy danh sách điểm danh theo ca thi thành công",
                 Data = roster
             });
         }
@@ -72,7 +72,7 @@ namespace e360_clone.Controllers
         {
             if (studentId <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "StudentId khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡" });
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "StudentId không hợp lệ" });
             }
 
             var items = await _repository.GetStudentAttendanceAsync(studentId, date);
@@ -82,7 +82,7 @@ namespace e360_clone.Controllers
                 return Ok(new ApiResponse<List<StudentAttendanceItemDto>>
                 {
                     Success = true,
-                    Message = "KhÃƒÂ´ng cÃƒÂ³ ca thi.",
+                    Message = "Không có ca thi.",
                     Data = new List<StudentAttendanceItemDto>()
                 });
             }
@@ -90,7 +90,7 @@ namespace e360_clone.Controllers
             return Ok(new ApiResponse<List<StudentAttendanceItemDto>>
             {
                 Success = true,
-                Message = "LÃ¡ÂºÂ¥y danh sÃƒÂ¡ch Ã„â€˜iÃ¡Â»Æ’m danh sinh viÃƒÂªn thÃƒÂ nh cÃƒÂ´ng",
+                Message = "Lấy danh sách điểm danh sinh viên thành công",
                 Data = items
             });
         }
@@ -108,7 +108,7 @@ namespace e360_clone.Controllers
                 return Ok(new ApiResponse<List<AttendanceReportItemDto>>
                 {
                     Success = true,
-                    Message = "L?y b?o c?o ?i?m danh th?nh c?ng",
+                    Message = "Lấy báo cáo điểm danh thành công",
                     Data = data
                 });
             }
@@ -122,7 +122,7 @@ namespace e360_clone.Controllers
         public async Task<IActionResult> Create([FromBody] Attendance attendance)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Attendance> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<Attendance> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
             attendance.RecordedAt = DateTime.UtcNow;
             await _repository.AddAsync(attendance);
@@ -130,7 +130,7 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = attendance.Id }, new ApiResponse<Attendance>
             {
                 Success = true,
-                Message = "ThÃªm Ä‘iá»ƒm danh thÃ nh cÃ´ng",
+                Message = "Thêm điểm danh thành công",
                 Data = attendance
             });
         }
@@ -140,20 +140,41 @@ namespace e360_clone.Controllers
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
+
+            var statusValue = string.IsNullOrWhiteSpace(attendance.Status)
+                ? existing.Status?.Trim() ?? string.Empty
+                : attendance.Status.Trim();
+            var canStudentConfirm = statusValue.Equals("Present", StringComparison.OrdinalIgnoreCase)
+                                    || statusValue.Equals("Late", StringComparison.OrdinalIgnoreCase);
+
+            if (attendance.StudentConfirmed && !canStudentConfirm)
+            {
+                return BadRequest(new ApiResponse<Attendance>
+                {
+                    Success = false,
+                    Message = "Chỉ được ký khi trạng thái là Present hoặc Late.",
+                    Data = existing
+                });
+            }
 
             existing.ExamId = attendance.ExamId;
             existing.StudentId = attendance.StudentId;
-            existing.Status = attendance.Status;
+            if (!string.IsNullOrWhiteSpace(attendance.Status))
+            {
+                existing.Status = attendance.Status;
+            }
             existing.CheckInTime = attendance.CheckInTime;
             existing.CheckOutTime = attendance.CheckOutTime;
             existing.Notes = attendance.Notes;
             existing.Violation = attendance.Violation;
             existing.StudentConfirmed = attendance.StudentConfirmed;
-            existing.StudentConfirmedAt = attendance.StudentConfirmedAt;
+            existing.StudentConfirmedAt = attendance.StudentConfirmed
+                ? (attendance.StudentConfirmedAt ?? DateTime.UtcNow)
+                : null;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cáº­p nháº­t Ä‘iá»ƒm danh thÃ nh cÃ´ng");
+            return HandleResult(existing, "Cập nhật điểm danh thành công");
         }
 
         [HttpDelete("{id}")]
@@ -161,10 +182,10 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
+                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "XÃ³a Ä‘iá»ƒm danh thÃ nh cÃ´ng");
+            return HandleResult(true, "Xóa điểm danh thành công");
         }
 
     }

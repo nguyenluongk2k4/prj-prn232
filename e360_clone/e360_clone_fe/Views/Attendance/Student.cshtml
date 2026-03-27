@@ -71,6 +71,8 @@
                                 {
                                     var statusLabel = item.StudentConfirmed ? "Đã ký giấy" : "Chưa ký giấy";
                                     var statusClass = item.StudentConfirmed ? "bg-success-100 text-success-600" : "bg-warning-100 text-warning-600";
+                                    var canSign = string.Equals(item.Status, "Present", StringComparison.OrdinalIgnoreCase)
+                                        || string.Equals(item.Status, "Late", StringComparison.OrdinalIgnoreCase);
                                     <tr data-attendance-id="@item.AttendanceId">
                                         <td>@item.StartTime.ToString("hh\\:mm") - @item.EndTime.ToString("hh\\:mm")</td>
                                         <td>@item.SubjectCode - @item.SubjectName</td>
@@ -82,17 +84,25 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <form asp-controller="Attendance" asp-action="StudentConfirm" method="post" class="student-confirm-form">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="attendanceId" value="@item.AttendanceId" />
-                                                <input type="hidden" name="examId" value="@item.ExamId" />
-                                                <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                                <input type="hidden" name="confirmed" value="false" />
-                                                <label class="form-check d-inline-flex align-items-center gap-8 text-sm mb-0">
-                                                    <input type="checkbox" name="confirmed" value="true" class="form-check-input js-confirm-checkbox" @(item.StudentConfirmed ? "checked disabled" : "") />
-                                                    <span>Ký giấy</span>
-                                                </label>
-                                            </form>
+                                            @if (canSign)
+                                            {
+                                                <form asp-controller="Attendance" asp-action="StudentConfirm" method="post" class="student-confirm-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="attendanceId" value="@item.AttendanceId" />
+                                                    <input type="hidden" name="examId" value="@item.ExamId" />
+                                                    <input type="hidden" name="status" value="@item.Status" />
+                                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                                    <input type="hidden" name="confirmed" value="false" />
+                                                    <label class="form-check d-inline-flex align-items-center gap-8 text-sm mb-0">
+                                                        <input type="checkbox" name="confirmed" value="true" class="form-check-input js-confirm-checkbox" @(item.StudentConfirmed ? "checked disabled" : "") />
+                                                        <span>Ký giấy</span>
+                                                    </label>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-xs text-secondary-light">Không thể ký (trạng thái @item.Status)</span>
+                                            }
                                         </td>
                                     </tr>
                                 }
