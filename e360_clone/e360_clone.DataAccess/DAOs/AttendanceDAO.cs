@@ -18,11 +18,11 @@ namespace e360_clone.DataAccess.DAOs
                 return null;
             }
 
-            var studentExams = await _context.StudentExams
-                .Where(se => se.ExamId == examId)
+            var studentIds = await _context.ExamRoomAllocations
+                .Where(a => a.ExamId == examId)
+                .Select(a => a.StudentId)
+                .Distinct()
                 .ToListAsync();
-
-            var studentIds = studentExams.Select(se => se.StudentId).Distinct().ToList();
             if (studentIds.Count == 0)
             {
                 return new List<AttendanceRosterItemDto>();
@@ -110,15 +110,6 @@ namespace e360_clone.DataAccess.DAOs
                 .Select(a => a.ExamId)
                 .Distinct()
                 .ToListAsync();
-
-            if (allocationExamIds.Count == 0)
-            {
-                allocationExamIds = await _context.StudentExams
-                    .Where(se => se.StudentId == studentId)
-                    .Select(se => se.ExamId)
-                    .Distinct()
-                    .ToListAsync();
-            }
 
             if (allocationExamIds.Count == 0)
             {

@@ -26,8 +26,6 @@ namespace e360_clone.Seeders
             await SeedStudentSubjectsAsync(context);
             await SeedTeachingAssignmentsAsync(context);
             await SeedExamSchedulesAsync(context);
-            await SeedStudentExamsAsync(context);
-            await SeedGradesAsync(context);
             await AllocateExamRoomsAsync(context);
         }
 
@@ -595,73 +593,6 @@ namespace e360_clone.Seeders
             }
         }
 
-        private static async Task SeedStudentExamsAsync(AppDbContext context)
-        {
-            var exams = await context.Exams.AsNoTracking().ToListAsync();
-            if (exams.Count == 0)
-            {
-                Console.WriteLine("No exams found. Skip student-exam seeding.");
-                return;
-            }
-
-            var studentSubjects = await context.StudentSubjects.AsNoTracking().ToListAsync();
-            var existing = await context.StudentExams
-                .Select(se => new { se.ExamId, se.StudentId })
-                .ToListAsync();
-            var existingSet = new HashSet<(int ExamId, int StudentId)>(existing.Select(x => (x.ExamId, x.StudentId)));
-
-            var toAdd = new List<StudentExam>();
-            foreach (var exam in exams)
-            {
-                var semesterFilter = ParseSemester(exam.Semester);
-                var candidates = studentSubjects.Where(ss =>
-                        ss.SubjectId == exam.SubjectId &&
-                        (ss.ClassId == null || ss.ClassId == exam.ClassId || ss.ClassId == 0))
-                    .ToList();
-
-                if (!string.IsNullOrWhiteSpace(exam.AcademicYear))
-                {
-                    candidates = candidates
-                        .Where(ss => ss.AcademicYear == exam.AcademicYear)
-                        .ToList();
-                }
-
-                if (semesterFilter.HasValue)
-                {
-                    candidates = candidates
-                        .Where(ss => ss.Semester == semesterFilter.Value)
-                        .ToList();
-                }
-
-                foreach (var ss in candidates)
-                {
-                    var key = (exam.Id, ss.StudentId);
-                    if (existingSet.Contains(key))
-                        continue;
-
-                    toAdd.Add(new StudentExam
-                    {
-                        ExamId = exam.Id,
-                        StudentId = ss.StudentId,
-                        Status = "Registered",
-                        CreatedAt = DateTime.UtcNow
-                    });
-                    existingSet.Add(key);
-                }
-            }
-
-            if (toAdd.Count > 0)
-            {
-                await context.StudentExams.AddRangeAsync(toAdd);
-                await context.SaveChangesAsync();
-                Console.WriteLine($"Seeded {toAdd.Count} student-exam records.");
-            }
-            else
-            {
-                Console.WriteLine("No new student-exam records to seed.");
-            }
-        }
-
         private static async Task SeedExamSchedulesAsync(AppDbContext context)
         {
             var rooms = await context.ExamRooms.AsNoTracking()
@@ -851,7 +782,7 @@ namespace e360_clone.Seeders
             var exams = await context.Exams.AsNoTracking().ToListAsync();
             var rooms = await context.ExamRooms.AsNoTracking()
                 .Where(r => r.Status == "Available" || string.IsNullOrWhiteSpace(r.Status))
-                .ToListAsync();
+                .ToDictionaryAsync(r => r.Id);
 
             if (exams.Count == 0 || rooms.Count == 0)
             {
@@ -860,17 +791,24 @@ namespace e360_clone.Seeders
             }
 
             var rand = new Random();
-            var grouped = exams.GroupBy(e => new { e.ExamDate.Date, e.StartTime, e.EndTime }).ToList();
+            var studentsByClass = await context.Students.AsNoTracking()
+                .GroupBy(s => s.ClassId)
+                .ToDictionaryAsync(g => g.Key, g => g.ToList());
 
-            foreach (var slot in grouped)
+            foreach (var exam in exams)
             {
-                var slotExamIds = slot.Select(e => e.Id).ToList();
-                var studentExams = await context.StudentExams
-                    .Where(se => slotExamIds.Contains(se.ExamId))
-                    .ToListAsync();
+                if (!rooms.TryGetValue(exam.RoomId, out var room))
+                {
+                    continue;
+                }
+
+                if (!studentsByClass.TryGetValue(exam.ClassId, out var classStudents) || classStudents.Count == 0)
+                {
+                    continue;
+                }
 
                 var allocationsToRemove = await context.ExamRoomAllocations
-                    .Where(a => slotExamIds.Contains(a.ExamId))
+                    .Where(a => a.ExamId == exam.Id)
                     .ToListAsync();
                 if (allocationsToRemove.Count > 0)
                 {
@@ -878,125 +816,36 @@ namespace e360_clone.Seeders
                     await context.SaveChangesAsync();
                 }
 
-                var examQueues = studentExams
-                    .GroupBy(se => se.ExamId)
-                    .ToDictionary(g => g.Key, g => new Queue<int>(g.Select(x => x.StudentId).OrderBy(_ => rand.Next())));
-
-                var remainingExamIds = new HashSet<int>(examQueues.Keys.Where(id => examQueues[id].Count > 0));
-                if (remainingExamIds.Count == 0)
-                    continue;
-
-                var shuffledRooms = rooms.OrderBy(_ => rand.Next()).ToList();
+                var shuffledStudents = classStudents.OrderBy(_ => rand.Next()).ToList();
+                var capacity = room.Capacity > 0 ? room.Capacity : shuffledStudents.Count;
+                var seatNumber = 1;
                 var allocations = new List<ExamRoomAllocation>();
 
-                foreach (var room in shuffledRooms)
+                foreach (var student in shuffledStudents)
                 {
-                    if (remainingExamIds.Count == 0)
-                        break;
-
-                    var capacity = room.Capacity > 0 ? Math.Min(room.Capacity, 30) : 30;
-                    var subjectCount = remainingExamIds.Count >= 3 ? rand.Next(2, 4) : Math.Min(remainingExamIds.Count, 2);
-                    if (subjectCount <= 0)
-                        break;
-
-                    var selectedExams = remainingExamIds
-                        .OrderByDescending(id => examQueues[id].Count)
-                        .ThenBy(_ => rand.Next())
-                        .Take(subjectCount)
-                        .ToList();
-                    var active = new List<int>(selectedExams);
-                    var seatNumber = 1;
-
-                    while (capacity > 0 && active.Count > 0)
+                    if (seatNumber > capacity)
                     {
-                        for (var i = 0; i < active.Count && capacity > 0; i++)
-                        {
-                            var examId = active[i];
-                            var queue = examQueues[examId];
-                            if (queue.Count == 0)
-                            {
-                                active.RemoveAt(i);
-                                i--;
-                                continue;
-                            }
-
-                            var studentId = queue.Dequeue();
-                            allocations.Add(new ExamRoomAllocation
-                            {
-                                ExamId = examId,
-                                StudentId = studentId,
-                                RoomId = room.Id,
-                                SeatNumber = seatNumber,
-                                CreatedAt = DateTime.UtcNow
-                            });
-                            seatNumber++;
-                            capacity--;
-                        }
+                        break;
                     }
 
-                    foreach (var examId in selectedExams)
+                    allocations.Add(new ExamRoomAllocation
                     {
-                        if (examQueues[examId].Count == 0)
-                        {
-                            remainingExamIds.Remove(examId);
-                        }
-                    }
+                        ExamId = exam.Id,
+                        StudentId = student.Id,
+                        RoomId = exam.RoomId,
+                        SeatNumber = seatNumber,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                    seatNumber++;
                 }
 
                 if (allocations.Count > 0)
                 {
                     await context.ExamRoomAllocations.AddRangeAsync(allocations);
                     await context.SaveChangesAsync();
-                    Console.WriteLine($"Allocated {allocations.Count} students to rooms for slot {slot.Key.Date:yyyy-MM-dd} {slot.Key.StartTime:hh\\:mm}-{slot.Key.EndTime:hh\\:mm}.");
+                    Console.WriteLine($"Allocated {allocations.Count} students to room {room.RoomCode} for exam {exam.ExamCode}.");
                 }
             }
-        }
-
-        private static async Task SeedGradesAsync(AppDbContext context)
-        {
-            if (await context.Grades.AnyAsync())
-            {
-                Console.WriteLine("Database already has grades.");
-                return;
-            }
-
-            var studentExams = await context.StudentExams.AsNoTracking().Take(200).ToListAsync();
-            if (studentExams.Count == 0)
-            {
-                Console.WriteLine("No student exams found. Skip grade seeding.");
-                return;
-            }
-
-            var rand = new Random();
-            var scoreTypes = new[] { "ProgressTest", "Practical", "Final", "Lab", "Assignment" };
-            var now = DateTime.UtcNow;
-            var grades = new List<Grade>();
-
-            foreach (var se in studentExams)
-            {
-                foreach (var type in scoreTypes)
-                {
-                    var score = Math.Round((decimal)(rand.NextDouble() * 6.0 + 4.0), 1);
-                    var letter = e360_clone.BusinessObjects.Utilities.GradeUtils.CalculateLetterGrade(score);
-
-                    grades.Add(new Grade
-                    {
-                        StudentId = se.StudentId,
-                        ExamId = se.ExamId,
-                        Score = score,
-                        ScoreType = type,
-                        LetterGrade = letter,
-                        Notes = "Seeded",
-                        Status = "Published",
-                        EnteredAt = now,
-                        ApprovedAt = now
-                    });
-                }
-            }
-
-            await context.Grades.AddRangeAsync(grades);
-            await context.SaveChangesAsync();
-            Console.WriteLine($"Seeded {grades.Count} grades (component scores).");
         }
 
         private static int? ParseSemester(string? semester)

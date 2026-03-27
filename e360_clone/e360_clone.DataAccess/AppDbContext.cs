@@ -13,10 +13,7 @@ namespace e360_clone.DataAccess
         public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Exam> Exams { get; set; }
         public DbSet<ExamRoom> ExamRooms { get; set; }
-        public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ProctorAssignment> ProctorAssignments { get; set; }
-        public DbSet<Grade> Grades { get; set; }
-        public DbSet<GradeEntry> GradeEntries { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Major> Majors { get; set; }
@@ -25,10 +22,6 @@ namespace e360_clone.DataAccess
         
         // New entities for Student Management & Exam Scheduling
         public DbSet<StudentSubject> StudentSubjects { get; set; }
-        public DbSet<CourseSession> CourseSessions { get; set; }
-        public DbSet<StudentAttendance> StudentAttendances { get; set; }
-        public DbSet<ExamForm> ExamForms { get; set; }
-        public DbSet<StudentExam> StudentExams { get; set; }
         public DbSet<TeachingAssignment> TeachingAssignments { get; set; }
         public DbSet<ExamRoomAllocation> ExamRoomAllocations { get; set; }
 

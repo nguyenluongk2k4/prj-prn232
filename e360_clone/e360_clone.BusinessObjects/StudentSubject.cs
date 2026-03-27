@@ -49,6 +49,5 @@ namespace e360_clone.BusinessObjects
         public Student? Student { get; set; }
         public Subject? Subject { get; set; }
         public Class? Class { get; set; }
-        public ICollection<StudentAttendance>? Attendances { get; set; }
     }
 }
