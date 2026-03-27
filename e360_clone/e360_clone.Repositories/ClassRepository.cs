@@ -77,5 +77,24 @@ namespace e360_clone.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public Task<(List<Class> Items, int TotalRecords)> GetPagedFilteredWithMetaAsync(
+            int pageNumber,
+            int pageSize,
+            string? searchTerm,
+            string? majorCode,
+            int? cohort,
+            int? subjectId,
+            string? status)
+        {
+            return _dao.GetPagedFilteredWithMetaAsync(
+                pageNumber,
+                pageSize,
+                searchTerm,
+                majorCode,
+                cohort,
+                subjectId,
+                status);
+        }
     }
 }

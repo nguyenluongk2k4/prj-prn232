@@ -1,19 +1,16 @@
 ﻿using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace e360_clone.Controllers
 {
     public class ClassesController : BaseApiController
     {
         private readonly IClassRepository _repository;
-        private readonly IMajorRepository _majorRepository;
 
-        public ClassesController(IClassRepository repository, IMajorRepository majorRepository)
+        public ClassesController(IClassRepository repository)
         {
             _repository = repository;
-            _majorRepository = majorRepository;
         }
 
         [HttpGet]
@@ -24,94 +21,23 @@ namespace e360_clone.Controllers
             [FromQuery] int? subjectId,
             [FromQuery] string? status)
         {
-            var term = request.SearchTerm?.Trim();
-            var major = majorCode?.Trim().ToUpperInvariant();
-            var statusFilter = status?.Trim();
-            Func<IQueryable<Class>, IOrderedQueryable<Class>> orderBy = q => q.OrderBy(x => x.ClassCode);
-
-            IEnumerable<Class> data;
-            int totalRecords;
-
-            var hasFilter = !string.IsNullOrEmpty(term)
-                            || !string.IsNullOrEmpty(major)
-                            || cohort.HasValue
-                            || subjectId.HasValue
-                            || !string.IsNullOrEmpty(statusFilter);
-            if (hasFilter)
-            {
-                int? majorId = null;
-                if (!string.IsNullOrEmpty(major))
-                {
-                    var majorEntity = await _majorRepository.GetByCodeAsync(major);
-                    if (majorEntity == null)
-                    {
-                        return Ok(new PagedResponse<Class>
-                        {
-                            Success = true,
-                            Message = "KhÃ´ng cÃ³ dá»¯ liá»‡u",
-                            Data = new List<Class>(),
-                            PageNumber = request.PageNumber,
-                            PageSize = request.PageSize,
-                            TotalRecords = 0
-                        });
-                    }
-
-                    majorId = majorEntity.Id;
-                }
-
-                List<int>? classIds = null;
-                if (subjectId.HasValue)
-                {
-                    var ids = await HttpContext.RequestServices
-                        .GetRequiredService<IStudentSubjectRepository>()
-                        .GetClassIdsBySubjectAsync(subjectId.Value);
-                    classIds = ids;
-                    if (classIds.Count == 0)
-                    {
-                        return Ok(new PagedResponse<Class>
-                        {
-                            Success = true,
-                            Message = "KhÃ´ng cÃ³ dá»¯ liá»‡u",
-                            Data = new List<Class>(),
-                            PageNumber = request.PageNumber,
-                            PageSize = request.PageSize,
-                            TotalRecords = 0
-                        });
-                    }
-                }
-
-                System.Linq.Expressions.Expression<Func<Class, bool>> filter = x =>
-                    (string.IsNullOrEmpty(term) || x.ClassName.Contains(term) || x.ClassCode.Contains(term)) &&
-                    (!majorId.HasValue || x.MajorId == majorId.Value) &&
-                    (!cohort.HasValue || x.Cohort == cohort.Value) &&
-                    (classIds == null || classIds.Contains(x.Id)) &&
-                    (string.IsNullOrEmpty(statusFilter) || x.Status == statusFilter);
-
-                data = await _repository.GetPagedFilteredAsync(
-                    request.PageNumber,
-                    request.PageSize,
-                    filter,
-                    orderBy);
-                totalRecords = await _repository.CountAsync(filter);
-            }
-            else
-            {
-                data = await _repository.GetPagedFilteredAsync(
-                    request.PageNumber,
-                    request.PageSize,
-                    null,
-                    orderBy);
-                totalRecords = await _repository.CountAsync();
-            }
+            var result = await _repository.GetPagedFilteredWithMetaAsync(
+                request.PageNumber,
+                request.PageSize,
+                request.SearchTerm,
+                majorCode,
+                cohort,
+                subjectId,
+                status);
 
             return Ok(new PagedResponse<Class>
             {
                 Success = true,
                 Message = "Láº¥y danh sÃ¡ch lá»›p há»c thÃ nh cÃ´ng",
-                Data = data.ToList(),
+                Data = result.Items,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-                TotalRecords = totalRecords
+                TotalRecords = result.TotalRecords
             });
         }
 
