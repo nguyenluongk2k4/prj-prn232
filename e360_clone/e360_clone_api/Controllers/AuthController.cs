@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using e360_clone.BusinessObjects;
+using e360_clone.BusinessObjects.DTOs.Auth;
 using e360_clone.BusinessObjects.Helpers;
 using e360_clone.Repositories;
 using System.IdentityModel.Tokens.Jwt;
@@ -223,58 +223,6 @@ namespace e360_clone.Controllers
         }
     }
 
-    public class LoginRequest
-    {
-        [Required(ErrorMessage = "Email is required")]
-        public string Email { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Password is required")]
-        public string Password { get; set; } = string.Empty;
-
-        public bool RememberMe { get; set; }
-    }
-
-    public class RegisterRequest
-    {
-        [Required]
-        public string FullName { get; set; } = string.Empty;
-        [Required]
-        public string Email { get; set; } = string.Empty;
-        [Required]
-        public string Password { get; set; } = string.Empty;
-        public int? StudentId { get; set; }
-    }
-
-    public class QuickLoginRequest
-    {
-        [Required]
-        public string Role { get; set; } = string.Empty;
-    }
-
-    public class LoginResponse
-    {
-        public string Token { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
-        public string? AvatarUrl { get; set; }
-        public int? LecturerId { get; set; }
-        public int? StudentId { get; set; }
-    }
-
-    public class UserProfileResponse
-    {
-        public int Id { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
-        public string? AvatarUrl { get; set; }
-        public string? Status { get; set; }
-        public int? LecturerId { get; set; }
-        public int? StudentId { get; set; }
-    }
 }
 
 

@@ -28,7 +28,8 @@ namespace e360_clone_fe.Controllers
             string? startTime,
             string? endTime,
             int? examId,
-            string? searchTerm)
+            string? searchTerm,
+            bool? onlyUnconfirmed)
         {
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
@@ -149,6 +150,11 @@ namespace e360_clone_fe.Controllers
                 {
                     roster = rosterResponse.Data;
                 }
+            }
+
+            if (onlyUnconfirmed == true)
+            {
+                roster = roster.Where(r => !r.StudentConfirmed).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -602,6 +608,40 @@ namespace e360_clone_fe.Controllers
                 ? reportResponse.Data
                 : new List<AttendanceReportItemViewModel>();
 
+            var role = HttpContext.Session.GetString("Role");
+            var lecturerId = HttpContext.Session.GetInt32("LecturerId");
+            if (IsTeacherLike(role, lecturerId))
+            {
+                var proctorResponse = await _apiService.GetAsync<List<ProctorAssignmentListItemViewModel>>(
+                    "proctors",
+                    new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "2000" } });
+
+                if (proctorResponse.Success && proctorResponse.Data != null)
+                {
+                    var assignedExamIds = proctorResponse.Data
+                        .Where(p => p.LecturerId == lecturerId!.Value)
+                        .Select(p => p.ExamId)
+                        .ToHashSet();
+                    items = items.Where(i => assignedExamIds.Contains(i.ExamId)).ToList();
+                }
+                else
+                {
+                    items = new List<AttendanceReportItemViewModel>();
+                }
+
+                subjects = items
+                    .Select(i => new SubjectFormViewModel { Id = i.SubjectId, SubjectCode = i.SubjectCode, SubjectName = i.SubjectName })
+                    .DistinctBy(s => s.Id)
+                    .OrderBy(s => s.SubjectCode)
+                    .ToList();
+
+                classes = items
+                    .Select(i => new ClassFormViewModel { Id = i.ClassId, ClassCode = i.ClassCode })
+                    .DistinctBy(c => c.Id)
+                    .OrderBy(c => c.ClassCode)
+                    .ToList();
+            }
+
             var model = new AttendanceReportPageViewModel
             {
                 Filter = new AttendanceReportFilterViewModel
@@ -619,7 +659,8 @@ namespace e360_clone_fe.Controllers
                 Absent = items.Sum(x => x.Absent),
                 Late = items.Sum(x => x.Late),
                 Excused = items.Sum(x => x.Excused),
-                Confirmed = items.Sum(x => x.Confirmed)
+                Confirmed = items.Sum(x => x.Confirmed),
+                Unconfirmed = items.Sum(x => Math.Max(0, x.Total - x.Confirmed))
             };
 
             return View(model);

@@ -113,6 +113,12 @@
                     <div class="text-xl fw-bold text-primary">@Model.Confirmed</div>
                 </div>
             </div>
+            <div class="col-md-2">
+                <div class="card radius-12 p-16 text-center">
+                    <div class="text-secondary-light text-sm">Chưa ký</div>
+                    <div class="text-xl fw-bold text-warning">@Model.Unconfirmed</div>
+                </div>
+            </div>
         </div>
 
         <div class="card radius-12 mt-24">
@@ -131,6 +137,9 @@
                                 <th>Late</th>
                                 <th>Excused</th>
                                 <th>Đã ký</th>
+                                <th>Chưa ký</th>
+                                <th>Trạng thái ký</th>
+                                <th>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -138,6 +147,7 @@
                             {
                                 @foreach (var item in Model.Items)
                                 {
+                                    var isFullyConfirmed = item.Confirmed >= item.Total && item.Total > 0;
                                     <tr>
                                         <td>@item.ExamDate.ToString("dd/MM/yyyy")</td>
                                         <td>@item.StartTime.ToString("hh\\:mm") - @item.EndTime.ToString("hh\\:mm")</td>
@@ -149,13 +159,34 @@
                                         <td>@item.Late</td>
                                         <td>@item.Excused</td>
                                         <td>@item.Confirmed</td>
+                                        <td>@Math.Max(0, item.Total - item.Confirmed)</td>
+                                        <td>
+                                            @if (isFullyConfirmed)
+                                            {
+                                                <span class="badge bg-success">Đã ký đủ</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">Chưa ký đủ (@item.Confirmed/@item.Total)</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (isFullyConfirmed)
+                                            {
+                                                <a class="btn btn-sm btn-outline-primary" href="/Attendance?examId=@item.ExamId">Xem danh sách</a>
+                                            }
+                                            else
+                                            {
+                                                <a class="btn btn-sm btn-primary-600" href="/Attendance?examId=@item.ExamId&onlyUnconfirmed=true">Xem chưa ký</a>
+                                            }
+                                        </td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="10" class="text-center py-4">
+                                    <td colspan="12" class="text-center py-4">
                                         <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
                                         <p class="text-muted mt-2">Chưa có dữ liệu báo cáo</p>
                                     </td>

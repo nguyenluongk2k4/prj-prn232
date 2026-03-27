@@ -4,7 +4,6 @@ using e360_clone.BusinessObjects;
 using e360_clone.BusinessObjects.DTOs;
 using e360_clone.BusinessObjects.Enums;
 using e360_clone.DataAccess;
-using e360_clone.Repositories;
 using e360_clone_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +12,12 @@ namespace e360_clone.Controllers
 {
     public class GradesController : BaseApiController
     {
-        private readonly IGradeRepository _repository;
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly ILogger<GradesController> _logger;
 
-        public GradesController(IGradeRepository repository, AppDbContext context, IEmailService emailService, ILogger<GradesController> logger)
+        public GradesController(AppDbContext context, IEmailService emailService, ILogger<GradesController> logger)
         {
-            _repository = repository;
             _context = context;
             _emailService = emailService;
             _logger = logger;
@@ -29,14 +26,15 @@ namespace e360_clone.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PagedRequest request)
         {
-            var data = await _repository.GetPagedFilteredAsync(
-                request.PageNumber,
-                request.PageSize,
-                null,
-                q => q.OrderBy(x => x.StudentId));
-            var totalRecords = await _repository.CountAsync();
+            var query = _context.GradeEntries.AsQueryable();
+            var totalRecords = await query.CountAsync();
+            var data = await query
+                .OrderBy(x => x.StudentId)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
 
-            return Ok(new PagedResponse<Grade>
+            return Ok(new PagedResponse<GradeEntry>
             {
                 Success = true,
                 Message = "Lấy danh sách điểm thành công",
@@ -50,7 +48,7 @@ namespace e360_clone.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _repository.GetByIdAsync(id);
+            var item = await _context.GradeEntries.FirstOrDefaultAsync(g => g.Id == id);
             if (item == null)
                 return HandleNotFound($"Không tìm thấy điểm có ID = {id}");
 
@@ -92,30 +90,24 @@ namespace e360_clone.Controllers
             var subjectMap = subjects.ToDictionary(s => s.Id, s => s);
             var classMap = classes.ToDictionary(c => c.Id, c => c);
 
-            var grades = await _context.Grades
+            var grades = await _context.GradeEntries
                 .Where(g => g.StudentId == studentId && g.Status == "Published")
                 .ToListAsync();
 
-            var examIds = grades.Select(g => g.ExamId).Distinct().ToList();
-            var exams = examIds.Count > 0
-                ? await _context.Exams.Where(e => examIds.Contains(e.Id)).ToListAsync()
-                : new List<Exam>();
-            var examMap = exams.ToDictionary(e => e.Id, e => e);
-
             var gradeItems = grades
-                .GroupBy(g => g.ExamId)
+                .GroupBy(g => new { g.SubjectId, g.AcademicYear, g.Semester })
                 .Select(group =>
                 {
-                    if (!examMap.TryGetValue(group.Key, out var exam))
-                    {
-                        return null;
-                    }
+                    subjectMap.TryGetValue(group.Key.SubjectId, out var subject);
+                    var enrollment = enrollments.FirstOrDefault(e =>
+                        e.SubjectId == group.Key.SubjectId &&
+                        e.AcademicYear == group.Key.AcademicYear &&
+                        e.Semester == group.Key.Semester);
 
-                    subjectMap.TryGetValue(exam.SubjectId, out var subject);
                     Class? cls = null;
-                    if (exam.ClassId > 0)
+                    if (enrollment?.ClassId.HasValue == true)
                     {
-                        classMap.TryGetValue(exam.ClassId, out cls);
+                        classMap.TryGetValue(enrollment.ClassId.Value, out cls);
                     }
 
                     var components = group
@@ -133,20 +125,18 @@ namespace e360_clone.Controllers
 
                     return new StudentGradeItemDto
                     {
-                        ExamId = exam.Id,
-                        SubjectId = exam.SubjectId,
+                        SubjectId = group.Key.SubjectId,
                         SubjectCode = subject?.SubjectCode ?? string.Empty,
                         SubjectName = subject?.SubjectName ?? string.Empty,
-                        ClassId = exam.ClassId,
+                        ClassId = enrollment?.ClassId,
                         ClassCode = cls?.ClassCode ?? string.Empty,
-                        ExamDate = exam.ExamDate,
-                        StartTime = exam.StartTime,
-                        EndTime = exam.EndTime,
+                        AcademicYear = group.Key.AcademicYear,
+                        Semester = group.Key.Semester,
+                        TermLabel = BusinessObjects.Utilities.TermMapper.GetTermLabel(group.Key.AcademicYear, group.Key.Semester),
                         Components = components
                     };
                 })
-                .Where(x => x != null)
-                .ToList()!;
+                .ToList();
 
             var defaultComponents = BuildDefaultComponents();
             var subjectItems = enrollments
@@ -161,15 +151,14 @@ namespace e360_clone.Controllers
 
                     return new StudentGradeItemDto
                     {
-                        ExamId = 0,
                         SubjectId = e.SubjectId,
                         SubjectCode = subject?.SubjectCode ?? string.Empty,
                         SubjectName = subject?.SubjectName ?? string.Empty,
                         ClassId = e.ClassId,
                         ClassCode = cls?.ClassCode ?? string.Empty,
-                        ExamDate = default,
-                        StartTime = default,
-                        EndTime = default,
+                        AcademicYear = e.AcademicYear,
+                        Semester = e.Semester,
+                        TermLabel = BusinessObjects.Utilities.TermMapper.GetTermLabel(e.AcademicYear, e.Semester),
                         Components = defaultComponents.Select(c => new StudentGradeComponentDto
                         {
                             ScoreType = c.ScoreType,
@@ -185,9 +174,10 @@ namespace e360_clone.Controllers
 
             var result = gradeItems
                 .Concat(subjectItems)
-                .GroupBy(x => new { x.SubjectId, x.ExamId })
+                .GroupBy(x => new { x.SubjectId, x.AcademicYear, x.Semester })
                 .Select(g => g.First())
-                .OrderByDescending(x => x.ExamDate == default ? DateTime.MinValue : x.ExamDate)
+                .OrderByDescending(x => x.AcademicYear)
+                .ThenByDescending(x => x.Semester)
                 .ToList();
 
             return Ok(new ApiResponse<List<StudentGradeItemDto>>
@@ -198,15 +188,127 @@ namespace e360_clone.Controllers
             });
         }
 
+        [HttpGet("transcript")]
+        public async Task<IActionResult> GetTranscript([FromQuery] int studentId)
+        {
+            if (studentId <= 0)
+            {
+                return BadRequest(new ApiResponse<List<TranscriptTermDto>>
+                {
+                    Success = false,
+                    Message = "StudentId không hợp lệ",
+                    Data = new List<TranscriptTermDto>()
+                });
+            }
+
+            var enrollments = await _context.StudentSubjects
+                .Where(s => s.StudentId == studentId)
+                .ToListAsync();
+
+            if (enrollments.Count == 0)
+            {
+                return Ok(new ApiResponse<List<TranscriptTermDto>>
+                {
+                    Success = true,
+                    Message = "Chưa có môn học cho sinh viên này",
+                    Data = new List<TranscriptTermDto>()
+                });
+            }
+
+            var subjectIds = enrollments.Select(e => e.SubjectId).Distinct().ToList();
+            var classIds = enrollments.Where(e => e.ClassId.HasValue).Select(e => e.ClassId!.Value).Distinct().ToList();
+
+            var subjects = await _context.Subjects.Where(s => subjectIds.Contains(s.Id)).ToListAsync();
+            var classes = await _context.Classes.Where(c => classIds.Contains(c.Id)).ToListAsync();
+            var subjectMap = subjects.ToDictionary(s => s.Id, s => s);
+            var classMap = classes.ToDictionary(c => c.Id, c => c);
+
+            var grades = await _context.GradeEntries
+                .Where(g => g.StudentId == studentId && g.Status == "Published")
+                .ToListAsync();
+
+            var gradeComponentsBySubject = grades
+                .GroupBy(g => (g.SubjectId, g.AcademicYear, g.Semester))
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => new TranscriptComponentDto
+                    {
+                        ScoreType = x.ScoreType,
+                        ScoreTypeText = ResolveScoreTypeText(x.ScoreType),
+                        Score = x.Score,
+                        LetterGrade = x.LetterGrade,
+                        Weight = ResolveScoreTypeWeight(x.ScoreType)
+                    }).OrderBy(x => x.ScoreType).ToList());
+
+            var defaultComponents = BuildDefaultTranscriptComponents();
+
+            var terms = enrollments
+                .GroupBy(e => new { e.AcademicYear, e.Semester })
+                .Select(term =>
+                {
+                    var courses = term.Select(e =>
+                    {
+                        subjectMap.TryGetValue(e.SubjectId, out var subject);
+                        Class? cls = null;
+                        if (e.ClassId.HasValue)
+                        {
+                            classMap.TryGetValue(e.ClassId.Value, out cls);
+                        }
+
+                        var key = (e.SubjectId, e.AcademicYear, e.Semester);
+                        var components = gradeComponentsBySubject.TryGetValue(key, out var comps)
+                            ? comps
+                            : defaultComponents.Select(c => new TranscriptComponentDto
+                            {
+                                ScoreType = c.ScoreType,
+                                ScoreTypeText = c.ScoreTypeText,
+                                Score = null,
+                                LetterGrade = string.Empty,
+                                Weight = c.Weight
+                            }).ToList();
+
+                        return new TranscriptCourseDto
+                        {
+                            SubjectId = e.SubjectId,
+                            SubjectCode = subject?.SubjectCode ?? string.Empty,
+                            SubjectName = subject?.SubjectName ?? string.Empty,
+                            ClassCode = cls?.ClassCode ?? string.Empty,
+                            Components = components
+                        };
+                    })
+                    .OrderBy(c => c.SubjectCode)
+                    .ToList();
+
+                    return new TranscriptTermDto
+                    {
+                        AcademicYear = term.Key.AcademicYear,
+                        Semester = term.Key.Semester,
+                        TermLabel = BusinessObjects.Utilities.TermMapper.GetTermLabel(term.Key.AcademicYear, term.Key.Semester),
+                        Courses = courses
+                    };
+                })
+                .OrderByDescending(t => t.AcademicYear)
+                .ThenByDescending(t => t.Semester)
+                .ToList();
+
+            return Ok(new ApiResponse<List<TranscriptTermDto>>
+            {
+                Success = true,
+                Message = "Lấy transcript thành công",
+                Data = terms
+            });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Grade grade)
+        public async Task<IActionResult> Create([FromBody] GradeEntry grade)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Grade> { Success = false, Message = "Dữ liệu không hợp lệ" });
+                return BadRequest(new ApiResponse<GradeEntry> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
-            await _repository.AddAsync(grade);
+            _context.GradeEntries.Add(grade);
+            await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = grade.Id }, new ApiResponse<Grade>
+            return CreatedAtAction(nameof(GetById), new { id = grade.Id }, new ApiResponse<GradeEntry>
             {
                 Success = true,
                 Message = "Thêm điểm thành công",
@@ -215,14 +317,16 @@ namespace e360_clone.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Grade grade)
+        public async Task<IActionResult> Update(int id, [FromBody] GradeEntry grade)
         {
-            var existing = await _repository.GetByIdAsync(id);
+            var existing = await _context.GradeEntries.FirstOrDefaultAsync(g => g.Id == id);
             if (existing == null)
                 return HandleNotFound($"Không tìm thấy điểm có ID = {id}");
 
             existing.StudentId = grade.StudentId;
-            existing.ExamId = grade.ExamId;
+            existing.SubjectId = grade.SubjectId;
+            existing.AcademicYear = grade.AcademicYear;
+            existing.Semester = grade.Semester;
             existing.Score = grade.Score;
             existing.ScoreType = grade.ScoreType;
             existing.LetterGrade = grade.LetterGrade;
@@ -233,34 +337,38 @@ namespace e360_clone.Controllers
             existing.ApprovedAt = grade.ApprovedAt;
             existing.Status = grade.Status;
 
-            await _repository.UpdateAsync(existing);
+            await _context.SaveChangesAsync();
             return HandleResult(existing, "Cập nhật điểm thành công");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _repository.GetByIdAsync(id);
+            var item = await _context.GradeEntries.FirstOrDefaultAsync(g => g.Id == id);
             if (item == null)
                 return HandleNotFound($"Không tìm thấy điểm có ID = {id}");
 
-            await _repository.DeleteAsync(item);
+            _context.GradeEntries.Remove(item);
+            await _context.SaveChangesAsync();
             return HandleResult(true, "Xóa điểm thành công");
         }
 
         [HttpPost("import")]
         public async Task<IActionResult> ImportGrades(
-            [FromQuery] int examId,
-            [FromQuery] int? enteredBy,
-            [FromQuery] string? scoreType,
+            [FromForm] int subjectId,
+            [FromForm] string? academicYear,
+            [FromForm] int? semester,
+            [FromForm] int? enteredBy,
+            [FromForm] string? scoreType,
+            [FromForm] string? role,
             IFormFile? file)
         {
-            if (examId <= 0)
+            if (subjectId <= 0 || string.IsNullOrWhiteSpace(academicYear) || !semester.HasValue)
             {
                 return BadRequest(new ApiResponse<GradeImportResultDto>
                 {
                     Success = false,
-                    Message = "ExamId không hợp lệ",
+                    Message = "Thiếu môn hoặc kỳ học",
                     Data = new GradeImportResultDto()
                 });
             }
@@ -303,13 +411,35 @@ namespace e360_clone.Controllers
             var studentMap = students.ToDictionary(s => s.StudentCode, s => s, StringComparer.OrdinalIgnoreCase);
 
             var studentIds = students.Select(s => s.Id).ToList();
-            var existing = await _context.Grades
-                .Where(g => g.ExamId == examId && studentIds.Contains(g.StudentId))
+            var enrollments = await _context.StudentSubjects
+                .Where(s => s.SubjectId == subjectId &&
+                            s.AcademicYear == academicYear &&
+                            s.Semester == semester.Value &&
+                            studentIds.Contains(s.StudentId))
+                .ToListAsync();
+            var enrolledStudentIds = enrollments.Select(s => s.StudentId).ToHashSet();
+
+            var existing = await _context.GradeEntries
+                .Where(g => g.SubjectId == subjectId &&
+                            g.AcademicYear == academicYear &&
+                            g.Semester == semester.Value &&
+                            studentIds.Contains(g.StudentId))
                 .ToListAsync();
             var gradeMap = existing.ToDictionary(g => (g.StudentId, g.ScoreType), g => g);
 
             var now = DateTime.UtcNow;
-            var normalizedScoreType = string.IsNullOrWhiteSpace(scoreType) ? "Final" : scoreType.Trim();
+            var normalizedScoreType = string.IsNullOrWhiteSpace(scoreType) ? string.Empty : scoreType.Trim();
+            var normalizedRole = role?.Trim() ?? string.Empty;
+
+            if (!IsRoleAllowed(normalizedRole, normalizedScoreType))
+            {
+                return BadRequest(new ApiResponse<GradeImportResultDto>
+                {
+                    Success = false,
+                    Message = "Loại điểm không hợp lệ cho quyền hiện tại.",
+                    Data = result
+                });
+            }
 
             foreach (var row in rows)
             {
@@ -327,6 +457,13 @@ namespace e360_clone.Controllers
                     continue;
                 }
 
+                if (!enrolledStudentIds.Contains(student.Id))
+                {
+                    result.Skipped++;
+                    result.Errors.Add($"Sinh viên {row.StudentCode} không học môn này trong kỳ đã chọn.");
+                    continue;
+                }
+
                 if (!TryParseScore(row.ScoreText, out var score))
                 {
                     result.Skipped++;
@@ -335,6 +472,7 @@ namespace e360_clone.Controllers
                 }
 
                 var key = (student.Id, normalizedScoreType);
+                var autoPublish = IsAutoPublishScoreType(normalizedScoreType);
                 if (gradeMap.TryGetValue(key, out var grade))
                 {
                     grade.Score = score;
@@ -343,22 +481,31 @@ namespace e360_clone.Controllers
                     grade.Notes = row.Notes ?? string.Empty;
                     grade.EnteredBy = enteredBy;
                     grade.EnteredAt = now;
-                    grade.Status = "Submitted";
+                    grade.Status = autoPublish ? "Published" : "Submitted";
+                    if (autoPublish)
+                    {
+                        grade.ApprovedBy = enteredBy;
+                        grade.ApprovedAt = now;
+                    }
                     result.Updated++;
                 }
                 else
                 {
-                    _context.Grades.Add(new Grade
+                    _context.GradeEntries.Add(new GradeEntry
                     {
                         StudentId = student.Id,
-                        ExamId = examId,
+                        SubjectId = subjectId,
+                        AcademicYear = academicYear!.Trim(),
+                        Semester = semester.Value,
                         Score = score,
                         ScoreType = normalizedScoreType,
                         LetterGrade = row.LetterGrade ?? string.Empty,
                         Notes = row.Notes ?? string.Empty,
                         EnteredBy = enteredBy,
                         EnteredAt = now,
-                        Status = "Submitted"
+                        Status = autoPublish ? "Published" : "Submitted",
+                        ApprovedBy = autoPublish ? enteredBy : null,
+                        ApprovedAt = autoPublish ? now : null
                     });
                     result.Imported++;
                 }
@@ -375,19 +522,21 @@ namespace e360_clone.Controllers
         }
 
         [HttpPost("publish")]
-        public async Task<IActionResult> PublishGrades([FromQuery] int examId, [FromQuery] int? approvedBy)
+        public async Task<IActionResult> PublishGrades([FromQuery] int subjectId, [FromQuery] string? academicYear, [FromQuery] int? semester, [FromQuery] int? approvedBy)
         {
-            if (examId <= 0)
+            if (subjectId <= 0 || string.IsNullOrWhiteSpace(academicYear) || !semester.HasValue)
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "ExamId không hợp lệ"
+                    Message = "Thiếu môn hoặc kỳ học"
                 });
             }
 
-            var grades = await _context.Grades
-                .Where(g => g.ExamId == examId)
+            var grades = await _context.GradeEntries
+                .Where(g => g.SubjectId == subjectId &&
+                            g.AcademicYear == academicYear &&
+                            g.Semester == semester.Value)
                 .ToListAsync();
 
             if (grades.Count == 0)
@@ -409,13 +558,7 @@ namespace e360_clone.Controllers
 
             await _context.SaveChangesAsync();
 
-            var exam = await _context.Exams.FirstOrDefaultAsync(e => e.Id == examId);
-            var subject = exam != null
-                ? await _context.Subjects.FirstOrDefaultAsync(s => s.Id == exam.SubjectId)
-                : null;
-            var classCode = exam != null && exam.ClassId > 0
-                ? await _context.Classes.Where(c => c.Id == exam.ClassId).Select(c => c.ClassCode).FirstOrDefaultAsync()
-                : string.Empty;
+            var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subjectId);
 
             var studentIds = grades.Select(g => g.StudentId).Distinct().ToList();
             var students = await _context.Students
@@ -442,11 +585,8 @@ namespace e360_clone.Controllers
 
                 var body = $@"
 <p>Chào {student.FullName},</p>
-<p>Điểm thi đã được công bố.</p>
+<p>Điểm đã được công bố cho kỳ {academicYear} - kỳ {semester}.</p>
 <p><strong>Môn:</strong> {subjectName}</p>
-<p><strong>Lớp:</strong> {classCode}</p>
-<p><strong>Điểm:</strong> {grade.Score?.ToString(CultureInfo.InvariantCulture)}</p>
-<p><strong>Điểm chữ:</strong> {grade.LetterGrade}</p>
 <p>Trân trọng.</p>";
 
                 var ok = await _emailService.SendAsync(student.Email, "Công bố điểm thi", body);
@@ -457,6 +597,133 @@ namespace e360_clone.Controllers
             {
                 Success = true,
                 Message = $"Đã công bố điểm. Email đã gửi: {sent}/{students.Count}"
+            });
+        }
+
+        [HttpPost("manual")]
+        public async Task<IActionResult> EnterManual([FromBody] ManualGradeRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Dữ liệu không hợp lệ"
+                });
+            }
+
+            if (request.SubjectId <= 0 || string.IsNullOrWhiteSpace(request.AcademicYear) || request.Semester <= 0 || string.IsNullOrWhiteSpace(request.ScoreType))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Thiếu môn/kỳ hoặc loại điểm"
+                });
+            }
+
+            if (!IsRoleAllowed(request.Role ?? string.Empty, request.ScoreType))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Loại điểm không hợp lệ cho quyền hiện tại"
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.StudentCode))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Vui lòng nhập mã sinh viên"
+                });
+            }
+
+            if (!request.Score.HasValue)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Vui lòng nhập điểm"
+                });
+            }
+
+            var student = await _context.Students.FirstOrDefaultAsync(s =>
+                s.StudentCode == request.StudentCode.Trim());
+            if (student == null)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Không tìm thấy sinh viên"
+                });
+            }
+
+            var enrollment = await _context.StudentSubjects.FirstOrDefaultAsync(s =>
+                s.StudentId == student.Id &&
+                s.SubjectId == request.SubjectId &&
+                s.AcademicYear == request.AcademicYear &&
+                s.Semester == request.Semester);
+            if (enrollment == null)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Sinh viên không học môn này trong kỳ đã chọn"
+                });
+            }
+
+            var normalizedScoreType = request.ScoreType.Trim();
+            var existing = await _context.GradeEntries.FirstOrDefaultAsync(g =>
+                g.SubjectId == request.SubjectId &&
+                g.AcademicYear == request.AcademicYear &&
+                g.Semester == request.Semester &&
+                g.StudentId == student.Id &&
+                g.ScoreType == normalizedScoreType);
+
+            var now = DateTime.UtcNow;
+            if (existing != null)
+            {
+                existing.Score = request.Score;
+                existing.LetterGrade = request.LetterGrade ?? string.Empty;
+                existing.Notes = request.Notes ?? string.Empty;
+                existing.EnteredBy = request.EnteredBy;
+                existing.EnteredAt = now;
+                var autoPublish = IsAutoPublishScoreType(normalizedScoreType);
+                existing.Status = autoPublish ? "Published" : "Submitted";
+                if (autoPublish)
+                {
+                    existing.ApprovedBy = request.EnteredBy;
+                    existing.ApprovedAt = now;
+                }
+            }
+            else
+            {
+                var autoPublish = IsAutoPublishScoreType(normalizedScoreType);
+                _context.GradeEntries.Add(new GradeEntry
+                {
+                    StudentId = student.Id,
+                    SubjectId = request.SubjectId,
+                    AcademicYear = request.AcademicYear,
+                    Semester = request.Semester,
+                    ScoreType = normalizedScoreType,
+                    Score = request.Score,
+                    LetterGrade = request.LetterGrade ?? string.Empty,
+                    Notes = request.Notes ?? string.Empty,
+                    EnteredBy = request.EnteredBy,
+                    EnteredAt = now,
+                    Status = autoPublish ? "Published" : "Submitted",
+                    ApprovedBy = autoPublish ? request.EnteredBy : null,
+                    ApprovedAt = autoPublish ? now : null
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new ApiResponse<string>
+            {
+                Success = true,
+                Message = "Đã lưu điểm"
             });
         }
 
@@ -576,11 +843,13 @@ namespace e360_clone.Controllers
 
             return scoreType.Trim() switch
             {
-                "ProgressTest" => "Progress test",
-                "Practical" => "Practical exam",
-                "Final" => "Final exam",
+                "ProgressTest" => "Kiểm tra quá trình",
+                "Practical" => "Thực hành",
+                "Final" => "Cuối kỳ",
+                "PracticalRetake" => "Thi lại thực hành",
+                "FinalRetake" => "Thi lại cuối kỳ",
                 "Lab" => "Lab",
-                "Assignment" => "Assignment",
+                "Assignment" => "Bài tập",
                 "Midterm" => GradeTypeHelper.GetText(GradeType.GiuaKy),
                 "Other" => GradeTypeHelper.GetText(GradeType.Khac),
                 "KiemTra15Phut" => GradeTypeHelper.GetText(GradeType.KiemTra15Phut),
@@ -606,6 +875,8 @@ namespace e360_clone.Controllers
                 "ProgressTest" => 0.2m,
                 "Practical" => 0.2m,
                 "Final" => 0.4m,
+                "PracticalRetake" => 0.2m,
+                "FinalRetake" => 0.4m,
                 "Lab" => 0.1m,
                 "Assignment" => 0.1m,
                 "Midterm" => (decimal)GradeTypeHelper.GetWeight(GradeType.GiuaKy),
@@ -639,6 +910,81 @@ namespace e360_clone.Controllers
                 Score = null,
                 LetterGrade = string.Empty,
                 Notes = string.Empty,
+                Weight = ResolveScoreTypeWeight(type)
+            }).ToList();
+        }
+
+        private static bool IsRoleAllowed(string role, string scoreType)
+        {
+            if (string.IsNullOrWhiteSpace(role) || string.IsNullOrWhiteSpace(scoreType))
+            {
+                return false;
+            }
+
+            if (string.Equals(role, "Teacher", StringComparison.OrdinalIgnoreCase))
+            {
+                return scoreType.Equals("ProgressTest", StringComparison.OrdinalIgnoreCase)
+                       || scoreType.Equals("Assignment", StringComparison.OrdinalIgnoreCase)
+                       || scoreType.Equals("Lab", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(role, "SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(role, "Staff", StringComparison.OrdinalIgnoreCase))
+            {
+                return scoreType.Equals("Final", StringComparison.OrdinalIgnoreCase)
+                       || scoreType.Equals("Practical", StringComparison.OrdinalIgnoreCase)
+                       || scoreType.Equals("FinalRetake", StringComparison.OrdinalIgnoreCase)
+                       || scoreType.Equals("PracticalRetake", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
+        }
+
+        private static bool IsAutoPublishScoreType(string scoreType)
+        {
+            if (string.IsNullOrWhiteSpace(scoreType))
+            {
+                return false;
+            }
+
+            return scoreType.Equals("ProgressTest", StringComparison.OrdinalIgnoreCase)
+                   || scoreType.Equals("Assignment", StringComparison.OrdinalIgnoreCase)
+                   || scoreType.Equals("Lab", StringComparison.OrdinalIgnoreCase);
+        }
+
+
+        public sealed class ManualGradeRequest
+        {
+            public int SubjectId { get; set; }
+            public string AcademicYear { get; set; } = string.Empty;
+            public int Semester { get; set; }
+            public string ScoreType { get; set; } = string.Empty;
+            public string StudentCode { get; set; } = string.Empty;
+            public decimal? Score { get; set; }
+            public string? LetterGrade { get; set; }
+            public string? Notes { get; set; }
+            public int? EnteredBy { get; set; }
+            public string? Role { get; set; }
+        }
+
+        private static List<TranscriptComponentDto> BuildDefaultTranscriptComponents()
+        {
+            var defaultTypes = new[]
+            {
+                "ProgressTest",
+                "Practical",
+                "Final",
+                "Lab",
+                "Assignment"
+            };
+
+            return defaultTypes.Select(type => new TranscriptComponentDto
+            {
+                ScoreType = type,
+                ScoreTypeText = ResolveScoreTypeText(type),
+                Score = null,
+                LetterGrade = string.Empty,
                 Weight = ResolveScoreTypeWeight(type)
             }).ToList();
         }

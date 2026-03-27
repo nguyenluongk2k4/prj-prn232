@@ -27,6 +27,7 @@ namespace e360_clone.Seeders
             await SeedTeachingAssignmentsAsync(context);
             await SeedExamSchedulesAsync(context);
             await SeedStudentExamsAsync(context);
+            await SeedGradesAsync(context);
             await AllocateExamRoomsAsync(context);
         }
 
@@ -949,6 +950,53 @@ namespace e360_clone.Seeders
                     Console.WriteLine($"Allocated {allocations.Count} students to rooms for slot {slot.Key.Date:yyyy-MM-dd} {slot.Key.StartTime:hh\\:mm}-{slot.Key.EndTime:hh\\:mm}.");
                 }
             }
+        }
+
+        private static async Task SeedGradesAsync(AppDbContext context)
+        {
+            if (await context.Grades.AnyAsync())
+            {
+                Console.WriteLine("Database already has grades.");
+                return;
+            }
+
+            var studentExams = await context.StudentExams.AsNoTracking().Take(200).ToListAsync();
+            if (studentExams.Count == 0)
+            {
+                Console.WriteLine("No student exams found. Skip grade seeding.");
+                return;
+            }
+
+            var rand = new Random();
+            var scoreTypes = new[] { "ProgressTest", "Practical", "Final", "Lab", "Assignment" };
+            var now = DateTime.UtcNow;
+            var grades = new List<Grade>();
+
+            foreach (var se in studentExams)
+            {
+                foreach (var type in scoreTypes)
+                {
+                    var score = Math.Round((decimal)(rand.NextDouble() * 6.0 + 4.0), 1);
+                    var letter = e360_clone.BusinessObjects.Utilities.GradeUtils.CalculateLetterGrade(score);
+
+                    grades.Add(new Grade
+                    {
+                        StudentId = se.StudentId,
+                        ExamId = se.ExamId,
+                        Score = score,
+                        ScoreType = type,
+                        LetterGrade = letter,
+                        Notes = "Seeded",
+                        Status = "Published",
+                        EnteredAt = now,
+                        ApprovedAt = now
+                    });
+                }
+            }
+
+            await context.Grades.AddRangeAsync(grades);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"Seeded {grades.Count} grades (component scores).");
         }
 
         private static int? ParseSemester(string? semester)

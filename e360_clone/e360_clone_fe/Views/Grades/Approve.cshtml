@@ -38,43 +38,35 @@
     <div class="content-area p-24">
         <div class="card radius-12">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table bordered-table mb-0">
-                        <thead class="bg-neutral-100">
-                            <tr>
-                                <th>Ca thi</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.Exams.Any())
+                <form asp-action="Publish" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <div class="col-md-6">
+                        <label class="form-label">Môn học</label>
+                        <select class="form-select" name="subjectId" required>
+                            <option value="">-- Chọn môn --</option>
+                            @foreach (var subject in Model.Subjects)
                             {
-                                @foreach (var exam in Model.Exams)
-                                {
-                                    <tr>
-                                        <td>@exam.Display</td>
-                                        <td>
-                                            <form asp-action="Publish" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="examId" value="@exam.Id" />
-                                                <button type="submit" class="btn btn-sm btn-success">Công bố</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                }
+                                <option value="@subject.Id" selected="@(Model.SelectedSubjectId == subject.Id)">@subject.SubjectCode - @subject.SubjectName</option>
                             }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="2" class="text-center py-4">
-                                        <i class="ri-inbox-line text-muted" style="font-size: 48px;"></i>
-                                        <p class="text-muted mt-2">Chưa có ca thi</p>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Năm học</label>
+                        <input type="text" class="form-control" name="academicYear" value="@Model.AcademicYear" placeholder="2025-2026" required />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Học kỳ</label>
+                        <select class="form-select" name="semester" required>
+                            <option value="">-- Chọn kỳ --</option>
+                            <option value="1" selected="@(Model.Semester == 1)">Kỳ 1</option>
+                            <option value="2" selected="@(Model.Semester == 2)">Kỳ 2</option>
+                            <option value="3" selected="@(Model.Semester == 3)">Kỳ 3</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Công bố điểm</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

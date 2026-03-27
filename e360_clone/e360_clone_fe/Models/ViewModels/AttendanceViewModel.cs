@@ -41,6 +41,7 @@ namespace e360_clone_fe.Models.ViewModels
 
     public class AttendanceReportItemViewModel
     {
+        public int ExamId { get; set; }
         public DateTime ExamDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
@@ -77,5 +78,6 @@ namespace e360_clone_fe.Models.ViewModels
         public int Late { get; set; }
         public int Excused { get; set; }
         public int Confirmed { get; set; }
+        public int Unconfirmed { get; set; }
     }
 }

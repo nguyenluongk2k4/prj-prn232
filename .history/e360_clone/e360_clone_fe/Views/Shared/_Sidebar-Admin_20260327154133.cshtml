@@ -1,0 +1,168 @@
+﻿@{
+    var role = Context.Session.GetString("Role") ?? "";
+    var fullName = Context.Session.GetString("FullName") ?? Context.Session.GetString("Username") ?? "Guest";
+}
+
+<aside class="sidebar">
+  <button type="button" class="sidebar-close-btn">
+    <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+  </button>
+
+  <!-- Logo -->
+  <div class="">
+    <div class="sidebar-logo d-flex align-items-center justify-content-between">
+      <a href="/" class="">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="light-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="dark-logo" style="max-height: 50px;">
+        <img src="/assets/images/logo-ic.png" alt="FPT Education logo" class="logo-icon" style="max-height: 32px;">
+      </a>
+      <button type="button" class="text-xxl d-xl-flex d-none line-height-1 sidebar-toggle text-neutral-500"
+        aria-label="Collapse Sidebar">
+        <i class="ri-contract-left-line"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- User Info -->
+  <div class="mx-16 py-12">
+    <div class="dropdown profile-dropdown">
+      <button type="button"
+        class="profile-dropdown__button d-flex align-items-center justify-content-between p-10 w-100 overflow-hidden bg-neutral-50 radius-12"
+        data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        @{
+          var avatarUrl = Context.Session.GetString("AvatarUrl");
+          var avatarSrc = !string.IsNullOrWhiteSpace(avatarUrl)
+              ? avatarUrl
+              : "/assets/images/thumbs/avatar-img1.png";
+        }
+        <span class="d-flex align-items-start gap-10">
+          <img src="@avatarSrc" alt="Avatar"
+            class="w-40-px h-40-px rounded-circle object-fit-cover flex-shrink-0">
+          <span class="profile-dropdown__contents">
+            <span class="h6 mb-0 text-md d-block text-primary-light">@fullName</span>
+            <span class="text-secondary-light text-sm mb-0 d-block">@(role == "Admin" || role == "SuperAdmin" ? "Quản trị viên" : role)</span>
+          </span>
+        </span>
+        <span class="profile-dropdown__icon pe-8 text-xl d-flex line-height-1">
+          <i class="ri-arrow-right-s-line"></i>
+        </span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-lg-end border p-12">
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li>
+          <form id="logoutForm" asp-controller="Auth" asp-action="Logout" method="post" class="d-none">
+            @Html.AntiForgeryToken()
+          </form>
+          <button type="button" id="logoutBtn"
+            class="dropdown-item rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900 d-flex align-items-center gap-2 py-6 w-100 border-0 bg-transparent">
+            <i class="ri-shut-down-line"></i>
+            Đăng xuất
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar Menu -->
+  <div class="sidebar-menu-area">
+    <ul class="sidebar-menu" id="sidebar-menu">
+      
+      @* Dashboard *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-home-4-line"></i>
+          <span>Tổng quan</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Dashboard/LMS"><i class="ri-circle-fill circle-icon w-auto"></i> LMS</a></li>
+        </ul>
+      </li>
+
+      @* Students Management *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-graduation-cap-line"></i>
+          <span>Sinh viên</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Students/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Thêm sinh viên</a></li>
+          <li><a href="/Students"><i class="ri-circle-fill circle-icon w-auto"></i> Danh sách sinh viên</a></li>
+        </ul>
+      </li>
+
+      @* Lecturers Management *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-user-follow-line"></i>
+          <span>Giảng viên</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Lecturers/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Thêm giảng viên</a></li>
+          <li><a href="/Lecturers"><i class="ri-circle-fill circle-icon w-auto"></i> Danh sách giảng viên</a></li>
+        </ul>
+      </li>
+
+      @* Academic *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-book-open-line"></i>
+          <span>Học thuật</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Subjects"><i class="ri-circle-fill circle-icon w-auto"></i> Môn học</a></li>
+          <li><a href="/Classes"><i class="ri-circle-fill circle-icon w-auto"></i> Lớp học</a></li>
+        </ul>
+      </li>
+
+      @* Examinations *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-file-edit-line"></i>
+          <span>Kỳ thi</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Exams"><i class="ri-circle-fill circle-icon w-auto"></i> Danh sách kỳ thi</a></li>
+          <li><a href="/Exams/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Tạo kỳ thi</a></li>
+        </ul>
+      </li>
+
+      @* Exam Schedule *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-calendar-line"></i>
+          <span>Lịch thi</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/ExamSchedules"><i class="ri-circle-fill circle-icon w-auto"></i> Danh sách lịch thi</a></li>
+          <li><a href="/ExamSchedules/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Tạo lịch thi</a></li>
+        </ul>
+      </li>
+
+      @* Proctor Assignment *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-user-star-line"></i>
+          <span>Phân công coi thi</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/ProctorAssignments"><i class="ri-circle-fill circle-icon w-auto"></i> Danh sách phân công</a></li>
+          <li><a href="/ProctorAssignments/Create"><i class="ri-circle-fill circle-icon w-auto"></i> Tạo phân công</a></li>
+        </ul>
+      </li>
+
+      @* Attendance *@
+      <li class="dropdown">
+        <a href="javascript:void(0)">
+          <i class="ri-calendar-check-line"></i>
+          <span>Điểm danh thi</span>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="/Attendance"><i class="ri-circle-fill circle-icon w-auto"></i> Quản lý điểm danh thi</a></li>
+          <li><a href="/Attendance/Reports"><i class="ri-circle-fill circle-icon w-auto"></i> Báo cáo điểm danh thi</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</aside>

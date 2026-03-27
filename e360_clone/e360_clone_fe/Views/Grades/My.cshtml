@@ -72,11 +72,7 @@
                                 <div class="border rounded-8 p-16 mb-3">
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-2">
                                         <div class="fw-semibold text-dark">
-                                            Kỳ thi:
-                                            @(item.ExamDate == default ? "-" : item.ExamDate.ToString("dd/MM/yyyy"))
-                                        </div>
-                                        <div class="text-secondary-light">
-                                            @(item.ExamDate == default ? "-" : $"{item.StartTime:hh\\:mm} - {item.EndTime:hh\\:mm}")
+                                            Kỳ học: @(string.IsNullOrWhiteSpace(item.TermLabel) ? "-" : item.TermLabel)
                                         </div>
                                     </div>
                                     <div class="text-secondary-light mb-3">Lớp: <span class="text-dark fw-semibold">@(!string.IsNullOrWhiteSpace(item.ClassCode) ? item.ClassCode : "-")</span></div>

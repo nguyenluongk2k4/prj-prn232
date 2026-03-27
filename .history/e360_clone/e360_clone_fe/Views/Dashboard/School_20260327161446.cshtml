@@ -1,0 +1,340 @@
+@model e360_clone.BusinessObjects.DTOs.AdminDashboardSummaryDto
+@{
+    ViewData["Title"] = "Tổng quan trường";
+    Layout = "_Layout";
+}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h1 class="text-2xl fw-bold mb-2 text-primary-light">Tổng quan trường</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Tổng quan</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Content Area -->
+<div class="content-area p-24">
+    <!-- Statistics Cards -->
+    <div class="bg-base rounded-3 p-20 mb-24">
+        <div class="row g-3">
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-primary-100">
+                            <img src="/assets/images/icons/lms-icon-1.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Tổng sinh viên</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg1.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.TotalStudents</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-purple-100">
+                            <img src="/assets/images/icons/lms-icon-2.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Tổng giảng viên</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg2.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.TotalLecturers</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-warning-100">
+                            <img src="/assets/images/icons/lms-icon-3.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Tổng lớp học</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg3.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.TotalClasses</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-success-100">
+                            <img src="/assets/images/icons/lms-icon-4.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Tổng môn học</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg4.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.TotalSubjects</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-primary-100">
+                            <img src="/assets/images/icons/lms-icon-1.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Phòng thi</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg1.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.TotalExamRooms</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-4">
+                <div class="border rounded-3">
+                    <div class="px-16 py-12 d-flex gap-8 align-items-center">
+                        <span class="d-flex align-items-center justify-content-center w-32-px h-32-px rounded-circle bg-purple-100">
+                            <img src="/assets/images/icons/lms-icon-2.png" alt="Icon">
+                        </span>
+                        <span class="text-primary-light fw-medium">Ca thi 14 ngày tới</span>
+                    </div>
+                    <div class="position-relative z-1">
+                        <img src="/assets/images/icons/lms-card-gradient-bg2.png"
+                             class="position-absolute w-100 h-100 z-n1 object-fit-cover lms-card-gradient-bg"
+                             alt="Gradient BG">
+                        <div class="px-16 py-12">
+                            <h6 class="mb-6">@Model.UpcomingExamCount</h6>
+                            <span class="text-secondary-light fw-medium mt-6 d-block">Cập nhật theo hệ thống</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card radius-12 mb-24">
+        <div class="card-body p-24">
+            <h2 class="text-xl fw-bold mb-3 text-primary-light">Quick Actions</h2>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <a href="/Students" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-48-px h-48-px rounded-circle bg-primary-100 text-primary-600 d-flex align-items-center justify-content-center text-2xl">
+                                    <i class="ri-graduation-cap-line"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-primary-light">Students</h6>
+                                    <p class="text-sm text-secondary-light mb-0">Manage Students</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="/Teachers" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-48-px h-48-px rounded-circle bg-success-100 text-success-600 d-flex align-items-center justify-content-center text-2xl">
+                                    <i class="ri-user-follow-line"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-success-600">Teachers</h6>
+                                    <p class="text-sm text-secondary-light mb-0">Manage Teachers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="/Exams" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-48-px h-48-px rounded-circle bg-warning-100 text-warning-600 d-flex align-items-center justify-content-center text-2xl">
+                                    <i class="ri-file-edit-line"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-warning-600">Exams</h6>
+                                    <p class="text-sm text-secondary-light mb-0">Manage Exams</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="/Classes" class="card radius-12 border bg-hover-neutral-50 text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-48-px h-48-px rounded-circle bg-info-100 text-info-600 d-flex align-items-center justify-content-center text-2xl">
+                                    <i class="ri-list-view"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-info-600">Classes</h6>
+                                    <p class="text-sm text-secondary-light mb-0">Manage Classes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-24">
+        <div class="col-xxl-6">
+            <div class="card radius-12 h-100">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Sinh viên theo ngành</h2>
+                    <div id="studentsByMajorChart" style="min-height: 320px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-6">
+            <div class="card radius-12 h-100">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Lớp theo khóa</h2>
+                    <div id="classesByCohortChart" style="min-height: 320px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-24">
+        <div class="col-xxl-7">
+            <div class="card radius-12 h-100">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Ca thi theo ngày (14 ngày)</h2>
+                    <div id="examsByDateChart" style="min-height: 320px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-5">
+            <div class="card radius-12 h-100">
+                <div class="card-body p-24">
+                    <h2 class="text-xl fw-bold mb-3 text-primary-light">Lịch thi sắp tới</h2>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="bg-neutral-100">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th>Giờ</th>
+                                    <th>Môn</th>
+                                    <th>Lớp</th>
+                                    <th>Phòng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.UpcomingExams.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-secondary-light py-16">Chưa có lịch thi.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var exam in Model.UpcomingExams)
+                                    {
+                                        <tr>
+                                            <td>@exam.ExamDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@exam.StartTime.ToString(@"hh\:mm") - @exam.EndTime.ToString(@"hh\:mm")</td>
+                                            <td>
+                                                <div class="fw-medium">@exam.SubjectCode</div>
+                                                <div class="text-sm text-secondary-light">@exam.SubjectName</div>
+                                            </td>
+                                            <td>@exam.ClassCode</td>
+                                            <td>@(!string.IsNullOrWhiteSpace(exam.RoomCode) ? exam.RoomCode : "-")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const studentsByMajor = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.StudentsByMajor,
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+        const classesByCohort = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.ClassesByCohort,
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+        const examsByDate = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.ExamsByDate,
+            new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+
+        const majorLabels = studentsByMajor.map(x => x.label);
+        const majorValues = studentsByMajor.map(x => x.value);
+
+        const cohortLabels = classesByCohort.map(x => x.label);
+        const cohortValues = classesByCohort.map(x => x.value);
+
+        const examDateLabels = examsByDate.map(x => x.label);
+        const examDateValues = examsByDate.map(x => x.value);
+
+        if (document.querySelector("#studentsByMajorChart")) {
+            const chart = new ApexCharts(document.querySelector("#studentsByMajorChart"), {
+                chart: { type: "donut", height: 320 },
+                labels: majorLabels,
+                series: majorValues,
+                legend: { position: "bottom" }
+            });
+            chart.render();
+        }
+
+        if (document.querySelector("#classesByCohortChart")) {
+            const chart = new ApexCharts(document.querySelector("#classesByCohortChart"), {
+                chart: { type: "bar", height: 320 },
+                series: [{ name: "Số lớp", data: cohortValues }],
+                xaxis: { categories: cohortLabels },
+                plotOptions: { bar: { borderRadius: 6, columnWidth: "40%" } }
+            });
+            chart.render();
+        }
+
+        if (document.querySelector("#examsByDateChart")) {
+            const chart = new ApexCharts(document.querySelector("#examsByDateChart"), {
+                chart: { type: "line", height: 320 },
+                series: [{ name: "Ca thi", data: examDateValues }],
+                xaxis: { categories: examDateLabels },
+                stroke: { width: 3, curve: "smooth" },
+                markers: { size: 4 }
+            });
+            chart.render();
+        }
+    </script>
+}

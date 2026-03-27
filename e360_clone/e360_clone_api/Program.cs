@@ -56,6 +56,7 @@ namespace e360_clone
             builder.Services.AddScoped<IGradeRepository, GradeRepository>();
             builder.Services.AddScoped<ProctorAssignmentDAO>();
             builder.Services.AddScoped<IProctorAssignmentRepository, ProctorAssignmentRepository>();
+            builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 

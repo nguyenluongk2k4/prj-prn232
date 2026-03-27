@@ -16,6 +16,7 @@ namespace e360_clone.DataAccess
         public DbSet<ExamSchedule> ExamSchedules { get; set; }
         public DbSet<ProctorAssignment> ProctorAssignments { get; set; }
         public DbSet<Grade> Grades { get; set; }
+        public DbSet<GradeEntry> GradeEntries { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Major> Majors { get; set; }

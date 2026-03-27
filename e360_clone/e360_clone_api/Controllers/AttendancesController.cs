@@ -1,4 +1,4 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
 using e360_clone.Repositories;
 using e360_clone.DataAccess;
 using e360_clone.BusinessObjects.DTOs;
@@ -31,7 +31,7 @@ namespace e360_clone.Controllers
             return Ok(new PagedResponse<Attendance>
             {
                 Success = true,
-                Message = "Lấy danh sách điểm danh thành công",
+                Message = "Láº¥y danh sÃ¡ch Ä‘iá»ƒm danh thÃ nh cÃ´ng",
                 Data = data.ToList(),
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
@@ -44,9 +44,9 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
 
-            return HandleResult(item, "Lấy thông tin điểm danh thành công");
+            return HandleResult(item, "Láº¥y thÃ´ng tin Ä‘iá»ƒm danh thÃ nh cÃ´ng");
         }
 
         [HttpGet("roster")]
@@ -54,13 +54,13 @@ namespace e360_clone.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "ExamId không hợp lệ" });
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "ExamId khÃ´ng há»£p lá»‡" });
             }
 
             var exam = await _context.Exams.AsNoTracking().FirstOrDefaultAsync(e => e.Id == examId);
             if (exam == null)
             {
-                return HandleNotFound($"Không tìm thấy kỳ thi có ID = {examId}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y ká»³ thi cÃ³ ID = {examId}");
             }
 
             var studentExams = await _context.StudentExams
@@ -142,7 +142,7 @@ namespace e360_clone.Controllers
             return Ok(new ApiResponse<List<AttendanceRosterItem>>
             {
                 Success = true,
-                Message = "Lấy danh sách điểm danh theo ca thi thành công",
+                Message = "Láº¥y danh sÃ¡ch Ä‘iá»ƒm danh theo ca thi thÃ nh cÃ´ng",
                 Data = roster
             });
         }
@@ -152,7 +152,7 @@ namespace e360_clone.Controllers
         {
             if (studentId <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Success = false, Message = "StudentId khÃ´ng há»£p lá»‡" });
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "StudentId khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡" });
             }
 
             var targetDate = (date ?? DateTime.UtcNow.Date).Date;
@@ -179,7 +179,7 @@ namespace e360_clone.Controllers
                 return Ok(new ApiResponse<List<StudentAttendanceItemDto>>
                 {
                     Success = true,
-                    Message = "KhÃ´ng cÃ³ ca thi.",
+                    Message = "KhÃƒÂ´ng cÃƒÂ³ ca thi.",
                     Data = new List<StudentAttendanceItemDto>()
                 });
             }
@@ -253,7 +253,7 @@ namespace e360_clone.Controllers
             return Ok(new ApiResponse<List<StudentAttendanceItemDto>>
             {
                 Success = true,
-                Message = "Láº¥y danh sÃ¡ch Ä‘iá»ƒm danh sinh viÃªn thÃ nh cÃ´ng",
+                Message = "LÃ¡ÂºÂ¥y danh sÃƒÂ¡ch Ã„â€˜iÃ¡Â»Æ’m danh sinh viÃƒÂªn thÃƒÂ nh cÃƒÂ´ng",
                 Data = items
             });
         }
@@ -265,74 +265,85 @@ namespace e360_clone.Controllers
             [FromQuery] int? subjectId,
             [FromQuery] int? classId)
         {
-            var startDate = (fromDate ?? DateTime.UtcNow.Date.AddDays(-7)).Date;
-            var endDate = (toDate ?? DateTime.UtcNow.Date).Date;
-
-            var query = from a in _context.Attendances
-                        join e in _context.Exams on a.ExamId equals e.Id
-                        join s in _context.Subjects on e.SubjectId equals s.Id
-                        join c in _context.Classes on e.ClassId equals c.Id
-                        where e.ExamDate.Date >= startDate && e.ExamDate.Date <= endDate
-                        select new { Attendance = a, Exam = e, Subject = s, Class = c };
-
-            if (subjectId.HasValue)
+            try
             {
-                query = query.Where(x => x.Exam.SubjectId == subjectId.Value);
-            }
+                var startDate = (fromDate ?? DateTime.UtcNow.Date.AddDays(-7)).Date;
+                var endDate = (toDate ?? DateTime.UtcNow.Date).Date;
+                var startUtc = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+                var endUtcExclusive = DateTime.SpecifyKind(endDate.AddDays(1), DateTimeKind.Utc);
 
-            if (classId.HasValue)
-            {
-                query = query.Where(x => x.Exam.ClassId == classId.Value);
-            }
+                var query = from a in _context.Attendances
+                            join e in _context.Exams on a.ExamId equals e.Id
+                            join s in _context.Subjects on e.SubjectId equals s.Id
+                            join c in _context.Classes on e.ClassId equals c.Id
+                            where e.ExamDate >= startUtc && e.ExamDate < endUtcExclusive
+                            select new { Attendance = a, Exam = e, Subject = s, Class = c };
 
-            var data = await query
-                .GroupBy(x => new
+                if (subjectId.HasValue)
                 {
-                    Date = x.Exam.ExamDate.Date,
-                    x.Exam.StartTime,
-                    x.Exam.EndTime,
-                    x.Exam.SubjectId,
-                    x.Subject.SubjectCode,
-                    x.Subject.SubjectName,
-                    x.Exam.ClassId,
-                    x.Class.ClassCode
-                })
-                .Select(g => new AttendanceReportItem
-                {
-                    ExamDate = g.Key.Date,
-                    StartTime = g.Key.StartTime,
-                    EndTime = g.Key.EndTime,
-                    SubjectId = g.Key.SubjectId,
-                    SubjectCode = g.Key.SubjectCode,
-                    SubjectName = g.Key.SubjectName,
-                    ClassId = g.Key.ClassId,
-                    ClassCode = g.Key.ClassCode,
-                    Total = g.Count(),
-                    Present = g.Count(x => x.Attendance.Status == "Present"),
-                    Absent = g.Count(x => x.Attendance.Status == "Absent"),
-                    Late = g.Count(x => x.Attendance.Status == "Late"),
-                    Excused = g.Count(x => x.Attendance.Status == "Excused"),
-                    Confirmed = g.Count(x => x.Attendance.StudentConfirmed)
-                })
-                .OrderBy(x => x.ExamDate)
-                .ThenBy(x => x.StartTime)
-                .ThenBy(x => x.SubjectCode)
-                .ThenBy(x => x.ClassCode)
-                .ToListAsync();
+                    query = query.Where(x => x.Exam.SubjectId == subjectId.Value);
+                }
 
-            return Ok(new ApiResponse<List<AttendanceReportItem>>
+                if (classId.HasValue)
+                {
+                    query = query.Where(x => x.Exam.ClassId == classId.Value);
+                }
+
+                var data = await query
+                    .GroupBy(x => new
+                    {
+                        Date = x.Exam.ExamDate.Date,
+                        x.Exam.StartTime,
+                        x.Exam.EndTime,
+                        x.Exam.Id,
+                        x.Exam.SubjectId,
+                        x.Subject.SubjectCode,
+                        x.Subject.SubjectName,
+                        x.Exam.ClassId,
+                        x.Class.ClassCode
+                    })
+                    .Select(g => new AttendanceReportItemDto
+                    {
+                        ExamDate = g.Key.Date,
+                        StartTime = g.Key.StartTime,
+                        EndTime = g.Key.EndTime,
+                        ExamId = g.Key.Id,
+                        SubjectId = g.Key.SubjectId,
+                        SubjectCode = g.Key.SubjectCode,
+                        SubjectName = g.Key.SubjectName,
+                        ClassId = g.Key.ClassId,
+                        ClassCode = g.Key.ClassCode,
+                        Total = g.Count(),
+                        Present = g.Count(x => x.Attendance.Status == "Present"),
+                        Absent = g.Count(x => x.Attendance.Status == "Absent"),
+                        Late = g.Count(x => x.Attendance.Status == "Late"),
+                        Excused = g.Count(x => x.Attendance.Status == "Excused"),
+                        Confirmed = g.Count(x => x.Attendance.StudentConfirmed)
+                    })
+                    .OrderBy(x => x.ExamDate)
+                    .ThenBy(x => x.StartTime)
+                    .ThenBy(x => x.SubjectCode)
+                    .ThenBy(x => x.ClassCode)
+                    .ToListAsync();
+
+                return Ok(new ApiResponse<List<AttendanceReportItemDto>>
+                {
+                    Success = true,
+                    Message = "L?y b?o c?o ?i?m danh th?nh c?ng",
+                    Data = data
+                });
+            }
+            catch (Exception ex)
             {
-                Success = true,
-                Message = "Lấy báo cáo điểm danh thành công",
-                Data = data
-            });
+                return HandleError("GetReport failed: " + ex.Message);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Attendance attendance)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Attendance> { Success = false, Message = "Dữ liệu không hợp lệ" });
+                return BadRequest(new ApiResponse<Attendance> { Success = false, Message = "Dá»¯ liá»‡u khÃ´ng há»£p lá»‡" });
 
             attendance.RecordedAt = DateTime.UtcNow;
             await _repository.AddAsync(attendance);
@@ -340,7 +351,7 @@ namespace e360_clone.Controllers
             return CreatedAtAction(nameof(GetById), new { id = attendance.Id }, new ApiResponse<Attendance>
             {
                 Success = true,
-                Message = "Thêm điểm danh thành công",
+                Message = "ThÃªm Ä‘iá»ƒm danh thÃ nh cÃ´ng",
                 Data = attendance
             });
         }
@@ -350,7 +361,7 @@ namespace e360_clone.Controllers
         {
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
-                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
 
             existing.ExamId = attendance.ExamId;
             existing.StudentId = attendance.StudentId;
@@ -363,7 +374,7 @@ namespace e360_clone.Controllers
             existing.StudentConfirmedAt = attendance.StudentConfirmedAt;
 
             await _repository.UpdateAsync(existing);
-            return HandleResult(existing, "Cập nhật điểm danh thành công");
+            return HandleResult(existing, "Cáº­p nháº­t Ä‘iá»ƒm danh thÃ nh cÃ´ng");
         }
 
         [HttpDelete("{id}")]
@@ -371,10 +382,10 @@ namespace e360_clone.Controllers
         {
             var item = await _repository.GetByIdAsync(id);
             if (item == null)
-                return HandleNotFound($"Không tìm thấy điểm danh có ID = {id}");
+                return HandleNotFound($"KhÃ´ng tÃ¬m tháº¥y Ä‘iá»ƒm danh cÃ³ ID = {id}");
 
             await _repository.DeleteAsync(item);
-            return HandleResult(true, "Xóa điểm danh thành công");
+            return HandleResult(true, "XÃ³a Ä‘iá»ƒm danh thÃ nh cÃ´ng");
         }
 
         private sealed class AttendanceRosterItem
@@ -395,22 +406,7 @@ namespace e360_clone.Controllers
             public DateTime? StudentConfirmedAt { get; set; }
         }
 
-        private sealed class AttendanceReportItem
-        {
-            public DateTime ExamDate { get; set; }
-            public TimeSpan StartTime { get; set; }
-            public TimeSpan EndTime { get; set; }
-            public int SubjectId { get; set; }
-            public string SubjectCode { get; set; } = string.Empty;
-            public string SubjectName { get; set; } = string.Empty;
-            public int ClassId { get; set; }
-            public string ClassCode { get; set; } = string.Empty;
-            public int Total { get; set; }
-            public int Present { get; set; }
-            public int Absent { get; set; }
-            public int Late { get; set; }
-            public int Excused { get; set; }
-            public int Confirmed { get; set; }
-        }
     }
 }
+
+

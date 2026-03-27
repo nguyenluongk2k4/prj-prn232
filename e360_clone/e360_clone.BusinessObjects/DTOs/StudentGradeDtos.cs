@@ -12,15 +12,14 @@ namespace e360_clone.BusinessObjects.DTOs
 
     public class StudentGradeItemDto
     {
-        public int ExamId { get; set; }
         public int SubjectId { get; set; }
         public string SubjectCode { get; set; } = string.Empty;
         public string SubjectName { get; set; } = string.Empty;
         public int? ClassId { get; set; }
         public string ClassCode { get; set; } = string.Empty;
-        public DateTime ExamDate { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public string AcademicYear { get; set; } = string.Empty;
+        public int Semester { get; set; }
+        public string TermLabel { get; set; } = string.Empty;
         public List<StudentGradeComponentDto> Components { get; set; } = new();
     }
 }

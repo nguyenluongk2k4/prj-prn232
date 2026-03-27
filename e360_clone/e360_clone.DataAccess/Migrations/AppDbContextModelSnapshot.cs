@@ -560,6 +560,63 @@ namespace e360_clone.Migrations
                     b.ToTable("Grades");
                 });
 
+            modelBuilder.Entity("e360_clone.BusinessObjects.GradeEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AcademicYear")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ApprovedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("EnteredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EnteredBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LetterGrade")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Score")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("ScoreType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Semester")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GradeEntries");
+                });
+
             modelBuilder.Entity("e360_clone.BusinessObjects.Lecturer", b =>
                 {
                     b.Property<int>("Id")
@@ -936,6 +993,12 @@ namespace e360_clone.Migrations
                     b.Property<string>("Department")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal?>("MinFinalScore")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("MinPracticalScore")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("PracticeHours")
                         .HasColumnType("integer");
