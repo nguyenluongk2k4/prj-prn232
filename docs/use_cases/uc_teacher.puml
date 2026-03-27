@@ -11,39 +11,42 @@ skinparam actor {
     BorderColor Black
 }
 
-actor "Teacher" as teacher
+actor "Teacher (Lecturer)" as teacher
 
 rectangle "e360 Exam Management System" {
-    usecase "Login System" as UC_LOGIN
+
+    usecase "Login" as UC_LOGIN
     usecase "Reset Password" as UC_RESET
+    usecase "Logout" as UC_LOGOUT
 
     usecase "View Teacher Dashboard" as UC_DASHBOARD
 
-    usecase "View Proctor Assignments" as UC_VIEW_PROCTOR
+    usecase "View Proctor Assignments" as UC_VIEW_ASSIGN
     usecase "View Assigned Exam Details" as UC_EXAM_DETAIL
-    usecase "View Assigned Student List" as UC_STUDENT_LIST
 
-    usecase "Submit Student Grades" as UC_SUBMIT_GRADE
+    usecase "Take Student Attendance" as UC_ATTENDANCE
+    usecase "Record Student Violation" as UC_VIOLATION
+
+    usecase "Enter Student Grades" as UC_ENTER_GRADE
     usecase "Update Student Grade" as UC_UPDATE_GRADE
 
-    usecase "View Exam Schedule" as UC_EXAM_SCHEDULE
-
-    usecase "Log Out" as UC_LOGOUT
 }
 
 teacher --> UC_LOGIN
-teacher --> UC_DASHBOARD
-teacher --> UC_VIEW_PROCTOR
-teacher --> UC_SUBMIT_GRADE
-teacher --> UC_EXAM_SCHEDULE
 teacher --> UC_LOGOUT
-
+teacher --> UC_DASHBOARD
+teacher --> UC_VIEW_ASSIGN
+teacher --> UC_ATTENDANCE
+teacher --> UC_VIOLATION
+teacher --> UC_ENTER_GRADE
 UC_LOGIN <.. UC_RESET : <<extend>>
 
-UC_VIEW_PROCTOR <.. UC_EXAM_DETAIL : <<extend>>
-UC_VIEW_PROCTOR <.. UC_STUDENT_LIST : <<extend>>
+UC_VIEW_ASSIGN <.. UC_EXAM_DETAIL : <<extend>>
 
-UC_SUBMIT_GRADE <.. UC_UPDATE_GRADE : <<extend>>
-UC_SUBMIT_GRADE ..> UC_STUDENT_LIST : <<include>>
+UC_ATTENDANCE ..> UC_VIEW_ASSIGN : <<include>>
+UC_VIOLATION ..> UC_VIEW_ASSIGN : <<include>>
+
+UC_ENTER_GRADE <.. UC_UPDATE_GRADE : <<extend>>
+UC_ENTER_GRADE ..> UC_VIEW_ASSIGN : <<include>>
 
 @enduml

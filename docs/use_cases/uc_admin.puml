@@ -11,13 +11,20 @@ skinparam actor {
     BorderColor Black
 }
 
-actor "Admin /\nSuperAdmin" as admin
+actor "Admin" as admin
 
 rectangle "e360 Exam Management System" {
-    usecase "Login System" as UC_LOGIN
-    usecase "Reset Password" as UC_RESET
 
-    usecase "View School Dashboard" as UC_DASHBOARD
+    usecase "Login" as UC_LOGIN
+    usecase "Reset Password" as UC_RESET
+    usecase "Logout" as UC_LOGOUT
+
+    usecase "View Dashboard" as UC_DASHBOARD
+
+    usecase "Manage Accounts" as UC_ACCOUNTS
+    usecase "Create Account" as UC_CREATE_ACC
+    usecase "Update Account" as UC_UPDATE_ACC
+    usecase "Lock / Unlock Account" as UC_LOCK_ACC
 
     usecase "Manage Students" as UC_STUDENTS
     usecase "Create Student" as UC_CREATE_STU
@@ -33,20 +40,17 @@ rectangle "e360 Exam Management System" {
     usecase "Manage Classes" as UC_CLASSES
     usecase "Manage Exam Rooms" as UC_ROOMS
 
-    usecase "Manage Exams" as UC_EXAMS
-    usecase "Create Exam" as UC_CREATE_EXAM
-    usecase "Update Exam" as UC_UPDATE_EXAM
-    usecase "Delete Exam" as UC_DELETE_EXAM
+    usecase "View All Exam Schedules" as UC_EXAMS
+    usecase "View Proctor Assignments" as UC_PROCTOR
+    usecase "View Grade Results" as UC_GRADES
 
-    usecase "Assign Proctors" as UC_PROCTOR
-    usecase "Remove Proctor Assignment" as UC_DEL_PROCTOR
-
-    usecase "Manage Grades" as UC_GRADES
-    usecase "Manage Attendances" as UC_ATTEND
+    usecase "View Reports & Statistics" as UC_REPORTS
 }
 
 admin --> UC_LOGIN
+admin --> UC_LOGOUT
 admin --> UC_DASHBOARD
+admin --> UC_ACCOUNTS
 admin --> UC_STUDENTS
 admin --> UC_LECTURERS
 admin --> UC_SUBJECTS
@@ -55,9 +59,13 @@ admin --> UC_ROOMS
 admin --> UC_EXAMS
 admin --> UC_PROCTOR
 admin --> UC_GRADES
-admin --> UC_ATTEND
+admin --> UC_REPORTS
 
 UC_LOGIN <.. UC_RESET : <<extend>>
+
+UC_ACCOUNTS <.. UC_CREATE_ACC : <<extend>>
+UC_ACCOUNTS <.. UC_UPDATE_ACC : <<extend>>
+UC_ACCOUNTS <.. UC_LOCK_ACC : <<extend>>
 
 UC_STUDENTS <.. UC_CREATE_STU : <<extend>>
 UC_STUDENTS <.. UC_UPDATE_STU : <<extend>>
@@ -66,12 +74,5 @@ UC_STUDENTS <.. UC_DELETE_STU : <<extend>>
 UC_LECTURERS <.. UC_CREATE_LEC : <<extend>>
 UC_LECTURERS <.. UC_UPDATE_LEC : <<extend>>
 UC_LECTURERS <.. UC_DELETE_LEC : <<extend>>
-
-UC_EXAMS <.. UC_CREATE_EXAM : <<extend>>
-UC_EXAMS <.. UC_UPDATE_EXAM : <<extend>>
-UC_EXAMS <.. UC_DELETE_EXAM : <<extend>>
-
-UC_PROCTOR <.. UC_DEL_PROCTOR : <<extend>>
-UC_PROCTOR ..> UC_EXAMS : <<include>>
 
 @enduml
