@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -126,7 +126,7 @@ namespace e360_clone_fe.Services
         /// <summary>
         /// Handle API response
         /// </summary>
-        private async Task<ApiResponse<T>> HandleResponseAsync<T>(HttpResponseMessage response)
+                private async Task<ApiResponse<T>> HandleResponseAsync<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
             var requestUri = response.RequestMessage?.RequestUri?.ToString() ?? "(unknown)";
@@ -135,10 +135,9 @@ namespace e360_clone_fe.Services
             {
                 var location = response.Headers.Location?.ToString() ?? "(no location)";
                 _logger.LogWarning("API redirect {Status} from {RequestUri} to {Location}", response.StatusCode, requestUri, location);
-                return ApiResponse<T>.ErrorResult($"Lỗi API: {response.StatusCode}");
+                return ApiResponse<T>.ErrorResult("Loi API: " + response.StatusCode);
             }
 
-            // Handle 401 Unauthorized - clear token and redirect
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 var isAuthEndpoint = requestUri.Contains("/api/Auth/login", StringComparison.OrdinalIgnoreCase)
@@ -160,18 +159,17 @@ namespace e360_clone_fe.Services
                         context.Response.Redirect("/Auth/Login?returnUrl=" + Uri.EscapeDataString(context.Request.Path + context.Request.QueryString));
                     }
                 }
-                return ApiResponse<T>.ErrorResult("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+                return ApiResponse<T>.ErrorResult("Phien dang nhap da het han. Vui long dang nhap lai.");
             }
 
             if (string.IsNullOrWhiteSpace(content))
             {
                 _logger.LogWarning("Empty API response from {RequestUri} with status {StatusCode}", requestUri, response.StatusCode);
                 return response.IsSuccessStatusCode
-                    ? ApiResponse<T>.SuccessResult(default!, "Thành công")
-                    : ApiResponse<T>.ErrorResult($"Lỗi API: {response.StatusCode}");
+                    ? ApiResponse<T>.SuccessResult(default!, "Thanh cong")
+                    : ApiResponse<T>.ErrorResult("Loi API: " + response.StatusCode);
             }
 
-            // Parse API response
             try
             {
                 var apiResponse = JsonSerializer.Deserialize<ApiResponse<T>>(content, new JsonSerializerOptions
@@ -181,6 +179,12 @@ namespace e360_clone_fe.Services
 
                 if (apiResponse != null)
                 {
+                    if (string.IsNullOrWhiteSpace(apiResponse.Message))
+                    {
+                        apiResponse.Message = response.IsSuccessStatusCode
+                            ? "Thanh cong"
+                            : $"Loi API: {(int)response.StatusCode}";
+                    }
                     if (!apiResponse.Success)
                     {
                         _logger.LogWarning("API Error: {Message}", apiResponse.Message);
@@ -191,9 +195,13 @@ namespace e360_clone_fe.Services
             catch (JsonException ex)
             {
                 _logger.LogError(ex, "Failed to parse API response");
+                var preview = content.Length > 500 ? content.Substring(0, 500) + "..." : content;
+                if (!response.IsSuccessStatusCode)
+                {
+                    return ApiResponse<T>.ErrorResult(string.Format("Loi API: {0} - {1}", (int)response.StatusCode, preview));
+                }
             }
 
-            // Fallback for non-standard responses
             if (response.IsSuccessStatusCode)
             {
                 try
@@ -202,15 +210,16 @@ namespace e360_clone_fe.Services
                     {
                         PropertyNameCaseInsensitive = true
                     });
-                    return ApiResponse<T>.SuccessResult(data, "Thành công");
+                    return ApiResponse<T>.SuccessResult(data, "Thanh cong");
                 }
                 catch
                 {
-                    return ApiResponse<T>.SuccessResult(default!, "Thành công");
+                    return ApiResponse<T>.SuccessResult(default!, "Thanh cong");
                 }
             }
 
-            return ApiResponse<T>.ErrorResult($"Lỗi API: {response.StatusCode}");
+            var fallbackPreview = content.Length > 500 ? content.Substring(0, 500) + "..." : content;
+            return ApiResponse<T>.ErrorResult(string.Format("Loi API: {0} - {1}", (int)response.StatusCode, fallbackPreview));
         }
 
         /// <summary>
@@ -240,7 +249,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GET request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -263,7 +272,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GET with token failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -288,7 +297,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "POST request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -313,7 +322,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "PUT request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -332,7 +341,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "DELETE request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -362,7 +371,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "PATCH request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
 
@@ -420,7 +429,7 @@ namespace e360_clone_fe.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Upload request failed for {Endpoint}", endpoint);
-                return ApiResponse<T>.ErrorResult($"Lỗi kết nối: {ex.Message}");
+                return ApiResponse<T>.ErrorResult($"Lá»—i káº¿t ná»‘i: {ex.Message}");
             }
         }
     }
@@ -440,7 +449,7 @@ namespace e360_clone_fe.Services
             ? (int)Math.Ceiling(TotalRecords / (double)PageSize) 
             : 0;
 
-        public static ApiResponse<T> SuccessResult(T? data, string message = "Thành công")
+        public static ApiResponse<T> SuccessResult(T? data, string message = "ThÃ nh cÃ´ng")
         {
             return new ApiResponse<T>
             {
@@ -484,3 +493,4 @@ namespace e360_clone_fe.Services
         }
     }
 }
+

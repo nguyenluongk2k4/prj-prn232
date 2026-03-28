@@ -17,6 +17,8 @@ namespace e360_clone.Repositories
         {
             var fromDateOnly = fromDate.Date;
             var toDateOnly = toDate.Date;
+            var fromUtc = DateTime.SpecifyKind(fromDateOnly, DateTimeKind.Utc);
+            var toUtcExclusive = DateTime.SpecifyKind(toDateOnly.AddDays(1), DateTimeKind.Utc);
 
             var totalStudents = await _context.Students.CountAsync();
             var totalLecturers = await _context.Lecturers.CountAsync();
@@ -25,7 +27,7 @@ namespace e360_clone.Repositories
             var totalExamRooms = await _context.ExamRooms.CountAsync();
 
             var upcomingExamCount = await _context.Exams
-                .Where(e => e.ExamDate.Date >= fromDateOnly && e.ExamDate.Date <= toDateOnly)
+                .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
                 .CountAsync();
 
             var studentsByMajor = await (from s in _context.Students
@@ -40,7 +42,11 @@ namespace e360_clone.Repositories
                                          })
                 .ToListAsync();
 
-            var classesByCohort = await _context.Classes
+            var classCohorts = await _context.Classes
+                .Select(c => new { c.CohortYear, c.Cohort })
+                .ToListAsync();
+
+            var classesByCohort = classCohorts
                 .GroupBy(c => c.CohortYear > 0
                     ? c.CohortYear.ToString()
                     : (c.Cohort > 0 ? $"K{c.Cohort}" : "Unknown"))
@@ -50,10 +56,10 @@ namespace e360_clone.Repositories
                     Value = g.Count()
                 })
                 .OrderBy(x => x.Label)
-                .ToListAsync();
+                .ToList();
 
             var examCounts = await _context.Exams
-                .Where(e => e.ExamDate.Date >= fromDateOnly && e.ExamDate.Date <= toDateOnly)
+                .Where(e => e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive)
                 .GroupBy(e => e.ExamDate.Date)
                 .Select(g => new { Date = g.Key, Count = g.Count() })
                 .ToListAsync();
@@ -76,7 +82,7 @@ namespace e360_clone.Repositories
                                        join c in _context.Classes on e.ClassId equals c.Id
                                        join r in _context.ExamRooms on e.RoomId equals r.Id into roomJoin
                                        from r in roomJoin.DefaultIfEmpty()
-                                       where e.ExamDate.Date >= fromDateOnly && e.ExamDate.Date <= toDateOnly
+                                       where e.ExamDate >= fromUtc && e.ExamDate < toUtcExclusive
                                        orderby e.ExamDate, e.StartTime
                                        select new AdminDashboardExamItemDto
                                        {

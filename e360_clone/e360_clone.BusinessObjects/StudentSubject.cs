@@ -23,6 +23,8 @@ namespace e360_clone.BusinessObjects
 
         public int Semester { get; set; }
 
+        public int TermId { get; set; }
+
         [StringLength(20)]
         public string Status { get; set; } = "Enrolled"; // Enrolled, Completed, Failed, Retake, Withdrawn
 
@@ -49,5 +51,6 @@ namespace e360_clone.BusinessObjects
         public Student? Student { get; set; }
         public Subject? Subject { get; set; }
         public Class? Class { get; set; }
+        public Term? Term { get; set; }
     }
 }

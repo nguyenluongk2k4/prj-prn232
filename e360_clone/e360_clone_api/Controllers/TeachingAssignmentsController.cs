@@ -16,22 +16,19 @@ namespace e360_clone.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request, [FromQuery] int? lecturerId)
+        public async Task<IActionResult> GetAll([FromQuery] PagedRequest request, [FromQuery] int? lecturerId, [FromQuery] int? subjectId, [FromQuery] int? classId)
         {
-            Expression<Func<TeachingAssignment, bool>>? filter = null;
-            if (lecturerId.HasValue)
-            {
-                filter = x => x.LecturerId == lecturerId.Value;
-            }
+            Expression<Func<TeachingAssignment, bool>> filter = x =>
+                (!lecturerId.HasValue || x.LecturerId == lecturerId.Value) &&
+                (!subjectId.HasValue || x.SubjectId == subjectId.Value) &&
+                (!classId.HasValue || x.ClassId == classId.Value);
 
             var data = await _repository.GetPagedFilteredAsync(
                 request.PageNumber,
                 request.PageSize,
                 filter,
                 q => q.OrderBy(x => x.Id));
-            var totalRecords = filter == null
-                ? await _repository.CountAsync()
-                : await _repository.CountAsync(filter);
+            var totalRecords = await _repository.CountAsync(filter);
 
             return Ok(new PagedResponse<TeachingAssignment>
             {
@@ -60,6 +57,23 @@ namespace e360_clone.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<TeachingAssignment> { Success = false, Message = "Dữ liệu không hợp lệ" });
 
+            var exists = await _repository.AnyAsync(x =>
+                x.SubjectId == assignment.SubjectId &&
+                x.ClassId == assignment.ClassId &&
+                x.Status == "Active");
+            if (exists)
+            {
+                return BadRequest(new ApiResponse<TeachingAssignment>
+                {
+                    Success = false,
+                    Message = "Lớp này đã được gán cho môn học.",
+                    Data = null
+                });
+            }
+
+            assignment.Status = string.IsNullOrWhiteSpace(assignment.Status) ? "Active" : assignment.Status;
+            assignment.AcademicYear ??= string.Empty;
+            assignment.Semester ??= string.Empty;
             assignment.CreatedAt = DateTime.UtcNow;
             await _repository.AddAsync(assignment);
 

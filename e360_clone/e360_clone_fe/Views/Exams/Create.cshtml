@@ -27,6 +27,18 @@
     <div class="content-area p-24">
         <div class="card h-100">
             <div class="card-body p-24">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success mb-16" role="alert">
+                        <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger mb-16" role="alert">
+                        <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
                 <form asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
 
@@ -42,13 +54,13 @@
                         <div class="col-sm-6">
                             <label asp-for="Exam.ExamType" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
                             <select asp-for="Exam.ExamType" class="form-control form-select">
-                                <option value="ClassExam">Class Exam</option>
-                                <option value="GraduationExam">Graduation Exam</option>
+                                <option value="Practical">Practical Exam</option>
+                                <option value="Final">Final Exam</option>
                             </select>
                         </div>
                         <div class="col-sm-6">
                             <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Môn</label>
-                            <select asp-for="Exam.SubjectId" class="form-control form-select">
+                            <select asp-for="Exam.SubjectId" class="form-control form-select" id="subjectSelect">
                                 <option value="">Chọn môn</option>
                                 @foreach (var s in Model.Subjects)
                                 {
@@ -56,16 +68,26 @@
                                 }
                             </select>
                         </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="ApplyAllClasses" class="form-check-input" id="applyAllClasses" type="checkbox" />
+                                <label class="form-check-label" for="applyAllClasses">Áp dụng cho tất cả lớp đang học môn này</label>
+                            </div>
+                        </div>
                         <div class="col-sm-6">
                             <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Lớp</label>
                             <select asp-for="Exam.ClassId" class="form-control form-select" id="classSelect">
                                 <option value="">Chọn lớp</option>
                             </select>
+                            <div class="text-xs text-muted mt-6">Bỏ chọn nếu áp dụng cho tất cả lớp.</div>
                         </div>
                         <div class="col-sm-6">
-                            <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Phòng thi</label>
-                            <select asp-for="Exam.RoomId" class="form-control form-select" id="roomSelect">
-                                <option value="">Chọn phòng</option>
+                            <label asp-for="Exam.Status" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
+                            <select asp-for="Exam.Status" class="form-control form-select">
+                                <option value="Planned">Planned</option>
+                                <option value="InProgress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
                             </select>
                         </div>
                         <div class="col-sm-6">
@@ -84,22 +106,18 @@
                             <label asp-for="Exam.Duration" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
                             <input asp-for="Exam.Duration" type="number" class="form-control" />
                         </div>
-                        <div class="col-sm-3">
-                            <label asp-for="Exam.Semester" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
-                            <input asp-for="Exam.Semester" class="form-control" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label asp-for="Exam.AcademicYear" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
-                            <input asp-for="Exam.AcademicYear" class="form-control" placeholder="2024-2025" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label asp-for="Exam.Status" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
-                            <select asp-for="Exam.Status" class="form-control form-select">
-                                <option value="Planned">Planned</option>
-                                <option value="InProgress">In Progress</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
+                        <div class="col-12">
+                            <label class="text-sm fw-semibold text-primary-light d-inline-block mb-8">Phòng thi</label>
+                            <div class="d-flex flex-wrap gap-16 mb-8 text-sm">
+                                <div><strong>Sinh viên dự kiến:</strong> <span id="studentCount">-</span></div>
+                                <div><strong>Sức chứa đã chọn:</strong> <span id="selectedCapacity">0</span></div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-8 mb-8">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllRooms">Chọn tất cả</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="clearRooms">Bỏ chọn</button>
+                            </div>
+                            <div id="roomChecklist" class="row g-2"></div>
+                            <div class="text-xs text-muted mt-6">Danh sách phòng sẽ tự cập nhật theo ngày/giờ thi.</div>
                         </div>
                         <div class="col-12">
                             <label asp-for="Exam.Notes" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
@@ -122,15 +140,49 @@
     <script>
         (function () {
             const apiBase = window.APP_CONFIG?.API_BASE_URL || '/api';
-            const subjectSelect = document.getElementById('Exam_SubjectId');
+            const subjectSelect = document.getElementById('subjectSelect');
             const classSelect = document.getElementById('classSelect');
-            const roomSelect = document.getElementById('roomSelect');
+            const applyAllClasses = document.getElementById('applyAllClasses');
+            const roomChecklist = document.getElementById('roomChecklist');
+            const selectAllRooms = document.getElementById('selectAllRooms');
+            const clearRooms = document.getElementById('clearRooms');
             const examDateInput = document.getElementById('examDateInput');
             const startTimeInput = document.getElementById('startTimeInput');
             const endTimeInput = document.getElementById('endTimeInput');
+            const studentCountEl = document.getElementById('studentCount');
+            const selectedCapacityEl = document.getElementById('selectedCapacity');
+
+            const selectedRoomIds = new Set(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SelectedRoomIds)));
+            let currentRooms = [];
 
             function resetSelect(select, placeholder) {
                 select.innerHTML = `<option value="">${placeholder}</option>`;
+            }
+
+            function renderRooms(rooms) {
+                currentRooms = rooms || [];
+                roomChecklist.innerHTML = '';
+                if (!rooms.length) {
+                    roomChecklist.innerHTML = '<div class="text-sm text-muted">Chưa có phòng phù hợp.</div>';
+                    updateCapacity();
+                    return;
+                }
+
+                rooms.forEach(room => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'col-sm-6 col-md-4';
+
+                    const id = `room_${room.id}`;
+                    const checked = selectedRoomIds.has(room.id);
+                    wrapper.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input room-checkbox" type="checkbox" name="SelectedRoomIds" value="${room.id}" id="${id}" data-capacity="${room.capacity || 0}" ${checked ? 'checked' : ''}>
+                            <label class="form-check-label" for="${id}">${room.roomCode} - ${room.roomName}</label>
+                        </div>`;
+                    roomChecklist.appendChild(wrapper);
+                });
+                roomChecklist.querySelectorAll('.room-checkbox').forEach(cb => cb.addEventListener('change', updateCapacity));
+                updateCapacity();
             }
 
             async function loadClassesBySubject() {
@@ -157,26 +209,77 @@
                 const start = startTimeInput.value;
                 const end = endTimeInput.value;
                 if (!date || !start || !end) {
-                    resetSelect(roomSelect, 'Chọn phòng');
+                    renderRooms([]);
+                    return;
+                }
+                if (start >= end) {
+                    renderRooms([]);
                     return;
                 }
                 const url = `${apiBase}/rooms/available?examDate=${encodeURIComponent(date)}&startTime=${encodeURIComponent(start)}&endTime=${encodeURIComponent(end)}`;
                 const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
                 const json = await res.json();
                 const rooms = Array.isArray(json.data) ? json.data : [];
-                resetSelect(roomSelect, 'Chọn phòng');
-                rooms.forEach(r => {
-                    const option = document.createElement('option');
-                    option.value = r.id;
-                    option.textContent = `${r.roomCode} - ${r.roomName}`;
-                    roomSelect.appendChild(option);
-                });
+                renderRooms(rooms);
             }
 
+            function updateCapacity() {
+                let total = 0;
+                roomChecklist.querySelectorAll('.room-checkbox').forEach(cb => {
+                    if (cb.checked) {
+                        total += Number(cb.dataset.capacity || 0);
+                    }
+                });
+                if (selectedCapacityEl) {
+                    selectedCapacityEl.textContent = total.toString();
+                }
+            }
+
+            async function loadStudentCount() {
+                const subjectId = subjectSelect.value;
+                if (!subjectId) {
+                    if (studentCountEl) studentCountEl.textContent = '-';
+                    return;
+                }
+                const classId = applyAllClasses.checked ? '' : classSelect.value;
+                const url = `${apiBase}/exams/subject-student-count?subjectId=${encodeURIComponent(subjectId)}${classId ? `&classId=${encodeURIComponent(classId)}` : ''}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                const json = await res.json();
+                const count = typeof json.data === 'number' ? json.data : 0;
+                if (studentCountEl) studentCountEl.textContent = count.toString();
+            }
+
+            function updateClassToggle() {
+                if (applyAllClasses.checked) {
+                    classSelect.value = '';
+                    classSelect.setAttribute('disabled', 'disabled');
+                } else {
+                    classSelect.removeAttribute('disabled');
+                }
+            }
+
+            selectAllRooms?.addEventListener('click', () => {
+                roomChecklist.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+            });
+            clearRooms?.addEventListener('click', () => {
+                roomChecklist.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            });
+
             subjectSelect?.addEventListener('change', loadClassesBySubject);
+            subjectSelect?.addEventListener('change', loadStudentCount);
+
             examDateInput?.addEventListener('change', loadAvailableRooms);
             startTimeInput?.addEventListener('change', loadAvailableRooms);
             endTimeInput?.addEventListener('change', loadAvailableRooms);
+            applyAllClasses?.addEventListener('change', () => {
+                updateClassToggle();
+                loadStudentCount();
+            });
+            classSelect?.addEventListener('change', loadStudentCount);
+
+            updateClassToggle();
+            loadAvailableRooms();
+            loadStudentCount();
         })();
     </script>
 }

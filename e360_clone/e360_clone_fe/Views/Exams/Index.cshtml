@@ -154,11 +154,46 @@
                             <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
                                 <a class="page-link" href="?pageNumber=@(Model.PageNumber-1)&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">Trước</a>
                             </li>
-                            @for (int i = 1; i <= Model.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                                    <a class="page-link" href="?pageNumber=@i&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">@i</a>
-                                </li>
+                            @{
+                                var totalPages = Model.TotalPages;
+                                var currentPage = Model.PageNumber;
+                                var pages = new SortedSet<int>();
+
+                                if (totalPages <= 7)
+                                {
+                                    for (var i = 1; i <= totalPages; i++)
+                                    {
+                                        pages.Add(i);
+                                    }
+                                }
+                                else
+                                {
+                                    pages.Add(1);
+                                    pages.Add(totalPages);
+
+                                    for (var i = currentPage - 2; i <= currentPage + 2; i++)
+                                    {
+                                        if (i > 1 && i < totalPages)
+                                        {
+                                            pages.Add(i);
+                                        }
+                                    }
+                                }
+
+                                var lastPage = 0;
+                                foreach (var pageNumber in pages)
+                                {
+                                    if (pageNumber - lastPage > 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+
+                                    <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                                        <a class="page-link" href="?pageNumber=@pageNumber&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">@pageNumber</a>
+                                    </li>
+
+                                    lastPage = pageNumber;
+                                }
                             }
                             <li class="page-item @(Model.HasNext ? "" : "disabled")">
                                 <a class="page-link" href="?pageNumber=@(Model.PageNumber+1)&pageSize=@Model.PageSize&searchTerm=@Model.SearchTerm">Sau</a>

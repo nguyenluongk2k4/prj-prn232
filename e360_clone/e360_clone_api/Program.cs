@@ -3,10 +3,12 @@ using e360_clone.DataAccess;
 using e360_clone.Repositories;
 using e360_clone_api.Services;
 using e360_clone.DataAccess.DAOs;
+using e360_clone.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
 
 namespace e360_clone
 {
@@ -18,8 +20,38 @@ namespace e360_clone
 
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(kvp => kvp.Value?.Errors.Count > 0)
+                        .Select(kvp => new
+                        {
+                            Field = kvp.Key,
+                            Messages = kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                        })
+                        .ToList();
+
+                    var message = errors.Count == 0
+                        ? "Dữ liệu không hợp lệ."
+                        : $"Dữ liệu không hợp lệ: {errors[0].Field} - {errors[0].Messages.FirstOrDefault()}";
+
+                    return new BadRequestObjectResult(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = message,
+                        Data = errors
+                    });
+                };
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Logging.AddSimpleConsole(options =>
+            {
+                options.TimestampFormat = "HH:mm:ss ";
+                options.IncludeScopes = true;
+            });
 
             // Add DbContext with PostgreSQL
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -49,6 +81,8 @@ namespace e360_clone
             builder.Services.AddScoped<IExamRepository, ExamRepository>();
             builder.Services.AddScoped<ExamRoomDAO>();
             builder.Services.AddScoped<IExamRoomRepository, ExamRoomRepository>();
+            builder.Services.AddScoped<ExamRoomAllocationDAO>();
+            builder.Services.AddScoped<IExamRoomAllocationRepository, ExamRoomAllocationRepository>();
             builder.Services.AddScoped<LecturerDAO>();
             builder.Services.AddScoped<ILecturerRepository, LecturerRepository>();
             builder.Services.AddScoped<AttendanceDAO>();
@@ -60,6 +94,11 @@ namespace e360_clone
             builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+            builder.Services.Configure<CronJobSettings>(builder.Configuration.GetSection("CronJobSettings"));
+            builder.Services.AddHostedService<ExamCronJobService>();
+            builder.Services.Configure<ExamNotificationSettings>(builder.Configuration.GetSection("ExamNotificationSettings"));
+            builder.Services.AddSingleton<IExamNotificationQueue, ExamNotificationQueue>();
+            builder.Services.AddHostedService<ExamNotificationWorker>();
 
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");

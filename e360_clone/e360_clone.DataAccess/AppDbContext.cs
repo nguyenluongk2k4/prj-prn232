@@ -19,6 +19,7 @@ namespace e360_clone.DataAccess
         public DbSet<Major> Majors { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Term> Terms { get; set; }
         
         // New entities for Student Management & Exam Scheduling
         public DbSet<StudentSubject> StudentSubjects { get; set; }

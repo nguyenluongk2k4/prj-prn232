@@ -33,6 +33,12 @@ namespace e360_clone.Repositories
             return entity;
         }
 
+        public async Task AddRangeAsync(IEnumerable<Exam> exams)
+        {
+            await _dao.AddRangeAsync(exams);
+            await _dao.SaveChangesAsync();
+        }
+
         public override async Task UpdateAsync(Exam entity)
         {
             _dao.Update(entity);
@@ -117,6 +123,21 @@ namespace e360_clone.Repositories
             DateTime? toDate)
         {
             return _dao.GetStudentScheduleAsync(studentId, email, fromDate, toDate);
+        }
+
+        public Task<List<ClassLookupDto>> GetClassesForSubjectAsync(int subjectId)
+        {
+            return _dao.GetClassesForSubjectAsync(subjectId);
+        }
+
+        public Task<string?> GetSubjectCodeAsync(int subjectId)
+        {
+            return _dao.GetSubjectCodeAsync(subjectId);
+        }
+
+        public Task<int> GetStudentCountForSubjectAsync(int subjectId, int? classId)
+        {
+            return _dao.GetStudentCountForSubjectAsync(subjectId, classId);
         }
     }
 }

@@ -218,6 +218,80 @@ namespace e360_clone.Controllers
             });
         }
 
+        [HttpGet("not-in-class")]
+        public async Task<IActionResult> GetNotInClass([FromQuery] PagedRequest request, [FromQuery] int classId)
+        {
+            if (classId <= 0)
+            {
+                return BadRequest(new ApiResponse<List<StudentDto>>
+                {
+                    Success = false,
+                    Message = "ClassId không hợp lệ",
+                    Data = new List<StudentDto>()
+                });
+            }
+
+            var term = request.SearchTerm?.Trim();
+            Func<IQueryable<Student>, IOrderedQueryable<Student>> orderBy = q => q.OrderBy(s => s.StudentCode);
+
+            IEnumerable<Student> data;
+            int totalRecords;
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => s.ClassId != classId && (s.FullName.Contains(term) || s.StudentCode.Contains(term)),
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(
+                    s => s.ClassId != classId && (s.FullName.Contains(term) || s.StudentCode.Contains(term)));
+            }
+            else
+            {
+                data = await _studentRepository.GetPagedFilteredAsync(
+                    request.PageNumber,
+                    request.PageSize,
+                    s => s.ClassId != classId,
+                    orderBy);
+                totalRecords = await _studentRepository.CountAsync(s => s.ClassId != classId);
+            }
+
+            var students = data.ToList();
+            var accounts = await _accountRepository.GetByStudentIdsAsync(students.Select(s => s.Id));
+            var avatarMap = accounts
+                .Where(a => a.StudentId.HasValue)
+                .GroupBy(a => a.StudentId!.Value)
+                .ToDictionary(g => g.Key, g => g.First().AvatarUrl);
+
+            var dtoList = students.Select(s => new StudentDto
+            {
+                Id = s.Id,
+                StudentCode = s.StudentCode,
+                FullName = s.FullName,
+                DateOfBirth = s.DateOfBirth,
+                Gender = s.Gender,
+                Email = s.Email,
+                PhoneNumber = s.PhoneNumber,
+                Address = s.Address,
+                ClassId = s.ClassId,
+                Status = s.Status,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+                AvatarUrl = avatarMap.TryGetValue(s.Id, out var avatar) ? avatar : null
+            }).ToList();
+
+            return Ok(new PagedResponse<StudentDto>
+            {
+                Success = true,
+                Message = "Lấy danh sách sinh viên chưa thuộc lớp thành công",
+                Data = dtoList,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalRecords = totalRecords
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Student student)
         {

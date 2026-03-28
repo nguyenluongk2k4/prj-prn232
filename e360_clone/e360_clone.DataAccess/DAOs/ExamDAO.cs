@@ -1,4 +1,4 @@
-using e360_clone.BusinessObjects;
+﻿using e360_clone.BusinessObjects;
 using e360_clone.BusinessObjects.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +8,70 @@ namespace e360_clone.DataAccess.DAOs
     {
         public ExamDAO(AppDbContext context) : base(context)
         {
+        }
+
+        public async Task AddRangeAsync(IEnumerable<Exam> exams)
+        {
+            await _context.Exams.AddRangeAsync(exams);
+        }
+
+        public async Task<string?> GetSubjectCodeAsync(int subjectId)
+        {
+            return await _context.Subjects
+                .Where(s => s.Id == subjectId)
+                .Select(s => s.SubjectCode)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<ClassLookupDto>> GetClassesForSubjectAsync(int subjectId)
+        {
+            var currentTermId = await _context.Terms
+                .Where(t => t.IsCurrent)
+                .Select(t => t.Id)
+                .FirstOrDefaultAsync();
+
+            var classIds = await _context.StudentSubjects
+                .Where(s => s.SubjectId == subjectId)
+                .Where(s => s.Status == "Enrolled")
+                .Where(s => s.ClassId.HasValue)
+                .Where(s => currentTermId == 0 || s.TermId == currentTermId)
+                .Select(s => s.ClassId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            return await _context.Classes
+                .Where(c => classIds.Contains(c.Id))
+                .OrderBy(c => c.ClassCode)
+                .Select(c => new ClassLookupDto
+                {
+                    Id = c.Id,
+                    Code = c.ClassCode
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> GetStudentCountForSubjectAsync(int subjectId, int? classId)
+        {
+            var currentTermId = await _context.Terms
+                .Where(t => t.IsCurrent)
+                .Select(t => t.Id)
+                .FirstOrDefaultAsync();
+
+            var query = _context.StudentSubjects
+                .Where(s => s.SubjectId == subjectId)
+                .Where(s => s.Status == "Enrolled");
+
+            if (classId.HasValue && classId.Value > 0)
+            {
+                query = query.Where(s => s.ClassId == classId.Value);
+            }
+
+            if (currentTermId > 0)
+            {
+                query = query.Where(s => s.TermId == currentTermId);
+            }
+
+            return await query.Select(s => s.StudentId).Distinct().CountAsync();
         }
 
         public async Task<(List<Exam> Items, int TotalRecords)> GetPagedFilteredWithMetaAsync(
@@ -40,7 +104,7 @@ namespace e360_clone.DataAccess.DAOs
 
             var totalRecords = await query.CountAsync();
             var items = await query
-                .OrderBy(x => x.ExamDate)
+                .OrderByDescending(x => x.ExamDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

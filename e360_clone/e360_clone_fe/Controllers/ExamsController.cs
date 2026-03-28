@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using e360_clone_fe.Services;
 using e360_clone_fe.Models.ViewModels;
 
@@ -91,12 +91,62 @@ namespace e360_clone_fe.Controllers
             return View(response.Data);
         }
 
+        public async Task<IActionResult> Allocations(int id)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var response = await _apiService.GetAsync<ExamAllocationSummaryViewModel>($"{ApiEndpoint}/{id}/allocations");
+            if (!response.Success || response.Data == null)
+            {
+                TempData["ErrorMessage"] = response.Message ?? "Không thể tải danh sách sinh viên.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            ViewBag.PreselectedRoomIds = TempData.Peek("PreselectedRoomIds") as string ?? string.Empty;
+            return View(response.Data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AutoAllocate(int id, List<int> roomIds)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var request = new ExamAllocationAutoRequestViewModel
+            {
+                RoomIds = roomIds
+            };
+
+            var response = await _apiService.PostAsync<ExamAllocationSummaryViewModel>($"{ApiEndpoint}/{id}/allocations/auto", request);
+            TempData[response.Success ? "SuccessMessage" : "ErrorMessage"] =
+                response.Success ? response.Message : response.Message;
+
+            return RedirectToAction(nameof(Allocations), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveAllocations(int id, ExamAllocationSaveRequestViewModel model)
+        {
+            var authResult = RequireAuth();
+            if (authResult != null) return authResult;
+
+            var response = await _apiService.PostAsync<ExamAllocationSummaryViewModel>($"{ApiEndpoint}/{id}/allocations/manual", model);
+            TempData[response.Success ? "SuccessMessage" : "ErrorMessage"] =
+                response.Success ? response.Message : response.Message;
+
+            return RedirectToAction(nameof(Allocations), new { id });
+        }
+
         public async Task<IActionResult> Create()
         {
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
 
             var form = await BuildExamFormAsync();
+            form.ApplyAllClasses = true;
             return View(form);
         }
 
@@ -107,15 +157,34 @@ namespace e360_clone_fe.Controllers
             var authResult = RequireAuth();
             if (authResult != null) return authResult;
 
-            var response = await _apiService.PostAsync<ExamViewModel>(ApiEndpoint, model.Exam);
+            var request = new ExamCreateRequestViewModel
+            {
+                Exam = model.Exam,
+                RoomIds = model.SelectedRoomIds,
+                ApplyAllClasses = model.ApplyAllClasses
+            };
+
+            var response = await _apiService.PostAsync<ExamViewModel>(ApiEndpoint, request);
             if (response.Success)
             {
-                TempData["SuccessMessage"] = "Thêm kỳ thi thành công";
+                TempData["SuccessMessage"] = response.Message ?? "Thêm kỳ thi thành công";
+                if (response.Data != null)
+                {
+                    if (model.SelectedRoomIds != null && model.SelectedRoomIds.Count > 0)
+                    {
+                        TempData["PreselectedRoomIds"] = string.Join(",", model.SelectedRoomIds);
+                    }
+                    return RedirectToAction(nameof(Allocations), new { id = response.Data.Id });
+                }
                 return RedirectToAction(nameof(Index));
             }
 
-            TempData["ErrorMessage"] = response.Message;
+            TempData["ErrorMessage"] = string.IsNullOrWhiteSpace(response.Message)
+                ? "Tạo kỳ thi thất bại. Vui lòng kiểm tra dữ liệu."
+                : response.Message;
             var reload = await BuildExamFormAsync(model.Exam);
+            reload.ApplyAllClasses = model.ApplyAllClasses;
+            reload.SelectedRoomIds = model.SelectedRoomIds;
             return View(reload);
         }
 
@@ -149,7 +218,9 @@ namespace e360_clone_fe.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            TempData["ErrorMessage"] = response.Message;
+            TempData["ErrorMessage"] = string.IsNullOrWhiteSpace(response.Message)
+                ? "Cập nhật kỳ thi thất bại. Vui lòng kiểm tra dữ liệu."
+                : response.Message;
             var reload = await BuildExamFormAsync(model.Exam);
             return View(reload);
         }

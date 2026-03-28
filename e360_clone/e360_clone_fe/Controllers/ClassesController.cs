@@ -94,16 +94,26 @@ namespace e360_clone_fe.Controllers
 
             var majors = await _apiService.GetAsync<List<MajorViewModel>>("majors",
                 new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "1000" } });
+            var students = await _apiService.GetAsync<List<StudentViewModel>>("students",
+                new Dictionary<string, string> { { "pageNumber", "1" }, { "pageSize", "1000" }, { "classId", id.ToString() } });
+            var majorName = string.Empty;
             if (majors.Success && majors.Data != null)
             {
                 var major = majors.Data.FirstOrDefault(m => m.Id == response.Data.MajorId);
                 if (major != null)
                 {
-                    ViewBag.MajorName = $"{major.MajorCode} - {major.MajorName}";
+                    majorName = $"{major.MajorCode} - {major.MajorName}";
                 }
             }
 
-            return View(response.Data);
+            var viewModel = new ClassDetailsViewModel
+            {
+                Class = response.Data,
+                MajorName = majorName,
+                Students = students.Success && students.Data != null ? students.Data : new List<StudentViewModel>()
+            };
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Create()

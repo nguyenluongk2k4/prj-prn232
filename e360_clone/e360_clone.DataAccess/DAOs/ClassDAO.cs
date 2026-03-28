@@ -51,8 +51,15 @@ namespace e360_clone.DataAccess.DAOs
 
             if (subjectId.HasValue)
             {
+                var currentTermId = await _context.Terms
+                    .Where(t => t.IsCurrent)
+                    .Select(t => t.Id)
+                    .FirstOrDefaultAsync();
+
                 var classIds = await _context.StudentSubjects
                     .Where(x => x.SubjectId == subjectId.Value && x.ClassId.HasValue)
+                    .Where(x => x.Status == "Enrolled")
+                    .Where(x => currentTermId == 0 || x.TermId == currentTermId)
                     .Select(x => x.ClassId!.Value)
                     .Distinct()
                     .ToListAsync();

@@ -102,5 +102,21 @@ namespace e360_clone.Repositories
         {
             return await _dao.GetByStudentIdAsync(studentId);
         }
+
+        public async Task<int> AddStudentsToSubjectAsync(int subjectId, int classId, List<int> studentIds)
+        {
+            var added = await _dao.AddStudentsToSubjectAsync(subjectId, classId, studentIds);
+            if (added == 0)
+            {
+                return 0;
+            }
+            await _dao.SaveChangesAsync();
+            return added;
+        }
+
+        public Task<string> DiagnoseAddStudentsAsync(int subjectId, int classId, List<int> studentIds)
+        {
+            return _dao.DiagnoseAddStudentsAsync(subjectId, classId, studentIds);
+        }
     }
 }

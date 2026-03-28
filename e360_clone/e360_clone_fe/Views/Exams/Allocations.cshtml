@@ -1,0 +1,168 @@
+@model e360_clone_fe.Models.ViewModels.ExamAllocationSummaryViewModel
+@{
+    ViewData["Title"] = "Xếp sinh viên";
+    var allocationMap = Model.Allocations.ToDictionary(a => a.StudentId, a => a);
+    var preselectedRaw = ViewBag.PreselectedRoomIds as string ?? string.Empty;
+    var preselectedSet = new HashSet<int>(
+        preselectedRaw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(x => int.TryParse(x, out var id) ? id : 0)
+            .Where(id => id > 0)
+    );
+    var allocationRoomSet = new HashSet<int>(Model.Allocations.Select(a => a.RoomId));
+    var allowedRoomSet = preselectedSet.Count > 0 ? preselectedSet : allocationRoomSet;
+    var selectedRoomSet = new HashSet<int>(allowedRoomSet);
+    var allowedRooms = Model.Rooms.Where(r => allowedRoomSet.Contains(r.RoomId)).ToList();
+}
+
+<div class="main-content__wrapper">
+    <div class="breadcrumb-area py-20 px-24 bg-neutral-50">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl fw-bold mb-2 text-primary-light">Xếp sinh viên vào ca thi</h1>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a asp-action="Index">Kỳ thi</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Xếp sinh viên</li>
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a asp-action="Details" asp-route-id="@Model.ExamId" class="btn btn-outline-secondary">
+                    <i class="ri-arrow-left-line"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-area p-24">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success mb-16" role="alert">
+                <i class="ri-check-line"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger mb-16" role="alert">
+                <i class="ri-error-warning-line"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="card mb-16">
+            <div class="card-body p-24">
+                <div class="d-flex flex-wrap gap-16">
+                    <div><strong>Sinh viên đang học:</strong> @Model.StudentCount</div>
+                    <div><strong>Đã xếp:</strong> @Model.AllocatedCount</div>
+                    <div><strong>Sức chứa đã chọn:</strong> <span id="selectedCapacity">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        @if (allowedRooms.Count == 0)
+        {
+            <div class="alert alert-warning mb-24" role="alert">
+                Chưa có phòng được chọn cho kỳ thi này. Vui lòng quay lại bước tạo kỳ thi và chọn phòng.
+            </div>
+        }
+        else
+        {
+            <div class="card mb-24">
+                <div class="card-body p-24">
+                    <h4 class="mb-16">Tự động xếp phòng</h4>
+                    <form asp-action="AutoAllocate" asp-route-id="@Model.ExamId" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-2">
+                            @foreach (var room in allowedRooms)
+                            {
+                                <div class="col-sm-6 col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input room-checkbox" type="checkbox" name="roomIds" value="@room.RoomId" data-capacity="@room.Capacity" id="room_auto_@room.RoomId" @(selectedRoomSet.Contains(room.RoomId) ? "checked" : "")>
+                                        <label class="form-check-label" for="room_auto_@room.RoomId">
+                                            @room.RoomCode - @room.RoomName (Sức chứa: @room.Capacity)
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-16">
+                            <button type="submit" class="btn btn-primary-600">Tự động xếp</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-24">
+                    <h4 class="mb-16">Xếp thủ công</h4>
+                    <form asp-action="SaveAllocations" asp-route-id="@Model.ExamId" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Mã SV</th>
+                                        <th>Họ tên</th>
+                                        <th>Lớp</th>
+                                        <th>Phòng</th>
+                                        <th>Ghế</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (var i = 0; i < Model.Students.Count; i++)
+                                    {
+                                        var student = Model.Students[i];
+                                        allocationMap.TryGetValue(student.StudentId, out var alloc);
+                                        <tr>
+                                            <td>@student.StudentCode</td>
+                                            <td>@student.FullName</td>
+                                            <td>@student.ClassCode</td>
+                                            <td>
+                                                <input type="hidden" name="Allocations[@i].StudentId" value="@student.StudentId" />
+                                                <select class="form-control form-select" name="Allocations[@i].RoomId">
+                                                    <option value="">Chọn phòng</option>
+                                                    @foreach (var room in allowedRooms)
+                                                    {
+                                                        <option value="@room.RoomId" selected="@(alloc != null && alloc.RoomId == room.RoomId)">
+                                                            @room.RoomCode - @room.RoomName
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="number" name="Allocations[@i].SeatNumber" value="@(alloc?.SeatNumber ?? 0)" min="0" />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary">Lưu danh sách</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const capacityEl = document.getElementById('selectedCapacity');
+            const checkboxes = document.querySelectorAll('.room-checkbox');
+
+            function updateCapacity() {
+                let total = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        total += Number(cb.dataset.capacity || 0);
+                    }
+                });
+                capacityEl.textContent = total.toString();
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateCapacity));
+            updateCapacity();
+        })();
+    </script>
+}

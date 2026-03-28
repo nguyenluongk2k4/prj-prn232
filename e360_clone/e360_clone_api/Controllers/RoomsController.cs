@@ -7,10 +7,12 @@ namespace e360_clone.Controllers
     public class RoomsController : BaseApiController
     {
         private readonly IExamRoomRepository _repository;
+        private readonly ILogger<RoomsController> _logger;
 
-        public RoomsController(IExamRoomRepository repository)
+        public RoomsController(IExamRoomRepository repository, ILogger<RoomsController> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -60,8 +62,26 @@ namespace e360_clone.Controllers
             [FromQuery] TimeSpan endTime,
             [FromQuery] int? excludeExamId)
         {
-            var available = await _repository.GetAvailableRoomsAsync(examDate, startTime, endTime, excludeExamId);
-            return HandleResult(available, "Lấy danh sách phòng trống thành công");
+            if (examDate == default)
+            {
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "Ngày thi không hợp lệ" });
+            }
+
+            if (startTime >= endTime)
+            {
+                return BadRequest(new ApiResponse<object> { Success = false, Message = "Giờ bắt đầu phải nhỏ hơn giờ kết thúc" });
+            }
+
+            try
+            {
+                var available = await _repository.GetAvailableRoomsAsync(examDate, startTime, endTime, excludeExamId);
+                return HandleResult(available, "Lấy danh sách phòng trống thành công");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetAvailableRooms failed. examDate={ExamDate} start={Start} end={End} excludeExamId={ExcludeExamId}", examDate, startTime, endTime, excludeExamId);
+                return HandleError($"Không lấy được danh sách phòng trống: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}")]

@@ -43,8 +43,8 @@
                         <div class="col-sm-6">
                             <label asp-for="Exam.ExamType" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
                             <select asp-for="Exam.ExamType" class="form-control form-select">
-                                <option value="ClassExam">Class Exam</option>
-                                <option value="GraduationExam">Graduation Exam</option>
+                                <option value="Practical">Practical Exam</option>
+                                <option value="Final">Final Exam</option>
                             </select>
                         </div>
                         <div class="col-sm-6">
@@ -84,14 +84,6 @@
                         <div class="col-sm-3">
                             <label asp-for="Exam.Duration" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
                             <input asp-for="Exam.Duration" type="number" class="form-control" />
-                        </div>
-                        <div class="col-sm-3">
-                            <label asp-for="Exam.Semester" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
-                            <input asp-for="Exam.Semester" class="form-control" />
-                        </div>
-                        <div class="col-sm-6">
-                            <label asp-for="Exam.AcademicYear" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
-                            <input asp-for="Exam.AcademicYear" class="form-control" placeholder="2024-2025" />
                         </div>
                         <div class="col-sm-6">
                             <label asp-for="Exam.Status" class="text-sm fw-semibold text-primary-light d-inline-block mb-8"></label>
@@ -164,6 +156,10 @@
                 const start = startTimeInput.value;
                 const end = endTimeInput.value;
                 if (!date || !start || !end) {
+                    resetSelect(roomSelect, 'Chọn phòng');
+                    return;
+                }
+                if (start >= end) {
                     resetSelect(roomSelect, 'Chọn phòng');
                     return;
                 }

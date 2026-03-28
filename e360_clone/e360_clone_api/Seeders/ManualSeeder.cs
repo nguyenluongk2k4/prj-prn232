@@ -23,6 +23,7 @@ namespace e360_clone.Seeders
             await SeedLecturerAccountsAsync(context);
             await SeedStudentsAsync(context);
             await SeedStudentAccountsAsync(context);
+            await SeedTermsAsync(context);
             await SeedStudentSubjectsAsync(context);
             await SeedTeachingAssignmentsAsync(context);
             await SeedExamSchedulesAsync(context);
@@ -372,6 +373,17 @@ namespace e360_clone.Seeders
                 return;
             }
 
+            var currentTermId = await context.Terms
+                .Where(t => t.IsCurrent)
+                .Select(t => t.Id)
+                .FirstOrDefaultAsync();
+
+            if (currentTermId == 0)
+            {
+                Console.WriteLine("No current term found. Skip student-subject seeding.");
+                return;
+            }
+
             var subjectMap = subjects.ToDictionary(s => s.SubjectCode, s => s.Id);
             var subjectCodeById = subjects.ToDictionary(s => s.Id, s => s.SubjectCode);
             var majorCodeMap = await context.Majors.AsNoTracking()
@@ -437,6 +449,13 @@ namespace e360_clone.Seeders
                     enrollment.UpdatedAt = DateTime.UtcNow;
                     updatedExisting++;
                 }
+
+                if (enrollment.TermId == 0)
+                {
+                    enrollment.TermId = currentTermId;
+                    enrollment.UpdatedAt = DateTime.UtcNow;
+                    updatedExisting++;
+                }
             }
 
             var semesterDefault = 1;
@@ -480,6 +499,7 @@ namespace e360_clone.Seeders
                             ClassId = classIdForSubject,
                             AcademicYear = academicYear,
                             Semester = semester,
+                            TermId = currentTermId,
                             Status = "Enrolled",
                             TotalSessions = 0,
                             PresentSessions = 0,
@@ -513,6 +533,45 @@ namespace e360_clone.Seeders
             {
                 Console.WriteLine("No new student-subject enrollments to seed.");
             }
+        }
+
+        private static async Task SeedTermsAsync(AppDbContext context)
+        {
+            var termCode = "SPRING-2026";
+            var termName = "Spring 2026";
+            var startDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var endDate = new DateTime(2026, 5, 31, 23, 59, 59, DateTimeKind.Utc);
+
+            var existing = await context.Terms.FirstOrDefaultAsync(t => t.Code == termCode);
+            if (existing == null)
+            {
+                existing = new Term
+                {
+                    Code = termCode,
+                    Name = termName,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    IsCurrent = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await context.Terms.AddAsync(existing);
+            }
+            else
+            {
+                existing.Name = termName;
+                existing.StartDate = startDate;
+                existing.EndDate = endDate;
+                existing.IsCurrent = true;
+            }
+
+            var others = await context.Terms.Where(t => t.Id != existing.Id && t.IsCurrent).ToListAsync();
+            foreach (var term in others)
+            {
+                term.IsCurrent = false;
+            }
+
+            await context.SaveChangesAsync();
         }
 
         private static async Task SeedTeachingAssignmentsAsync(AppDbContext context)

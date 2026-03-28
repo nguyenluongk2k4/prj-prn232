@@ -11,7 +11,7 @@ namespace e360_clone.DataAccess.Configurations
             builder.HasKey(ss => ss.Id);
 
             // Indexes
-            builder.HasIndex(ss => new { ss.StudentId, ss.SubjectId, ss.Semester });
+            builder.HasIndex(ss => new { ss.StudentId, ss.SubjectId, ss.TermId });
             builder.HasIndex(ss => ss.StudentId);
             builder.HasIndex(ss => ss.SubjectId);
 
@@ -30,6 +30,11 @@ namespace e360_clone.DataAccess.Configurations
                 .WithMany()
                 .HasForeignKey(ss => ss.ClassId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(ss => ss.Term)
+                .WithMany()
+                .HasForeignKey(ss => ss.TermId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // HasMany for attendances (through StudentSubject -> StudentAttendances)
             // Note: Attendances are linked through CourseSession, not directly

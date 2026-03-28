@@ -1,0 +1,245 @@
+@{
+    Layout = "_LayoutAuth";
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-lg-flex bg-white">
+    <div class="w-50 d-lg-flex d-none overflow-hidden position-relative">
+        <img src="~/assets/images/login-bg.webp" alt="Login Background" class="w-100 h-100 object-fit-cover">
+        <div class="position-absolute bottom-0 start-0 w-100 p-40 bg-gradient-to-t from-black-50">
+            <div class="text-white">
+                <h2 class="text-3xl fw-bold mb-2">E360 Clone</h2>
+                <p class="mb-0 opacity-75">Nền tảng quản lý lịch thi và coi thi</p>
+            </div>
+        </div>
+    </div>
+    <div class="lg-w-50 px-24 py-32 d-flex justify-content-center align-items-center">
+        <div class="max-w-540-px mx-auto">
+            <a href="/" class="d-block mb-4">
+                <img src="~/assets/images/logo-ic.png" alt="Logo" class="w-200-px">
+            </a>
+            <div class="mt-32 mb-32">
+                <h1 class="h6 fw-bold text-primary-light mb-8">
+                    Welcome Back 👋
+                </h1>
+                <p class="text-sm text-secondary-light mb-0">
+                    Log in to your account to continue
+                </p>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="ri-error-warning-line me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="ri-checkbox-circle-line me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-controller="Auth" asp-action="Login" method="post" class="d-flex flex-column gap-32">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ReturnUrl" value="@Context.Request.Query["ReturnUrl"]" />
+
+                <div class="d-flex flex-column gap-16">
+                    <div>
+                        <label for="email" class="text-sm fw-semibold text-primary-light d-inline-block mb-8">
+                            Email Address
+                            <span class="text-danger-600">*</span>
+                        </label>
+                        <input type="email" id="email" name="Email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div>
+                        <label for="password" class="text-sm fw-semibold text-primary-light d-inline-block mb-8">
+                            Password
+                            <span class="text-danger-600">*</span>
+                        </label>
+                        <div class="position-relative">
+                            <input type="password" id="password" name="Password" class="form-control" placeholder="Enter your password" required>
+                            <button type="button"
+                                class="toggle-password btn p-0 border-0 bg-transparent position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light ri-eye-line"
+                                data-toggle="#password" aria-label="Toggle password visibility">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="form-check style-check d-flex align-items-center">
+                        <input class="form-check-input border border-neutral-400" type="checkbox" name="RememberMe" value="true" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="javascript:void(0)" class="text-primary-600 fw-medium text-decoration-underline">Forgot Password?</a>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary-600 text-sm btn-sm px-12 py-16 w-100 radius-8">
+                        Log In
+                    </button>
+                </div>
+
+                <div class="text-center text-sm text-secondary-light">
+                    or login as
+                </div>
+
+                <div class="d-grid sm-grid-cols-3 grid-cols-2 gap-16">
+                    <a href="/Auth/QuickLogin?role=SuperAdmin"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-success text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/sheild-icon.png" alt="Icon"></span>
+                        <span>Super Admin</span>
+                    </a>
+                    <a href="/Auth/QuickLogin?role=Admin"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-info-600 text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/dashboard-icon.png" alt="Icon"></span>
+                        <span>Admin</span>
+                    </a>
+                    <a href="/Auth/QuickLogin?role=Student"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-warning-600 text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/student-icon.png" alt="Icon"></span>
+                        <span>Student</span>
+                    </a>
+                    <a href="/Auth/QuickLogin?role=Teacher"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-purple-600 text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/teacher-icon.png" alt="Icon"></span>
+                        <span>Teacher</span>
+                    </a>
+                    <a href="/Auth/QuickLogin?role=Parent"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-primary-600 text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/guardian-icon.png" alt="Icon"></span>
+                        <span>Guardians</span>
+                    </a>
+                    <a href="/Auth/QuickLogin?role=Librarian"
+                        class="d-flex align-items-center gap-8 fw-semibold text-sm radius-6 justify-content-center flex-grow-1 bg-pink text-white py-10 px-8">
+                        <span class="d-flex"><img src="~/assets/images/icons/library-icon.png" alt="Icon"></span>
+                        <span>Librarian</span>
+                    </a>
+                </div>
+            </form>
+
+            <div class="mt-32 text-center text-sm">
+                Don't have an account?
+                <a href="javascript:void(0)" class="text-primary-600 fw-semibold text-decoration-underline">
+                    Create an account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = document.querySelector(this.dataset.toggle);
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.classList.toggle('ri-eye-line');
+            this.classList.toggle('ri-eye-off-line');
+        });
+    });
+
+    // Show/hide error alert
+    function showError(message) {
+        const alertEl = document.getElementById('errorAlert');
+        const msg = document.getElementById('errorMessage');
+        if (!alertEl || !msg) return;
+        msg.textContent = message;
+        alertEl.classList.remove('d-none');
+        setTimeout(() => alertEl.classList.add('d-none'), 5000);
+    }
+
+    // Set button loading state
+    function setLoginLoading(loading) {
+        const btn = document.getElementById('loginBtn');
+        const btnText = btn.querySelector('.btn-text');
+        const btnLoading = btn.querySelector('.btn-loading');
+        
+        if (loading) {
+            btn.disabled = true;
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        } else {
+            btn.disabled = false;
+            btnText.classList.remove('d-none');
+            btnLoading.classList.add('d-none');
+        }
+    }
+
+    // Handle form submit
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        setLoginLoading(true);
+
+        try {
+            const response = await AuthApi.login(email, password);
+            
+            if (response.success) {
+                // Save token and user info using Auth core
+                Auth.setAuth(response.data.token, {
+                    username: response.data.username,
+                    email: response.data.email,
+                    fullName: response.data.fullName,
+                    role: response.data.role,
+                    avatarUrl: response.data.avatarUrl
+                });
+
+                // Redirect based on role
+                Auth.redirectByRole();
+            } else {
+                showError(response.message || 'Login failed');
+            }
+        } catch (error) {
+            showError(error.message || 'Login failed. Please try again.');
+        } finally {
+            setLoginLoading(false);
+        }
+    });
+
+    // Handle quick login
+    document.querySelectorAll('.quick-login-btn').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const role = this.dataset.role;
+            
+            try {
+                const response = await AuthApi.quickLogin(role);
+                
+                if (response.success) {
+                    // Save token and user info
+                    Auth.setAuth(response.data.token, {
+                        username: response.data.username,
+                        email: response.data.email,
+                        fullName: response.data.fullName,
+                        role: response.data.role,
+                        avatarUrl: response.data.avatarUrl
+                    });
+
+                    // Redirect based on role
+                    Auth.redirectByRole();
+                }
+            } catch (error) {
+                showError(error.message || 'Quick login failed');
+            }
+        });
+    });
+
+    // Check if already logged in
+    if (Auth.isAuthenticated()) {
+        Auth.redirectByRole();
+    }
+</script>
+}

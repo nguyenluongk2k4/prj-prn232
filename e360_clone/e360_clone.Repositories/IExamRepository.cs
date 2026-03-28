@@ -13,5 +13,9 @@ namespace e360_clone.Repositories
             DateTime? fromDate,
             DateTime? toDate);
         Task<List<StudentExamScheduleDto>> GetStudentScheduleAsync(int studentId, string? email, DateTime? fromDate, DateTime? toDate);
+        Task AddRangeAsync(IEnumerable<Exam> exams);
+        Task<List<ClassLookupDto>> GetClassesForSubjectAsync(int subjectId);
+        Task<string?> GetSubjectCodeAsync(int subjectId);
+        Task<int> GetStudentCountForSubjectAsync(int subjectId, int? classId);
     }
 }

@@ -16,7 +16,7 @@ namespace e360_clone.BusinessObjects
         public string AcademicYear { get; set; } = string.Empty;
         public string Semester { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;     // Planned, InProgress, Completed, Cancelled
-        public string Notes { get; set; } = string.Empty;
+        public string? Notes { get; set; }
         public int CreatedBy { get; set; }                     // AccountId của admin tạo lịch
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace e360_clone_fe.Models.ViewModels
 {
@@ -16,7 +16,7 @@ namespace e360_clone_fe.Models.ViewModels
 
         [Display(Name = "Loại kỳ thi")]
         [StringLength(50)]
-        public string ExamType { get; set; } = "ClassExam";
+        public string ExamType { get; set; } = "Final";
 
         public int SubjectId { get; set; }
         public int ClassId { get; set; }
@@ -70,5 +70,14 @@ namespace e360_clone_fe.Models.ViewModels
         public List<SubjectViewModel> Subjects { get; set; } = new();
         public List<ClassViewModel> Classes { get; set; } = new();
         public List<ExamRoomViewModel> Rooms { get; set; } = new();
+        public List<int> SelectedRoomIds { get; set; } = new();
+        public bool ApplyAllClasses { get; set; } = true;
+    }
+
+    public class ExamCreateRequestViewModel
+    {
+        public ExamViewModel Exam { get; set; } = new ExamViewModel();
+        public List<int> RoomIds { get; set; } = new();
+        public bool ApplyAllClasses { get; set; }
     }
 }
